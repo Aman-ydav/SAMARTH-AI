@@ -1,13 +1,27 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [status, setStatus] = useState('Checking...')
+
+  useEffect(() => {
+    fetch(`${apiUrl}/api/health`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Backend unavailable')
+        }
+        return response.json()
+      })
+      .then((data) => setStatus(data.message))
+      .catch(() => setStatus('Unavailable'))
+  }, [])
 
   return (
-    <>
-      <h1>Welcome to the App</h1>
-    </>
+    <main>
+      <h1>Samarth AI</h1>
+      <p>Backend status: {status}</p>
+    </main>
   )
 }
 
