@@ -1,13 +1,57 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-     <link href="/src/index.css" rel="stylesheet">
-    <title>frontend</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SAMARTH AI</title>
+        <meta
+            name="description"
+            content="Prototype platform that maps officials' skills to role needs, finds gaps and recommends training for India's Official Statistical System. Not a government site."
+        />
+        <meta name="color-scheme" content="light dark" />
+        <meta
+            name="theme-color"
+            content="#fcfaf8"
+            media="(prefers-color-scheme: light)"
+        />
+        <meta
+            name="theme-color"
+            content="#13100d"
+            media="(prefers-color-scheme: dark)"
+        />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <script>
+            /* UI-15: set the theme class before first paint. Reads only the non-sensitive sai-theme key. */
+            (function () {
+                try {
+                    var saved = window.localStorage.getItem("sai-theme");
+                    var prefersDark = window.matchMedia(
+                        "(prefers-color-scheme: dark)"
+                    ).matches;
+                    if (
+                        saved === "dark" ||
+                        ((saved === null || saved === "system") && prefersDark)
+                    ) {
+                        document.documentElement.classList.add("dark");
+                    }
+                } catch (error) {
+                    /* storage blocked: fall back to the system preference handled by CSS color-scheme */
+                }
+            })();
+        </script>
+    </head>
+    <body>
+        <noscript>
+            <p>
+                SAMARTH AI needs JavaScript. Please turn on JavaScript in your
+                browser and reload this page.
+            </p>
+            <p lang="hi">
+                SAMARTH AI चलाने के लिए कृपया अपने ब्राउज़र में जावास्क्रिप्ट
+                चालू करें और पेज फिर से लोड करें।
+            </p>
+        </noscript>
+        <div id="root"></div>
+        <script type="module" src="/src/main.jsx"></script>
+    </body>
 </html>

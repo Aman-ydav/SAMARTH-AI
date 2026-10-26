@@ -3,3 +3,7 @@
 /node_modules
 /.vscode
 /.dist
+/coverage
+/postman/results
+package.json
+package-lock.json

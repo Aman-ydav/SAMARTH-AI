@@ -1,16 +1,37 @@
-# React + Vite
+# SAMARTH AI - frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 19 + Vite 8 single-page app for SAMARTH AI (Smart Competency Intelligence for Official Statistics). It is a prototype for SIH26101, not an official Government of India website.
 
-Currently, two official plugins are available:
+Stack: Tailwind CSS v4 (tokens in `src/index.css`), shadcn/ui (`src/components/ui`), Redux Toolkit + axios, React Router, react-hook-form + zod, react-i18next (en, hi), `motion` + `lenis` on marketing pages. Icons are filled react-icons exported from `src/components/icons/index.js` only.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The rules for this code live outside the repo in `../docs/rules/` (start with `00-index.md`); `../CLAUDE.md` is the short version.
 
-## React Compiler
+## Run
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+cp .env.sample .env      # local values only, never commit .env
+npm run dev              # http://localhost:5173, /api is proxied to http://localhost:8000
+```
 
-## Expanding the ESLint configuration
+## Scripts
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Script                      | What it does                                       |
+| --------------------------- | -------------------------------------------------- |
+| `npm run dev`               | Vite dev server with the `/api` proxy              |
+| `npm run build`             | production build into `dist/`                      |
+| `npm run preview`           | serve the production build locally                 |
+| `npm run lint` / `lint:fix` | ESLint (flat config)                               |
+| `npm run format`            | Prettier (same config as the backend)              |
+| `npm test` / `test:watch`   | Vitest, jsdom, Testing Library, vitest-axe         |
+| `npm run test:coverage`     | Vitest with v8 coverage and the rule 08 thresholds |
+
+From the repo root, `npm run rules:check` runs the rulebook checker.
+
+## Environment
+
+Only public `VITE_*` values exist (see `.env.sample`). Production leaves `VITE_API_URL` unset, so the app calls the relative `/api/v1` and `vercel.json` rewrites `/api/*` to the Render API, which keeps cookies first-party.
+
+## Design system in one paragraph
+
+Colours exist only in `src/index.css` (transcribed from `docs/rules/assets/palette.json`; primary `#D97757`). Components use semantic tokens (`bg-primary`, `text-muted-foreground`). The look is flat: no gradients, glow, blur or coloured shadows. New UI parts come from `npx shadcn@latest add <name>`, then are re-themed and their icons moved to the registry (rule 01, UI-21).

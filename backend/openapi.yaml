@@ -1,0 +1,2346 @@
+openapi: 3.1.0
+info:
+    title: SAMARTH AI API
+    version: 1.0.0
+    summary: "Milestone 1: health, auth, profile, media"
+    description: |-
+        Hand-kept contract of the routes registered by the Express app (see docs/08-api-design.md). Every route is also a request in backend/postman/samarthAi.postman_collection.json.
+
+        Success envelope: { statusCode, success: true, message, data, meta? }. Error envelope: { statusCode, success: false, message, code, errors[], data: null, requestId } (+ retryAfterSec on 423/429/503); requestId equals the X-Request-Id response header.
+        Auth transport is cookies only (sai_access, sai_refresh, sai_csrf). Every POST, PUT, PATCH and DELETE needs the X-CSRF-Token header to equal the sai_csrf cookie (double submit), except the signature-verified Cloudinary webhook. No token is ever in a response body.
+        A prototype / capstone product, not an official Government of India website.
+    license:
+        name: ISC
+        identifier: ISC
+servers:
+    - url: /api/v1
+      description: Same-site through the Vercel rewrite in production; http://localhost:8000/api/v1 in development
+tags:
+    - name: Health
+    - name: Auth
+    - name: Profile
+    - name: Media
+security: []
+paths:
+    /health:
+        servers:
+            - url: /
+              description: Outside the API prefix
+        get:
+            tags:
+                - Health
+            operationId: getHealth
+            summary: Process is alive (no dependencies)
+            security: []
+            responses:
+                "200":
+                    description: Alive
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  status:
+                                                      const: ok
+    /ready:
+        servers:
+            - url: /
+              description: Outside the API prefix
+        get:
+            tags:
+                - Health
+            operationId: getReady
+            summary: Database is connected
+            security: []
+            responses:
+                "200":
+                    description: Ready
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  status:
+                                                      const: ready
+                                                  db:
+                                                      type: string
+                                                      examples:
+                                                          - connected
+                "503":
+                    $ref: "#/components/responses/Error503"
+                    description: "Codes: INTEGRATION_ERROR (Retry-After header)."
+    /auth/register:
+        post:
+            tags:
+                - Auth
+            operationId: register
+            summary: Register a learner account
+            description: Always answers 202 with one fixed message for new, existing and pending addresses (no enumeration). The role is always learner. The verification mail is sent after the response.
+            security: []
+            parameters:
+                - &a1
+                  $ref: "#/components/parameters/CsrfToken"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                name:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 100
+                                email: &a2
+                                    type: string
+                                    maxLength: 254
+                                    format: email
+                                    description: Trimmed, NFKC-normalised and lower-cased before every lookup.
+                                password: &a4
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 256
+                                    description: "Policy (server-enforced, PASSWORD_POLICY): at least 10 characters and at most 72 UTF-8 bytes, not on the common-password denylist, must not contain the email name or the display name. Never trimmed or echoed."
+                                acceptTerms:
+                                    const: true
+                            required:
+                                - name
+                                - email
+                                - password
+                                - acceptTerms
+            responses:
+                "202":
+                    description: Neutral message
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 202
+                                          data: &a3
+                                              type: "null"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR, PASSWORD_POLICY, INVALID_JSON."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID, DOMAIN_NOT_ALLOWED (also: CORS_ORIGIN_DENIED)."
+                "413":
+                    $ref: "#/components/responses/Error413"
+                    description: "Codes: PAYLOAD_TOO_LARGE."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+    /auth/verify-email:
+        post:
+            tags:
+                - Auth
+            operationId: verifyEmail
+            summary: Consume the email-verification token and sign in
+            description: "POST only: opening the emailed link never consumes the token (R34). Token TTL 24 h, single use."
+            security: []
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                token: &a9
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 512
+                                    description: One-time token from the emailed link fragment (#token=...). Sent in the body, never in a URL.
+                            required:
+                                - token
+            responses:
+                "200":
+                    description: Email verified; session started
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                        Set-Cookie:
+                            description: sai_access (HttpOnly, Path=/, 15 min), sai_refresh (HttpOnly, Path=/api/v1/auth, 7 d sliding; 30 d with rememberMe) and sai_csrf (readable by JS, Path=/, same lifetime as sai_refresh); all SameSite=Lax, Secure in production.
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data: &a5
+                                              $ref: "#/components/schemas/AuthUserPayload"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VERIFY_TOKEN_INVALID, VALIDATION_ERROR."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+    /auth/resend-verification:
+        post:
+            tags:
+                - Auth
+            operationId: resendVerification
+            summary: Resend the verification mail (neutral answer)
+            description: 60 s cooldown, 5 per hour per address; per-address limits are silent (same 200, no mail).
+            security: []
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                email: *a2
+                            required:
+                                - email
+            responses:
+                "200":
+                    description: Neutral message
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data: *a3
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED (per IP only)."
+    /auth/login:
+        post:
+            tags:
+                - Auth
+            operationId: login
+            summary: Sign in with email and password
+            description: "Order: rate limit, lockout (shadow counters, identical for unknown emails), password, then account status. 5 failures lock for 15 min (doubling to 24 h). mustChangePassword users get only a 15-minute sai_access cookie (no refresh cookie) valid for POST /auth/change-password. A pending-deletion account that passes the password check signs in with reactivate: true."
+            security: []
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                email: *a2
+                                password: *a4
+                                rememberMe:
+                                    type: boolean
+                                reactivate:
+                                    type: boolean
+                            required:
+                                - email
+                                - password
+            responses:
+                "200":
+                    description: Signed in
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                        Set-Cookie:
+                            description: sai_access (HttpOnly, Path=/, 15 min), sai_refresh (HttpOnly, Path=/api/v1/auth, 7 d sliding; 30 d with rememberMe) and sai_csrf (readable by JS, Path=/, same lifetime as sai_refresh); all SameSite=Lax, Secure in production.
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data: *a5
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: INVALID_CREDENTIALS."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID, EMAIL_NOT_VERIFIED, ACCOUNT_SUSPENDED, ACCOUNT_DEACTIVATED."
+                "423":
+                    $ref: "#/components/responses/Error423"
+                    description: "Codes: ACCOUNT_LOCKED (retryAfterSec, Retry-After)."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED (10 per 15 min per address)."
+    /auth/google:
+        post:
+            tags:
+                - Auth
+            operationId: googleSignIn
+            summary: Sign in with a Google ID token
+            description: The ID token is verified server-side (signature, aud, iss, exp, email_verified). When GOOGLE_CLIENT_ID is not configured the API answers 403 FORBIDDEN.
+            security: []
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                credential: &a6
+                                    type: string
+                                    minLength: 10
+                                    maxLength: 4096
+                                    description: Fresh Google ID token (accounts without a password).
+                                nonce:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 256
+                                reactivate:
+                                    type: boolean
+                            required:
+                                - credential
+            responses:
+                "200":
+                    description: Signed in with Google
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                        Set-Cookie:
+                            description: sai_access (HttpOnly, Path=/, 15 min), sai_refresh (HttpOnly, Path=/api/v1/auth, 7 d sliding; 30 d with rememberMe) and sai_csrf (readable by JS, Path=/, same lifetime as sai_refresh); all SameSite=Lax, Secure in production.
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data: *a5
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: GOOGLE_TOKEN_INVALID, GOOGLE_EMAIL_UNVERIFIED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID, DOMAIN_NOT_ALLOWED, FORBIDDEN, EMAIL_NOT_VERIFIED, ACCOUNT_SUSPENDED, ACCOUNT_DEACTIVATED."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+                "502":
+                    $ref: "#/components/responses/Error502"
+                    description: "Codes: INTEGRATION_ERROR."
+        delete:
+            tags:
+                - Auth
+            operationId: unlinkGoogle
+            summary: Unlink Google from the account
+            security: &a8
+                - accessCookie: []
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                credential: *a6
+                            required:
+                                - credential
+            responses:
+                "200":
+                    description: Google unlinked
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  user:
+                                                      $ref: "#/components/schemas/UserSummary"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED, GOOGLE_TOKEN_INVALID."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID, REAUTH_REQUIRED, MUST_CHANGE_PASSWORD, FORBIDDEN."
+                "409":
+                    $ref: "#/components/responses/Error409"
+                    description: "Codes: CONFLICT (Google not linked), AUTH_METHOD_REQUIRED (last sign-in method)."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+    /auth/refresh:
+        post:
+            tags:
+                - Auth
+            operationId: refresh
+            summary: Rotate the refresh cookie
+            description: Authenticated by the sai_refresh cookie. Every failure is REFRESH_INVALID. A rotated token replayed inside the 10 s grace window gets only a new sai_access cookie; replayed later it is treated as theft (family revoked, owner mailed).
+            security:
+                - refreshCookie: []
+            parameters:
+                - *a1
+            requestBody: &a7
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties: {}
+            responses:
+                "200":
+                    description: Session refreshed
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                        Set-Cookie:
+                            description: All three session cookies are re-issued (rotation); inside the grace window only sai_access.
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data: *a3
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: REFRESH_INVALID."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+    /auth/logout:
+        post:
+            tags:
+                - Auth
+            operationId: logout
+            summary: Sign out (idempotent)
+            description: Works without a session. Revokes the session of the refresh cookie when present and clears all three cookies with the attributes they were set with.
+            security: []
+            parameters:
+                - *a1
+            requestBody: *a7
+            responses:
+                "200":
+                    description: Signed out
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                        Set-Cookie:
+                            description: sai_access, sai_refresh and sai_csrf cleared.
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data: *a3
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID."
+    /auth/logout-all:
+        post:
+            tags:
+                - Auth
+            operationId: logoutAll
+            summary: Revoke every session of the user
+            security: *a8
+            parameters:
+                - *a1
+            requestBody: *a7
+            responses:
+                "200":
+                    description: Signed out everywhere
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                        Set-Cookie:
+                            description: sai_access, sai_refresh and sai_csrf cleared.
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data: *a3
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_EXPIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID, MUST_CHANGE_PASSWORD."
+    /auth/me:
+        get:
+            tags:
+                - Auth
+            operationId: me
+            summary: Current user (the only identity source for the frontend)
+            security: *a8
+            responses:
+                "200":
+                    description: Current user
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  user:
+                                                      $ref: "#/components/schemas/UserSummary"
+                                                  needsOnboarding:
+                                                      type: boolean
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR (unexpected query parameter)."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_EXPIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: MUST_CHANGE_PASSWORD, ACCOUNT_SUSPENDED, ACCOUNT_DEACTIVATED."
+    /auth/sessions:
+        get:
+            tags:
+                - Auth
+            operationId: listSessions
+            summary: Live sessions of the user (at most 10)
+            security: *a8
+            responses:
+                "200":
+                    description: Sessions
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  items:
+                                                      type: array
+                                                      items:
+                                                          $ref: "#/components/schemas/SessionItem"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_EXPIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: MUST_CHANGE_PASSWORD."
+    /auth/sessions/{id}:
+        delete:
+            tags:
+                - Auth
+            operationId: revokeSession
+            summary: Revoke one of the user's own sessions
+            description: Revoking the current session acts as logout and clears the cookies. Another user's or an unknown session is NOT_FOUND, never 403.
+            security: *a8
+            parameters:
+                - *a1
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      maxLength: 64
+                  description: Session id (the refresh family id, an ObjectId hex string).
+            responses:
+                "200":
+                    description: Session revoked
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                        Set-Cookie:
+                            description: "Only when the current session was revoked: all three cookies cleared."
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data: *a3
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: INVALID_ID."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_EXPIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID, MUST_CHANGE_PASSWORD."
+                "404":
+                    $ref: "#/components/responses/Error404"
+                    description: "Codes: NOT_FOUND."
+    /auth/forgot-password:
+        post:
+            tags:
+                - Auth
+            operationId: forgotPassword
+            summary: Request a password-reset mail (neutral answer)
+            description: Always 200 with the same message for every address; the lookup, the 3-per-hour per-address cap and the mail happen after the response. Reset token TTL 30 min.
+            security: []
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                email: *a2
+                            required:
+                                - email
+            responses:
+                "200":
+                    description: Neutral message
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data: *a3
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED (per IP only)."
+    /auth/reset-password/validate:
+        post:
+            tags:
+                - Auth
+            operationId: validateResetToken
+            summary: Check a reset token without consuming it
+            security: []
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                token: *a9
+                            required:
+                                - token
+            responses:
+                "200":
+                    description: Reset link is valid
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  valid:
+                                                      const: true
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: RESET_TOKEN_INVALID, VALIDATION_ERROR."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+    /auth/reset-password:
+        post:
+            tags:
+                - Auth
+            operationId: resetPassword
+            summary: Set a new password with a reset token (no auto-login)
+            description: Validates the new password (policy, not equal to the current or last 3) BEFORE consuming the token, then consumes it atomically, bumps the token version, revokes all sessions and clears lockout counters.
+            security: []
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                token: *a9
+                                newPassword: *a4
+                            required:
+                                - token
+                                - newPassword
+            responses:
+                "200":
+                    description: Password updated. Sign in with your new password.
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data: *a3
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: RESET_TOKEN_INVALID, PASSWORD_POLICY, PASSWORD_REUSED, VALIDATION_ERROR."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+    /auth/change-password:
+        post:
+            tags:
+                - Auth
+            operationId: changePassword
+            summary: Change (or set) the password
+            description: The only route a must-change-password (limited) session may call; it then becomes a normal session. Bumps the token version and revokes the user's other sessions. The response re-issues sai_access and sai_csrf (a limited session also gets sai_refresh).
+            security: *a8
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                currentPassword: *a4
+                                credential: *a6
+                                newPassword: *a4
+                            required:
+                                - newPassword
+                            oneOf: &a10
+                                - required:
+                                      - currentPassword
+                                  not:
+                                      required:
+                                          - credential
+                                - required:
+                                      - credential
+                                  not:
+                                      required:
+                                          - currentPassword
+            responses:
+                "200":
+                    description: Password changed
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                        Set-Cookie:
+                            description: sai_access and sai_csrf re-issued.
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data: *a5
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR, PASSWORD_POLICY, PASSWORD_REUSED."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: INVALID_CREDENTIALS (wrong current password), AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID, REAUTH_REQUIRED."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED (10 per hour per user)."
+    /auth/change-email:
+        post:
+            tags:
+                - Auth
+            operationId: changeEmail
+            summary: Start an email change (neutral 202)
+            description: Needs the current password (or a fresh Google credential). The new address gets a confirmation link, the old address a notice with a 24 h undo link. An address that is the current one or owned by someone else silently sends nothing.
+            security: *a8
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                currentPassword: *a4
+                                credential: *a6
+                                newEmail: *a2
+                            required:
+                                - newEmail
+                            oneOf: *a10
+            responses:
+                "202":
+                    description: Neutral message
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 202
+                                          data: *a3
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: INVALID_CREDENTIALS, AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID, DOMAIN_NOT_ALLOWED, REAUTH_REQUIRED, MUST_CHANGE_PASSWORD."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED (5 per hour per user)."
+    /auth/change-email/confirm:
+        post:
+            tags:
+                - Auth
+            operationId: confirmEmailChange
+            summary: Apply the new address from the confirmation link
+            security: []
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                token: *a9
+                            required:
+                                - token
+            responses:
+                "200":
+                    description: Email address updated
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  emailChanged:
+                                                      const: true
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: EMAIL_CHANGE_INVALID, VALIDATION_ERROR."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+    /auth/change-email/undo:
+        post:
+            tags:
+                - Auth
+            operationId: undoEmailChange
+            summary: Restore the previous address and revoke every session
+            security: []
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                token: *a9
+                            required:
+                                - token
+            responses:
+                "200":
+                    description: Email change undone. Sign in again.
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  restored:
+                                                      const: true
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: EMAIL_CHANGE_INVALID, VALIDATION_ERROR."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+    /auth/account:
+        delete:
+            tags:
+                - Auth
+            operationId: deleteAccount
+            summary: Schedule account deletion (30-day grace)
+            description: "Re-authentication required. Revokes all sessions and clears the cookies. Signing in during the grace period cancels the deletion (the login response carries reactivate: true)."
+            security: *a8
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                currentPassword: *a4
+                                credential: *a6
+                            oneOf: *a10
+            responses:
+                "200":
+                    description: Account scheduled for deletion
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                        Set-Cookie:
+                            description: sai_access, sai_refresh and sai_csrf cleared.
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  graceEndsAt:
+                                                      type: string
+                                                      format: date-time
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: INVALID_CREDENTIALS, AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID, REAUTH_REQUIRED, MUST_CHANGE_PASSWORD."
+                "409":
+                    $ref: "#/components/responses/Error409"
+                    description: "Codes: LAST_ADMIN."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED (5 per hour per user)."
+    /auth/accept-invite:
+        post:
+            tags:
+                - Auth
+            operationId: acceptInvite
+            summary: Accept an invitation and sign in
+            description: Invites are created by the admin module (not exposed over HTTP yet). Token TTL 7 d, single use; the role comes from the invite, never from the body.
+            security: []
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                token: *a9
+                                name:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 100
+                                password: *a4
+                            required:
+                                - token
+                                - name
+                                - password
+            responses:
+                "200":
+                    description: Invitation accepted
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                        Set-Cookie:
+                            description: sai_access (HttpOnly, Path=/, 15 min), sai_refresh (HttpOnly, Path=/api/v1/auth, 7 d sliding; 30 d with rememberMe) and sai_csrf (readable by JS, Path=/, same lifetime as sai_refresh); all SameSite=Lax, Secure in production.
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data: *a5
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: INVITE_INVALID, PASSWORD_POLICY, VALIDATION_ERROR."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID, DOMAIN_NOT_ALLOWED."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+    /profile:
+        get:
+            tags:
+                - Profile
+            operationId: getProfile
+            summary: The signed-in user's profile
+            security: *a8
+            responses:
+                "200":
+                    description: Profile
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  user:
+                                                      $ref: "#/components/schemas/ProfileUser"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR (unexpected query parameter)."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_EXPIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: MUST_CHANGE_PASSWORD."
+        put:
+            tags:
+                - Profile
+            operationId: updateProfile
+            summary: Update name, locale and timezone (partial)
+            description: Only these three fields are writable; role, status, orgId and email in the body are refused as unknown fields.
+            security: *a8
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                name:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 100
+                                locale:
+                                    enum:
+                                        - en
+                                        - hi
+                                timezone:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 64
+                                    examples:
+                                        - Asia/Kolkata
+                            minProperties: 1
+            responses:
+                "200":
+                    description: Profile updated
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  user:
+                                                      $ref: "#/components/schemas/ProfileUser"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_EXPIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID, MUST_CHANGE_PASSWORD."
+    /media/signatures:
+        post:
+            tags:
+                - Media
+            operationId: requestMediaSignature
+            summary: Signed parameters for a direct browser upload to Cloudinary
+            description: "Role by kind: marketing admin and superadmin; learning-content and temp trainer, admin, superadmin; avatars (use PUT /me/avatar) and certificates (server-issued) nobody. Only server-decided values are signed; the API secret never leaves the server. Shares a 20-per-day bucket per user with POST /media/confirm."
+            security: *a8
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                kind:
+                                    enum:
+                                        - avatars
+                                        - marketing
+                                        - learning-content
+                                        - certificates
+                                        - temp
+                                resourceType:
+                                    enum:
+                                        - image
+                                        - video
+                                        - raw
+                                contentType:
+                                    type: string
+                                    minLength: 3
+                                    maxLength: 120
+                                    examples:
+                                        - video/mp4
+                                bytes:
+                                    type: integer
+                                    minimum: 0
+                                filename:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 255
+                                    description: Only used to cross-check the extension.
+                            required:
+                                - kind
+                                - resourceType
+                                - contentType
+                                - bytes
+            responses:
+                "201":
+                    description: Upload signature issued
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 201
+                                          data:
+                                              $ref: "#/components/schemas/MediaSignature"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR, MEDIA_TYPE_NOT_ALLOWED, UPLOAD_INVALID."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID, FORBIDDEN, MUST_CHANGE_PASSWORD."
+                "413":
+                    $ref: "#/components/responses/Error413"
+                    description: "Codes: MEDIA_TOO_LARGE."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+    /media/confirm:
+        post:
+            tags:
+                - Media
+            operationId: confirmMediaUpload
+            summary: Confirm a direct upload from Cloudinary's real asset
+            description: "Never trusts client metadata: fetches the asset, re-checks type, format and size, deletes and retires a mismatching asset. Repeating a confirm of a ready record returns it unchanged."
+            security: *a8
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                mediaId:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 24
+                                publicId:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 255
+                            oneOf:
+                                - required:
+                                      - mediaId
+                                  not:
+                                      required:
+                                          - publicId
+                                - required:
+                                      - publicId
+                                  not:
+                                      required:
+                                          - mediaId
+            responses:
+                "200":
+                    description: Upload confirmed
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              $ref: "#/components/schemas/Media"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR, INVALID_ID, MEDIA_TYPE_NOT_ALLOWED, UPLOAD_INVALID."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID, FORBIDDEN."
+                "404":
+                    $ref: "#/components/responses/Error404"
+                    description: "Codes: MEDIA_NOT_FOUND (also another owner's record)."
+                "413":
+                    $ref: "#/components/responses/Error413"
+                    description: "Codes: MEDIA_TOO_LARGE."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+                "502":
+                    $ref: "#/components/responses/Error502"
+                    description: "Codes: INTEGRATION_ERROR."
+    /media/webhook:
+        post:
+            tags:
+                - Media
+            operationId: cloudinaryWebhook
+            summary: Cloudinary notification (signature verified, CSRF-exempt)
+            description: Public route; trust comes from X-Cld-Signature over the RAW body and X-Cld-Timestamp (at most 2 hours old). Reconciles state idempotently by publicId + version; it never makes a record ready. Unknown or irrelevant notifications are acknowledged with action ignored.
+            security: []
+            parameters:
+                - name: X-Cld-Signature
+                  in: header
+                  required: true
+                  schema:
+                      type: string
+                  description: Hex digest of the raw body + timestamp + API secret.
+                - name: X-Cld-Timestamp
+                  in: header
+                  required: true
+                  schema:
+                      type: integer
+                  description: Unix seconds.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - notification_type
+                            properties:
+                                notification_type:
+                                    type: string
+                                public_id:
+                                    type: string
+                                version:
+                                    type: integer
+                            additionalProperties: true
+            responses:
+                "200":
+                    description: Processed
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  received:
+                                                      const: true
+                                                  action:
+                                                      enum:
+                                                          - reconciled
+                                                          - rejected
+                                                          - deleted
+                                                          - ignored
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: WEBHOOK_SIGNATURE_INVALID (missing, bad or stale), INVALID_JSON."
+                "413":
+                    $ref: "#/components/responses/Error413"
+                    description: "Codes: PAYLOAD_TOO_LARGE."
+    /media/{id}/access:
+        get:
+            tags:
+                - Media
+            operationId: getMediaAccess
+            summary: Short-lived signed URL for an authenticated asset
+            description: Owner, or admin / superadmin of the same organisation. Public assets need no link (422 UNPROCESSABLE).
+            security: *a8
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      maxLength: 64
+                  description: Media record id (ObjectId).
+            responses:
+                "200":
+                    description: Access link issued
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  mediaId:
+                                                      type: string
+                                                  url:
+                                                      type: string
+                                                      format: uri
+                                                  expiresAt:
+                                                      type: string
+                                                      format: date-time
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: INVALID_ID."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "404":
+                    $ref: "#/components/responses/Error404"
+                    description: "Codes: MEDIA_NOT_FOUND."
+                "422":
+                    $ref: "#/components/responses/Error422"
+                    description: "Codes: UNPROCESSABLE."
+    /media/{id}:
+        delete:
+            tags:
+                - Media
+            operationId: deleteMedia
+            summary: Delete a media record and its Cloudinary asset
+            description: Owner, or admin / superadmin of the same organisation. Deletes by the stored publicId. Avatars are removed with DELETE /me/avatar (409 CONFLICT here).
+            security: *a8
+            parameters:
+                - *a1
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      maxLength: 64
+                  description: Media record id (ObjectId).
+            responses:
+                "200":
+                    description: Media deleted
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  id:
+                                                      type: string
+                                                  status:
+                                                      const: deleted
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: INVALID_ID."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID."
+                "404":
+                    $ref: "#/components/responses/Error404"
+                    description: "Codes: MEDIA_NOT_FOUND."
+                "409":
+                    $ref: "#/components/responses/Error409"
+                    description: "Codes: CONFLICT (avatar)."
+    /me/avatar:
+        put:
+            tags:
+                - Media
+            operationId: putAvatar
+            summary: Upload or replace the avatar (multipart, JPEG/PNG/WebP up to 2 MB)
+            description: Type, extension and magic bytes are checked before Cloudinary sees the file; EXIF/GPS is stripped. Any extra text field is refused. A failed upload keeps the old avatar. 20 per day per user.
+            security: *a8
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            required:
+                                - file
+                            properties:
+                                file:
+                                    type: string
+                                    contentMediaType: image/*
+                                    format: binary
+                            additionalProperties: false
+            responses:
+                "200":
+                    description: Avatar updated
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  user:
+                                                      $ref: "#/components/schemas/UserSummary"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: MEDIA_TYPE_NOT_ALLOWED, UPLOAD_INVALID, VALIDATION_ERROR."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID."
+                "413":
+                    $ref: "#/components/responses/Error413"
+                    description: "Codes: FILE_TOO_LARGE."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+                "502":
+                    $ref: "#/components/responses/Error502"
+                    description: "Codes: MEDIA_UPLOAD_FAILED."
+        delete:
+            tags:
+                - Media
+            operationId: deleteAvatar
+            summary: Remove the avatar (idempotent)
+            security: *a8
+            parameters:
+                - *a1
+            requestBody: *a7
+            responses:
+                "200":
+                    description: Avatar removed
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  user:
+                                                      $ref: "#/components/schemas/UserSummary"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: CSRF_INVALID."
+components:
+    securitySchemes:
+        accessCookie:
+            type: apiKey
+            in: cookie
+            name: sai_access
+            description: "HttpOnly JWT (HS256), Path=/, 15 minutes. Claims: sub, role, orgId, sid, tv."
+        refreshCookie:
+            type: apiKey
+            in: cookie
+            name: sai_refresh
+            description: HttpOnly opaque token, Path=/api/v1/auth, rotated on every use.
+        csrfCookie:
+            type: apiKey
+            in: cookie
+            name: sai_csrf
+            description: Readable by JS, Path=/. Mirror it in the X-CSRF-Token header on unsafe methods.
+    parameters:
+        CsrfToken:
+            name: X-CSRF-Token
+            in: header
+            required: true
+            description: Must equal the sai_csrf cookie (constant-time compare) on POST, PUT, PATCH and DELETE, otherwise 403 CSRF_INVALID. The cookie is issued by any /api/v1 response that lacks it (for example GET /auth/me).
+            schema:
+                type: string
+                minLength: 32
+                maxLength: 128
+                pattern: ^[A-Za-z0-9_-]+$
+    headers:
+        RequestId:
+            description: Accepted from the client when 8-64 safe characters, otherwise generated. Same value as requestId in error bodies.
+            schema:
+                type: string
+        RetryAfter:
+            description: Seconds until the limit or lock ends.
+            schema:
+                type: integer
+    responses:
+        Error400:
+            description: "Bad input: the error envelope."
+            headers:
+                X-Request-Id:
+                    $ref: "#/components/headers/RequestId"
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ErrorEnvelope"
+        Error401:
+            description: "Not authenticated: the error envelope."
+            headers:
+                X-Request-Id:
+                    $ref: "#/components/headers/RequestId"
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ErrorEnvelope"
+        Error403:
+            description: "Forbidden, CSRF or policy: the error envelope."
+            headers:
+                X-Request-Id:
+                    $ref: "#/components/headers/RequestId"
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ErrorEnvelope"
+        Error404:
+            description: "Missing or not yours: the error envelope."
+            headers:
+                X-Request-Id:
+                    $ref: "#/components/headers/RequestId"
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ErrorEnvelope"
+        Error409:
+            description: "Conflict: the error envelope."
+            headers:
+                X-Request-Id:
+                    $ref: "#/components/headers/RequestId"
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ErrorEnvelope"
+        Error413:
+            description: "Too large: the error envelope."
+            headers:
+                X-Request-Id:
+                    $ref: "#/components/headers/RequestId"
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ErrorEnvelope"
+        Error422:
+            description: "Unprocessable state: the error envelope."
+            headers:
+                X-Request-Id:
+                    $ref: "#/components/headers/RequestId"
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ErrorEnvelope"
+        Error423:
+            description: "Account locked: the error envelope."
+            headers:
+                X-Request-Id:
+                    $ref: "#/components/headers/RequestId"
+                Retry-After:
+                    $ref: "#/components/headers/RetryAfter"
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ErrorEnvelope"
+        Error429:
+            description: "Rate limited: the error envelope."
+            headers:
+                X-Request-Id:
+                    $ref: "#/components/headers/RequestId"
+                Retry-After:
+                    $ref: "#/components/headers/RetryAfter"
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ErrorEnvelope"
+        Error502:
+            description: "Upstream failed: the error envelope."
+            headers:
+                X-Request-Id:
+                    $ref: "#/components/headers/RequestId"
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ErrorEnvelope"
+        Error503:
+            description: "Not ready: the error envelope."
+            headers:
+                X-Request-Id:
+                    $ref: "#/components/headers/RequestId"
+                Retry-After:
+                    $ref: "#/components/headers/RetryAfter"
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ErrorEnvelope"
+    schemas:
+        SuccessEnvelope:
+            type: object
+            required:
+                - statusCode
+                - success
+                - message
+                - data
+            properties:
+                statusCode:
+                    type: integer
+                success:
+                    const: true
+                message:
+                    type: string
+                data: {}
+                meta:
+                    type: object
+                    description: Pagination or request metadata (not used by milestone 1).
+            additionalProperties: false
+        ErrorEnvelope:
+            type: object
+            required:
+                - statusCode
+                - success
+                - message
+                - code
+                - errors
+                - data
+                - requestId
+            properties:
+                statusCode:
+                    type: integer
+                success:
+                    const: false
+                message:
+                    type: string
+                    description: Safe text, no internals.
+                code:
+                    enum:
+                        - VALIDATION_ERROR
+                        - BAD_REQUEST
+                        - INVALID_ID
+                        - INVALID_JSON
+                        - UPLOAD_INVALID
+                        - PASSWORD_POLICY
+                        - PASSWORD_REUSED
+                        - VERIFY_TOKEN_INVALID
+                        - RESET_TOKEN_INVALID
+                        - INVITE_INVALID
+                        - EMAIL_CHANGE_INVALID
+                        - WEBHOOK_SIGNATURE_INVALID
+                        - MEDIA_TYPE_NOT_ALLOWED
+                        - INVALID_CREDENTIALS
+                        - AUTH_REQUIRED
+                        - TOKEN_EXPIRED
+                        - TOKEN_INVALID
+                        - REFRESH_INVALID
+                        - SESSION_REVOKED
+                        - TOKEN_REUSE_DETECTED
+                        - GOOGLE_TOKEN_INVALID
+                        - GOOGLE_EMAIL_UNVERIFIED
+                        - MFA_REQUIRED
+                        - MFA_INVALID
+                        - FORBIDDEN
+                        - CSRF_INVALID
+                        - CORS_ORIGIN_DENIED
+                        - REAUTH_REQUIRED
+                        - DOMAIN_NOT_ALLOWED
+                        - EMAIL_NOT_VERIFIED
+                        - ACCOUNT_SUSPENDED
+                        - ACCOUNT_DEACTIVATED
+                        - ACCOUNT_PENDING_DELETION
+                        - MUST_CHANGE_PASSWORD
+                        - NOT_FOUND
+                        - MEDIA_NOT_FOUND
+                        - CONFLICT
+                        - LAST_ADMIN
+                        - AUTH_METHOD_REQUIRED
+                        - PAYLOAD_TOO_LARGE
+                        - FILE_TOO_LARGE
+                        - MEDIA_TOO_LARGE
+                        - UNSUPPORTED_MEDIA_TYPE
+                        - UNPROCESSABLE
+                        - ACCOUNT_LOCKED
+                        - RATE_LIMITED
+                        - INTERNAL
+                        - INTEGRATION_ERROR
+                        - MEDIA_UPLOAD_FAILED
+                        - AI_UNAVAILABLE
+                    description: Stable UPPER_SNAKE code.
+                errors:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/ErrorItem"
+                data:
+                    type: "null"
+                requestId:
+                    type: string
+                retryAfterSec:
+                    type: integer
+                    description: Present on 423, 429 and 503.
+            additionalProperties: false
+        ErrorItem:
+            type: object
+            required:
+                - message
+            properties:
+                field:
+                    type: string
+                    description: Dotted field path; query and path problems are prefixed (query.x, params.id).
+                message:
+                    type: string
+                code:
+                    type: string
+            additionalProperties: false
+        UserSummary:
+            type: object
+            description: "Explicit allow-list: never a hash, token or schema internal."
+            required:
+                - id
+                - email
+                - name
+                - role
+                - orgId
+                - status
+                - locale
+                - emailVerified
+                - authProviders
+                - hasPassword
+                - avatar
+                - mustChangePassword
+            additionalProperties: false
+            properties:
+                id:
+                    type: string
+                email:
+                    type: string
+                    format: email
+                name:
+                    type: string
+                role:
+                    enum:
+                        - learner
+                        - trainer
+                        - admin
+                        - superadmin
+                orgId:
+                    type: string
+                status:
+                    enum:
+                        - invited
+                        - pending_verification
+                        - active
+                        - suspended
+                        - deactivated
+                        - pending_deletion
+                        - deleted
+                locale:
+                    enum:
+                        - en
+                        - hi
+                emailVerified:
+                    type: boolean
+                authProviders:
+                    type: array
+                    items:
+                        enum:
+                            - local
+                            - google
+                            - sso
+                hasPassword:
+                    type: boolean
+                avatar:
+                    oneOf:
+                        - type: "null"
+                        - type: object
+                          additionalProperties: false
+                          properties:
+                              publicId:
+                                  type: string
+                              version:
+                                  type:
+                                      - integer
+                                      - "null"
+                          required:
+                              - publicId
+                              - version
+                mustChangePassword:
+                    type: boolean
+        ProfileUser:
+            type: object
+            description: "Explicit allow-list: never a hash, token or schema internal."
+            required:
+                - timezone
+                - id
+                - email
+                - name
+                - role
+                - orgId
+                - status
+                - locale
+                - emailVerified
+                - authProviders
+                - hasPassword
+                - avatar
+                - mustChangePassword
+            additionalProperties: false
+            properties:
+                timezone:
+                    type: string
+                    examples:
+                        - Asia/Kolkata
+                id:
+                    type: string
+                email:
+                    type: string
+                    format: email
+                name:
+                    type: string
+                role:
+                    enum:
+                        - learner
+                        - trainer
+                        - admin
+                        - superadmin
+                orgId:
+                    type: string
+                status:
+                    enum:
+                        - invited
+                        - pending_verification
+                        - active
+                        - suspended
+                        - deactivated
+                        - pending_deletion
+                        - deleted
+                locale:
+                    enum:
+                        - en
+                        - hi
+                emailVerified:
+                    type: boolean
+                authProviders:
+                    type: array
+                    items:
+                        enum:
+                            - local
+                            - google
+                            - sso
+                hasPassword:
+                    type: boolean
+                avatar:
+                    oneOf:
+                        - type: "null"
+                        - type: object
+                          additionalProperties: false
+                          properties:
+                              publicId:
+                                  type: string
+                              version:
+                                  type:
+                                      - integer
+                                      - "null"
+                          required:
+                              - publicId
+                              - version
+                mustChangePassword:
+                    type: boolean
+        AuthUserPayload:
+            type: object
+            additionalProperties: false
+            properties:
+                user:
+                    $ref: "#/components/schemas/UserSummary"
+                needsOnboarding:
+                    type: boolean
+                reactivate:
+                    type: boolean
+                    description: True when this sign-in cancelled a pending deletion or reactivated a deactivated account.
+            required:
+                - user
+                - needsOnboarding
+                - reactivate
+        SessionItem:
+            type: object
+            additionalProperties: false
+            properties:
+                id:
+                    type: string
+                device:
+                    type: string
+                    examples:
+                        - Chrome on Windows
+                createdAt:
+                    type: string
+                    format: date-time
+                lastUsedAt:
+                    type: string
+                    format: date-time
+                current:
+                    type: boolean
+            required:
+                - id
+                - device
+                - createdAt
+                - lastUsedAt
+                - current
+        Media:
+            type: object
+            additionalProperties: false
+            properties:
+                id:
+                    type: string
+                kind:
+                    enum:
+                        - avatars
+                        - marketing
+                        - learning-content
+                        - certificates
+                        - temp
+                publicId:
+                    type: string
+                resourceType:
+                    enum:
+                        - image
+                        - video
+                        - raw
+                deliveryType:
+                    enum:
+                        - public
+                        - authenticated
+                format:
+                    type:
+                        - string
+                        - "null"
+                bytes:
+                    type:
+                        - integer
+                        - "null"
+                width:
+                    type:
+                        - integer
+                        - "null"
+                height:
+                    type:
+                        - integer
+                        - "null"
+                duration:
+                    type:
+                        - number
+                        - "null"
+                version:
+                    type:
+                        - integer
+                        - "null"
+                status:
+                    enum:
+                        - pending
+                        - ready
+                        - deleted
+            required:
+                - id
+                - kind
+                - publicId
+                - resourceType
+                - deliveryType
+                - format
+                - bytes
+                - width
+                - height
+                - duration
+                - version
+                - status
+        MediaSignature:
+            type: object
+            additionalProperties: false
+            properties:
+                mediaId:
+                    type: string
+                cloudName:
+                    type: string
+                apiKey:
+                    type: string
+                    description: Public key; the API secret is never returned.
+                timestamp:
+                    type: integer
+                signature:
+                    type: string
+                folder:
+                    type: string
+                    examples:
+                        - samarth-ai/prod/learning-content
+                publicId:
+                    type: string
+                    description: Server-chosen; never derived from the client filename.
+                allowedFormats:
+                    type: string
+                    examples:
+                        - mp4,webm,mov
+                resourceType:
+                    enum:
+                        - image
+                        - video
+                        - raw
+                type:
+                    enum:
+                        - upload
+                        - authenticated
+                maxBytes:
+                    type: integer
+                expiresAt:
+                    type: string
+                    format: date-time
+                    description: One hour after issue.
+                uploadParams:
+                    type: object
+                    description: The exact fields to send to Cloudinary with the file.
+                    additionalProperties: true
+            required:
+                - mediaId
+                - cloudName
+                - apiKey
+                - timestamp
+                - signature
+                - folder
+                - publicId
+                - allowedFormats
+                - resourceType
+                - type
+                - maxBytes
+                - expiresAt
+                - uploadParams
+x-error-statuses:
+    VALIDATION_ERROR: 400
+    BAD_REQUEST: 400
+    INVALID_ID: 400
+    INVALID_JSON: 400
+    UPLOAD_INVALID: 400
+    PASSWORD_POLICY: 400
+    PASSWORD_REUSED: 400
+    VERIFY_TOKEN_INVALID: 400
+    RESET_TOKEN_INVALID: 400
+    INVITE_INVALID: 400
+    EMAIL_CHANGE_INVALID: 400
+    WEBHOOK_SIGNATURE_INVALID: 400
+    MEDIA_TYPE_NOT_ALLOWED: 400
+    INVALID_CREDENTIALS: 401
+    AUTH_REQUIRED: 401
+    TOKEN_EXPIRED: 401
+    TOKEN_INVALID: 401
+    REFRESH_INVALID: 401
+    SESSION_REVOKED: 401
+    TOKEN_REUSE_DETECTED: 401
+    GOOGLE_TOKEN_INVALID: 401
+    GOOGLE_EMAIL_UNVERIFIED: 401
+    MFA_REQUIRED: 401
+    MFA_INVALID: 401
+    FORBIDDEN: 403
+    CSRF_INVALID: 403
+    CORS_ORIGIN_DENIED: 403
+    REAUTH_REQUIRED: 403
+    DOMAIN_NOT_ALLOWED: 403
+    EMAIL_NOT_VERIFIED: 403
+    ACCOUNT_SUSPENDED: 403
+    ACCOUNT_DEACTIVATED: 403
+    ACCOUNT_PENDING_DELETION: 403
+    MUST_CHANGE_PASSWORD: 403
+    NOT_FOUND: 404
+    MEDIA_NOT_FOUND: 404
+    CONFLICT: 409
+    LAST_ADMIN: 409
+    AUTH_METHOD_REQUIRED: 409
+    PAYLOAD_TOO_LARGE: 413
+    FILE_TOO_LARGE: 413
+    MEDIA_TOO_LARGE: 413
+    UNSUPPORTED_MEDIA_TYPE: 415
+    UNPROCESSABLE: 422
+    ACCOUNT_LOCKED: 423
+    RATE_LIMITED: 429
+    INTERNAL: 500
+    INTEGRATION_ERROR: 502
+    MEDIA_UPLOAD_FAILED: 502
+    AI_UNAVAILABLE: 503

@@ -1,0 +1,364 @@
+{
+    "seo": {
+        "title": "SAMARTH AI | Competency Intelligence for Official Statistics",
+        "description": "Prototype platform that maps officials' skills to role needs, finds gaps and recommends training for India's Official Statistical System. Not a government site.",
+        "siteName": "SAMARTH AI",
+        "softwareDescription": "SAMARTH AI is a prototype platform that maps the skills of officials in India's Official Statistical System to their roles, finds the gaps and recommends the training to close them."
+    },
+    "media": {
+        "heroDashboard": "SAMARTH AI learner dashboard with a competency radar chart, ranked skill gaps and a learning path (demo data).",
+        "tourAssessment": "Quiz review screen listing AI-drafted questions with source quotes and approve or reject buttons (demo data).",
+        "tourMapping": "Gap list ranking competencies by priority with current and required levels (demo data).",
+        "tourRecs": "Recommended learning path showing courses, the gap each closes and a sample-data label (demo data).",
+        "tourDashboards": "Administrator heatmap of departments against competency domains (demo data).",
+        "tourLanguage": "The same dashboard shown in Hindi with the language switch visible (demo data).",
+        "rolesLearner": "Learner screen with a competency radar and a ranked list of gaps (demo data).",
+        "rolesTrainer": "Trainer screen for uploading material and reviewing generated quiz questions (demo data).",
+        "rolesAdmin": "Administrator screen with a department heatmap and the audit log (demo data).",
+        "rolesSuperadmin": "Platform administrator screen for organisations and the competency framework (demo data).",
+        "ogDefault": "SAMARTH AI wordmark with the tagline on a plain background.",
+        "authSide": "Decorative panel beside the sign-in form.",
+        "teamPortrait": "Portrait of a SAMARTH AI team member.",
+        "videoError": "This video could not be loaded.",
+        "demoData": "Demo data"
+    },
+    "ticker": {
+        "pause": "Pause the scrolling chips",
+        "play": "Resume the scrolling chips"
+    },
+    "hero": {
+        "eyebrow": "Smart Competency Intelligence for Official Statistics",
+        "title": "Build the skills that official statistics runs on.",
+        "sub": "SAMARTH AI maps every official's competencies to their role, finds the gaps, and recommends the training that closes them.",
+        "ctaPrimary": "Get started",
+        "ctaSecondary": "See how it works",
+        "note": "Prototype for SIH26101. Not an official Government of India website.",
+        "tickerLabel": "Skill areas the platform covers",
+        "tickerChips": [
+            "Survey design",
+            "Sampling",
+            "National accounts",
+            "Price statistics",
+            "Labour statistics",
+            "Data quality",
+            "SDMX",
+            "Python",
+            "SQL",
+            "GIS",
+            "AI and machine learning",
+            "Cybersecurity",
+            "Data privacy",
+            "Leadership"
+        ],
+        "mock": {
+            "description": "Sample learner dashboard showing a competency radar chart, ranked skill gaps and a learning path, using demo data.",
+            "title": "My competencies",
+            "persona": "Deputy Director, Data Analyst role",
+            "demo": "Demo data",
+            "levelsTitle": "Levels against role",
+            "gapsTitle": "Ranked gaps",
+            "pathTitle": "Learning path",
+            "columnCompetency": "Competency",
+            "columnCurrent": "Now",
+            "columnRequired": "Needed",
+            "columnGap": "Gap",
+            "simulated": "Simulated",
+            "competencies": {
+                "sampling": "Survey sampling",
+                "privacy": "Data privacy",
+                "python": "Python",
+                "ml": "AI and machine learning"
+            },
+            "path": {
+                "privacy": "Data privacy essentials",
+                "python": "Python for official statistics",
+                "ml": "Machine learning basics"
+            }
+        }
+    },
+    "problem": {
+        "title": "The problem we are solving",
+        "statement": "Statistical officials must keep learning: survey methods, cloud, GIS, AI, cybersecurity. The training catalogue is vast, yet no one tells an official which courses fit their role, their current skills and what the job needs next. Trainers write assessments by hand. Administrators cannot see capability across the workforce.",
+        "lines": [
+            "Officials: unclear which course to take next.",
+            "Trainers: assessments built slowly, by hand.",
+            "Administrators: no workforce-level view of skills."
+        ]
+    },
+    "acronym": {
+        "title": "Seven ideas, one name.",
+        "sub": "SAMARTH means \"capable\". Each letter is a promise the platform is built around.",
+        "status": {
+            "planned": "Planned",
+            "partial": "Partly planned",
+            "simulated": "Simulated data"
+        },
+        "cards": {
+            "s": {
+                "word": "Skill assessment",
+                "text": "Know where you stand, backed by evidence, not guesswork."
+            },
+            "a1": {
+                "word": "Adaptive learning",
+                "text": "Practice that adjusts to you and an AI tutor that explains."
+            },
+            "m": {
+                "word": "Mapping competencies",
+                "text": "Every role has a clear, shared definition of \"good\"."
+            },
+            "a2": {
+                "word": "AI-driven analytics",
+                "text": "See gaps and trends, with the reason shown."
+            },
+            "r": {
+                "word": "Recommendations",
+                "text": "The right course, and why it was picked."
+            },
+            "t": {
+                "word": "Training pathways",
+                "text": "An ordered path, not a pile of courses."
+            },
+            "h": {
+                "word": "Holistic capacity building",
+                "text": "Statistics, technology, digital governance and leadership together."
+            }
+        }
+    },
+    "how": {
+        "title": "From profile to progress in four steps.",
+        "cta": "Get started",
+        "steps": {
+            "profile": {
+                "title": "Build your profile",
+                "body": "Share your designation, role, qualifications, experience and past training. SAMARTH AI estimates a starting level for each competency."
+            },
+            "gaps": {
+                "title": "See your gaps",
+                "body": "Your levels are compared with what your role requires. Gaps are ranked by size and importance, with the reason shown."
+            },
+            "path": {
+                "title": "Follow your path",
+                "body": "Get an ordered path from iGOT Karmayogi and NSSTA TPAC programmes (simulated in this prototype), each with why it was recommended."
+            },
+            "evidence": {
+                "title": "Prove and update",
+                "body": "Quizzes and completed courses add evidence. Levels and recommendations refresh automatically."
+            }
+        },
+        "visual": {
+            "designation": "Designation",
+            "role": "Role",
+            "experience": "Experience",
+            "estimate": "Estimated starting levels",
+            "quiz": "Quiz result",
+            "completed": "Course completed",
+            "updated": "Level updated",
+            "why": "Why: closes your data privacy gap"
+        }
+    },
+    "tour": {
+        "title": "A look inside the prototype",
+        "sub": "Every screen below shows demo data.",
+        "panels": {
+            "assessment": {
+                "headline": "Turn any training material into a quiz.",
+                "sub": "Upload a PDF, Word, PowerPoint or text file. SAMARTH AI drafts multiple-choice questions, each with an explanation and the passage it came from.",
+                "bullets": [
+                    "Grounded in your document, with the source quote shown and checked.",
+                    "Trainers review, edit and approve before anything reaches learners.",
+                    "Instant scoring with explanations and personalised feedback."
+                ],
+                "note": "Video is supported through transcripts. Adaptive difficulty is planned."
+            },
+            "mapping": {
+                "headline": "A competency framework built for official statistics.",
+                "sub": "Four domains, 43 competencies and six proficiency levels give every role a clear definition of \"good\".",
+                "bullets": [
+                    "Statistical, technical, digital governance and behavioural skills in one view.",
+                    "Gaps ranked by size, role importance and department priorities.",
+                    "Every number explained: you can see why a gap matters."
+                ],
+                "note": "Role requirements are proposed defaults, to be validated with domain experts."
+            },
+            "recs": {
+                "headline": "Recommendations that explain themselves.",
+                "sub": "Each suggested course or programme shows the gap it closes and the level you can expect to reach.",
+                "bullets": [
+                    "Two sources: iGOT Karmayogi courses and NSSTA TPAC programmes.",
+                    "Completed items are excluded and your learning history is considered.",
+                    "One click opens the course in iGOT (link-out)."
+                ],
+                "note": "In this prototype the iGOT Karmayogi and NSSTA data are simulated with sample content. The integration is built behind an adapter so it can connect to the real services once access is granted."
+            },
+            "dashboards": {
+                "headline": "The right view for every role.",
+                "sub": "Learners see their radar, gaps and path. Administrators see departments, trends and training effectiveness.",
+                "bullets": [
+                    "Learner: competency radar, ranked gaps, learning hours.",
+                    "Administrator: department-by-domain heatmap, completion and top gaps.",
+                    "Planned: training effectiveness and an explainable skill-demand forecast (demo uses labelled synthetic history)."
+                ],
+                "note": ""
+            },
+            "language": {
+                "headline": "English and हिन्दी.",
+                "sub": "Switch the whole interface between English and Hindi at any time.",
+                "bullets": [
+                    "Hindi interface with a proper Devanagari typeface.",
+                    "Quiz and feedback translation by AI with trainer review (planned).",
+                    "Technical terms stay recognisable, for example \"stratified sampling\" kept in English in brackets."
+                ],
+                "note": ""
+            }
+        }
+    },
+    "roles": {
+        "title": "Built for four kinds of users.",
+        "label": "User roles",
+        "items": {
+            "learner": {
+                "title": "Learner",
+                "sub": "See where you stand and what to learn next.",
+                "bullets": [
+                    "Competency radar and gaps",
+                    "Recommended path",
+                    "Quizzes and an AI tutor"
+                ]
+            },
+            "trainer": {
+                "title": "Trainer",
+                "sub": "Turn your material into assessments.",
+                "bullets": [
+                    "Upload and generate",
+                    "Review and approve",
+                    "Cohort results"
+                ]
+            },
+            "admin": {
+                "title": "Admin",
+                "sub": "Understand capability across your organisation.",
+                "bullets": [
+                    "Invite and manage users",
+                    "Department heatmap and priorities",
+                    "Audit log"
+                ]
+            },
+            "superadmin": {
+                "title": "Platform admin",
+                "sub": "Keep the platform trustworthy.",
+                "bullets": [
+                    "Manage organisations",
+                    "Maintain the competency framework",
+                    "Integration health"
+                ]
+            }
+        }
+    },
+    "framework": {
+        "title": "The framework at a glance.",
+        "ringLabel": "Competency domains",
+        "figures": {
+            "domains": "domains",
+            "competencies": "competencies",
+            "levels": "levels (0 to 5)",
+            "roles": "seed roles"
+        },
+        "domains": {
+            "statistical": "Statistical",
+            "technical": "Technical",
+            "digitalGovernance": "Digital governance",
+            "behavioural": "Behavioural and managerial"
+        },
+        "footnote": "Seed framework and role requirements are proposed defaults and are being validated."
+    },
+    "trust": {
+        "title": "Security and privacy by design.",
+        "sub": "This is a prototype, so these are design commitments we build and test against, not certifications.",
+        "link": "Read the Privacy Policy",
+        "badge": {
+            "prototype": "Prototype",
+            "designed": "Designed",
+            "designedOptional": "Designed, optional"
+        },
+        "items": {
+            "tokens": "Access tokens live only in secure, HttpOnly cookies, never in browser storage.",
+            "rbac": "Role-based access on every route; people see only what their role allows.",
+            "sessions": "Rotating refresh tokens with reuse detection, account lockout and session control.",
+            "audit": "A hash-chained audit log you can verify for tampering.",
+            "ai": "No names, emails or employee IDs are sent to the AI model.",
+            "anchor": "Optional anchoring of hashes, never personal data, on a public test blockchain.",
+            "dpdp": "Built to align with the principles of India's DPDP Act 2023. We do not claim certification."
+        }
+    },
+    "standards": {
+        "label": "Standards and frameworks this prototype is designed around. Not certifications or endorsements.",
+        "chips": [
+            "UN Fundamental Principles of Official Statistics",
+            "SDMX",
+            "DDI",
+            "SDG indicators",
+            "Data quality frameworks",
+            "DPDP Act 2023",
+            "IT Act 2000",
+            "OWASP Top 10",
+            "WCAG 2.2 AA (target)",
+            "OpenID Connect",
+            "OAuth 2.0 with PKCE",
+            "GIGW (to verify)",
+            "CERT-In directions (to verify)",
+            "MeitY guidelines (to verify)"
+        ]
+    },
+    "faq": {
+        "title": "Frequently asked questions",
+        "items": [
+            {
+                "q": "Is SAMARTH AI an official government website?",
+                "a": "No. It is a student prototype for problem statement SIH26101 (MoSPI). It is not endorsed by or affiliated with MoSPI, NSSTA, iGOT Karmayogi or the Government of India."
+            },
+            {
+                "q": "Is it connected to the real iGOT Karmayogi?",
+                "a": "Not yet. The prototype uses a simulated catalogue. Real access needs government credentials. The integration sits behind one adapter so it can be switched when access exists."
+            },
+            {
+                "q": "Where do the NSSTA TPAC programmes come from?",
+                "a": "They are sample entries marked illustrative until verified against official sources."
+            },
+            {
+                "q": "Can I trust the AI-generated quiz questions?",
+                "a": "Each question must cite a quoted passage from your document, which is checked automatically, and a trainer approves it before learners see it. Reviewing is still a human job."
+            },
+            {
+                "q": "Does my personal data go to an AI model?",
+                "a": "By design, no. Names, emails and IDs are removed; only opaque IDs and aggregated competency data are used. See the Privacy Policy for the AI provider and details."
+            },
+            {
+                "q": "How are competency levels calculated?",
+                "a": "From evidence (quizzes, completions, trainer endorsement, profile, self-declaration) using published formulas. AI suggests; formulas decide; people can override."
+            },
+            {
+                "q": "Which languages are supported?",
+                "a": "The interface works in English and Hindi. AI translation of quizzes and feedback is planned, with trainer review."
+            },
+            {
+                "q": "Is blockchain really used?",
+                "a": "The audit log is hash-chained. Optionally, hashes (not personal data) can be anchored on a public test network for demonstration. A permissioned ledger would suit production."
+            },
+            {
+                "q": "Who can see my data?",
+                "a": "You, and only what each role allows: trainers see their cohorts' results; administrators see their organisation. Access is designed to be role-based and audited."
+            },
+            {
+                "q": "Can I use it for real official records?",
+                "a": "No. It is a prototype: use demo or non-sensitive data only."
+            }
+        ]
+    },
+    "cta": {
+        "title": "Start with your own competency profile.",
+        "sub": "Create an account in a minute and explore the prototype with demo data.",
+        "primary": "Get started",
+        "secondary": "Log in",
+        "disclaimer": "SAMARTH AI is a student prototype built in response to Smart India Hackathon problem statement SIH26101 (MoSPI). It is not an official Government of India website or service, and it is not endorsed by or affiliated with MoSPI, NSSTA, iGOT Karmayogi or the Government of India. Courses, integrations and some figures are simulated for demonstration."
+    }
+}

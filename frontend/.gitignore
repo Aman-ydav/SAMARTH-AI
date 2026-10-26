@@ -2,17 +2,20 @@
 logs
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
+# Dependencies and build output
 node_modules
 dist
 dist-ssr
+coverage
+
+# Local env (only .env.sample is committed)
+.env
+.env.*
+!.env.sample
 *.local
 
-# Editor directories and files
+# Editor and OS files
 .vscode/*
 !.vscode/extensions.json
 .idea

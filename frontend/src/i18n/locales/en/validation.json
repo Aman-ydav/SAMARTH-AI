@@ -1,0 +1,53 @@
+{
+    "required": "This field is required.",
+    "name": {
+        "required": "Enter your full name.",
+        "tooShort": "Enter at least 2 characters.",
+        "tooLong": "Use 80 characters or fewer."
+    },
+    "email": {
+        "required": "Enter your email address.",
+        "invalid": "Enter a valid email address.",
+        "tooLong": "Email addresses can have at most 254 characters.",
+        "sameAsCurrent": "This is already your email address."
+    },
+    "password": {
+        "required": "Enter your password.",
+        "tooShort": "Use at least 10 characters.",
+        "tooLongBytes": "Use at most 72 bytes. Characters outside basic English letters take more than one byte.",
+        "common": "This password is too common. Choose a less guessable one.",
+        "containsEmail": "The password must not contain the first part of your email address.",
+        "containsName": "The password must not contain your name.",
+        "sameAsCurrent": "The new password must be different from the current one.",
+        "policyMinLength": "At least 10 characters",
+        "policyMaxBytes": "At most 72 bytes",
+        "policyNotCommon": "Not a commonly used password",
+        "policyNoPersonal": "Does not contain your name or email"
+    },
+    "confirmPassword": {
+        "required": "Confirm your password.",
+        "mismatch": "The passwords do not match."
+    },
+    "terms": {
+        "required": "You must agree to the Terms of Use and Privacy Policy to continue."
+    },
+    "token": {
+        "required": "The link is missing its token. Open the link from your email again."
+    },
+    "locale": {
+        "invalid": "Choose English or Hindi."
+    },
+    "timezone": {
+        "required": "Choose a time zone.",
+        "invalid": "Choose a time zone from the list."
+    },
+    "confirmPhrase": {
+        "mismatch": "Type the confirmation word exactly as shown."
+    },
+    "avatar": {
+        "empty": "That file is empty. Choose a photo.",
+        "type": "Use a JPEG, PNG or WebP image.",
+        "tooLarge": "That photo is larger than 2 MB. Choose a smaller one.",
+        "mismatch": "That file is not really a JPEG, PNG or WebP image. Choose another photo."
+    }
+}

@@ -1,0 +1,67 @@
+{
+    "brand": {
+        "name": "SAMARTH AI",
+        "tagline": "आधिकारिक सांख्यिकी के लिए स्मार्ट दक्षता इंटेलिजेंस"
+    },
+    "documentTitle": "{{page}} | SAMARTH AI",
+    "prototype": "प्रोटोटाइप",
+    "prototypeNotice": "SIH26101 के लिए प्रोटोटाइप। यह भारत सरकार की आधिकारिक वेबसाइट नहीं है।",
+    "showPassword": "पासवर्ड दिखाएँ",
+    "hidePassword": "पासवर्ड छिपाएँ",
+    "opensInNewTab": "(नए टैब में खुलता है)",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "continue": "आगे बढ़ें",
+    "back": "वापस जाएँ",
+    "next": "अगला",
+    "submit": "जमा करें",
+    "confirm": "पुष्टि करें",
+    "close": "बंद करें",
+    "edit": "संपादित करें",
+    "delete": "हटाएँ",
+    "search": "खोजें",
+    "retry": "पुनः प्रयास करें",
+    "loading": "लोड हो रहा है…",
+    "goHome": "मुख्य पृष्ठ पर जाएँ",
+    "goBack": "वापस जाएँ",
+    "goToDashboard": "डैशबोर्ड पर जाएँ",
+    "or": "या",
+    "language": {
+        "label": "भाषा",
+        "en": "English",
+        "hi": "हिन्दी"
+    },
+    "role": {
+        "learner": "शिक्षार्थी",
+        "trainer": "प्रशिक्षक",
+        "admin": "प्रशासक",
+        "superadmin": "प्लेटफ़ॉर्म प्रशासक"
+    },
+    "banner": {
+        "offline": "आप ऑफ़लाइन हैं। दोबारा कनेक्ट होने तक इंटरनेट वाली क्रियाएँ उपलब्ध नहीं हैं।",
+        "waking": "सर्वर शुरू हो रहा है। इसमें एक मिनट तक लग सकता है।"
+    },
+    "pages": {
+        "landing": "SAMARTH AI",
+        "about": "हमारे बारे में",
+        "privacy": "गोपनीयता नीति",
+        "terms": "उपयोग की शर्तें",
+        "getStarted": "शुरू करें",
+        "labs": "वर्चुअल लैब",
+        "verifyCertificate": "प्रमाणपत्र सत्यापित करें",
+        "dashboard": "डैशबोर्ड",
+        "onboarding": "ऑनबोर्डिंग"
+    },
+    "ui": {
+        "breadcrumb": "पृष्ठ पथ",
+        "more": "और",
+        "pagination": "पृष्ठांकन",
+        "previous": "पिछला",
+        "goToPreviousPage": "पिछले पृष्ठ पर जाएँ",
+        "goToNextPage": "अगले पृष्ठ पर जाएँ",
+        "morePages": "और पृष्ठ",
+        "sidebar": "साइडबार",
+        "sidebarDescription": "मोबाइल साइडबार दिखाता है।",
+        "toggleSidebar": "साइडबार खोलें या बंद करें"
+    }
+}
