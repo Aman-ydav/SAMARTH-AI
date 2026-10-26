@@ -1,28 +1,17 @@
-import { useEffect, useState } from 'react'
+import { Suspense } from "react";
+import { RouterProvider } from "react-router/dom";
+import { AppProviders } from "@/app/providers/AppProviders";
+import { BootSplash } from "@/app/providers/BootSplash";
+import { router } from "@/app/router";
+import { store } from "@/app/store";
 
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
-
-function App() {
-  const [status, setStatus] = useState('Checking...')
-
-  useEffect(() => {
-    fetch(`${apiUrl}/api/health`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Backend unavailable')
-        }
-        return response.json()
-      })
-      .then((data) => setStatus(data.message))
-      .catch(() => setStatus('Unavailable'))
-  }, [])
-
-  return (
-    <main>
-      <h1>Samarth AI</h1>
-      <p>Backend status: {status}</p>
-    </main>
-  )
+/* The Suspense boundary covers the first render of a Hindi visitor: Hindi namespaces load on demand (FE-111). */
+export default function App() {
+    return (
+        <AppProviders store={store}>
+            <Suspense fallback={<BootSplash />}>
+                <RouterProvider router={router} />
+            </Suspense>
+        </AppProviders>
+    );
 }
-
-export default App

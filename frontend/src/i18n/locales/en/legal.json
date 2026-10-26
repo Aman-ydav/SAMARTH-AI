@@ -1,0 +1,272 @@
+{
+    "common": {
+        "draftTitle": "Draft",
+        "draftNotice": "Draft – review by legal counsel before production.",
+        "placeholderNote": "Items in square brackets, such as [SUPPORT_EMAIL: placeholder], are placeholders that the team must replace before launch.",
+        "versionLabel": "Version",
+        "lastUpdatedLabel": "Last updated",
+        "tocTitle": "On this page",
+        "tocLabel": "Table of contents",
+        "englishAuthoritative": "The English text is authoritative. Sections that are not yet translated are shown in English.",
+        "disclaimerTitle": "Prototype disclaimer",
+        "disclaimer": "SAMARTH AI is a student prototype built in response to Smart India Hackathon problem statement SIH26101 (MoSPI). It is not an official Government of India website or service, and it is not endorsed by or affiliated with MoSPI, NSSTA, iGOT Karmayogi or the Government of India. Courses, integrations and some figures are simulated for demonstration.",
+        "print": "Print this page",
+        "related": "Related documents"
+    },
+    "privacy": {
+        "title": "Privacy Policy",
+        "intro": "How SAMARTH AI collects, uses and protects data in this prototype.",
+        "relatedLink": "Read the Terms of Use",
+        "sections": {
+            "overview": {
+                "title": "Summary",
+                "paragraphs": [
+                    "SAMARTH AI is a student prototype (SIH26101). We collect only what we need to run the demo, never sell data, set no tracking or advertising cookies, and do not send personal data to the AI model.",
+                    "This policy follows the principles of India's Digital Personal Data Protection Act, 2023 (DPDP Act) and the Information Technology Act, 2000, but it is not a certification of compliance."
+                ]
+            },
+            "whoWeAre": {
+                "title": "Who we are",
+                "paragraphs": [
+                    "The SAMARTH AI team, acting as data fiduciary for this prototype. Contact: {{supportEmail}}."
+                ]
+            },
+            "dataWeCollect": {
+                "title": "Data we collect",
+                "paragraphs": ["We collect the following kinds of data."],
+                "items": [
+                    "Account: name, email, password (stored only as a salted hash), role, organisation, language, status, consent time and policy version.",
+                    "Google sign-in (optional): name, email, email-verified flag and Google account id. We never see your Google password.",
+                    "Profile: designation, department, job role, current assignment, qualifications, experience and past trainings.",
+                    "Learning data: competency evidence, quiz attempts and answers, scores, recommendations, simulated enrolments and completions.",
+                    "Uploaded content: documents and transcripts you or your trainer upload.",
+                    "AI tutor chats and notification preferences.",
+                    "Security and technical data: session records (device type and a keyed hash of the IP address, never the raw address), audit log entries, rate-limit counters, and server logs with request ids (no passwords or tokens)."
+                ]
+            },
+            "purposesAndConsent": {
+                "title": "Why we use it, and consent",
+                "paragraphs": [
+                    "We use data to create and secure your account, build your competency profile, recommend learning, generate and score quizzes, show dashboards to the right roles, send service emails and keep the platform safe.",
+                    "We rely on your consent, given when you sign up and when you complete your profile. You can withdraw it at any time, although this may end your account. We use data only for these purposes."
+                ]
+            },
+            "cookies": {
+                "title": "Cookies and browser storage",
+                "paragraphs": [
+                    "We use strictly necessary cookies and browser storage only. There are no analytics, advertising or tracking cookies."
+                ],
+                "after": [
+                    "If you use Google Sign-In, Google may set its own cookies on its pages. See Google's policy."
+                ]
+            },
+            "processors": {
+                "title": "Who processes data for us",
+                "paragraphs": [
+                    "Our service providers are MongoDB Atlas (database), Cloudinary (images and uploaded documents), Brevo (service emails), Google (sign-in, optional), Render (API hosting), Vercel (website hosting) and the AI provider {{llmProvider}}. They act on our instructions.",
+                    "Some may store or process data outside India (region: {{dataRegion}}). We choose providers with appropriate safeguards."
+                ]
+            },
+            "ai": {
+                "title": "AI model",
+                "paragraphs": [
+                    "Prompts contain opaque ids and aggregated competency data only. Names, emails, employee ids and phone numbers are removed before any text is sent.",
+                    "Uploaded documents are used to draft quiz questions and are treated as untrusted data. We prefer providers that do not train on API data. This must be confirmed for {{llmProvider}}."
+                ]
+            },
+            "retention": {
+                "title": "How long we keep data",
+                "items": [
+                    "Account and learning data: while your account exists.",
+                    "Unverified accounts: purged after 7 days.",
+                    "AI tutor conversations: 90 days.",
+                    "AI response cache: 7 days.",
+                    "Audit log: kept, without passwords or tokens."
+                ],
+                "after": [
+                    "After you request deletion there is a 30-day grace period. Then your identity is removed and only anonymised aggregates remain."
+                ]
+            },
+            "security": {
+                "title": "Security",
+                "paragraphs": [
+                    "Designed measures: HTTPS, HttpOnly session cookies, hashed passwords and tokens, role-based access, rate limiting and lockout, input validation, a hash-chained audit log and least-privilege database access.",
+                    "No system is perfectly secure. This is a prototype, so do not upload sensitive official information. We will act on personal-data breaches and, where required by law, report them."
+                ]
+            },
+            "yourRights": {
+                "title": "Your rights (DPDP Act)",
+                "paragraphs": [
+                    "You may ask to access, correct or erase your data, withdraw consent, obtain a summary of your data, have grievances redressed, and nominate someone to exercise these rights for you.",
+                    "Use Settings (profile edit, export and delete tools, some of them still planned) or write to us."
+                ]
+            },
+            "grievance": {
+                "title": "Grievance and contact",
+                "paragraphs": [
+                    "Grievance officer: {{grievanceName}}, {{grievanceEmail}}.",
+                    "We aim to acknowledge within 3 days and resolve within 15 days. These targets are proposed and counsel must confirm them. If a grievance is unresolved, you may approach the Data Protection Board of India once it is operational."
+                ]
+            },
+            "children": {
+                "title": "Children",
+                "paragraphs": [
+                    "SAMARTH AI is for working officials aged 18 and over. We do not knowingly collect children's data. Contact us to have it removed."
+                ]
+            },
+            "transfers": {
+                "title": "Transfers",
+                "paragraphs": [
+                    "See the section on who processes data for us. We will not transfer data to any country the Government of India restricts."
+                ]
+            },
+            "changes": {
+                "title": "Changes",
+                "paragraphs": [
+                    "We will post updates here with a new date and version, and notify you by email or in the app for material changes."
+                ]
+            }
+        }
+    },
+    "cookies": {
+        "caption": "Cookies and browser storage used by SAMARTH AI",
+        "columns": {
+            "name": "Name",
+            "type": "Type",
+            "purpose": "Purpose",
+            "lifetime": "Lifetime"
+        },
+        "rows": [
+            {
+                "name": "sai_access",
+                "type": "Cookie, HttpOnly, Secure",
+                "purpose": "Proves you are signed in.",
+                "lifetime": "15 minutes"
+            },
+            {
+                "name": "sai_refresh",
+                "type": "Cookie, HttpOnly, Secure, path /api/v1/auth",
+                "purpose": "Renews your session. Rotated on each use.",
+                "lifetime": "7 days sliding (30-day cap), or 30 days sliding (90-day cap) with remember me"
+            },
+            {
+                "name": "sai_csrf",
+                "type": "Cookie, readable by the page",
+                "purpose": "Protects against cross-site request forgery.",
+                "lifetime": "Same as sai_refresh for that session"
+            },
+            {
+                "name": "sai-theme",
+                "type": "Browser localStorage",
+                "purpose": "Remembers light or dark mode.",
+                "lifetime": "Until cleared"
+            },
+            {
+                "name": "sai-lang",
+                "type": "Browser localStorage",
+                "purpose": "Remembers English or Hindi.",
+                "lifetime": "Until cleared"
+            },
+            {
+                "name": "sai-sidebar",
+                "type": "Browser localStorage",
+                "purpose": "Remembers whether the sidebar is collapsed.",
+                "lifetime": "Until cleared"
+            }
+        ]
+    },
+    "terms": {
+        "title": "Terms of Use",
+        "intro": "The rules for using SAMARTH AI, a student prototype.",
+        "relatedLink": "Read the Privacy Policy",
+        "sections": {
+            "acceptance": {
+                "title": "Acceptance",
+                "paragraphs": [
+                    "By creating an account or using SAMARTH AI you agree to these Terms and the Privacy Policy. If you do not agree, do not use it."
+                ]
+            },
+            "prototype": {
+                "title": "Prototype status",
+                "paragraphs": [
+                    "SAMARTH AI is a student prototype, not an official government service. Features, data and availability can change or stop without notice. Simulated content (catalogue, programmes, demo data) is illustrative.",
+                    "It is not an official Government of India website or service, and it is not endorsed by or affiliated with MoSPI, NSSTA, iGOT Karmayogi or the Government of India."
+                ]
+            },
+            "accounts": {
+                "title": "Accounts",
+                "paragraphs": [
+                    "You must be 18 or older and give accurate information. Keep your password confidential and tell us about misuse. Administrators may invite users and set roles. You are responsible for activity under your account."
+                ]
+            },
+            "acceptableUse": {
+                "title": "Acceptable use",
+                "paragraphs": ["Do not:"],
+                "items": [
+                    "break the law;",
+                    "attempt unauthorised access or probe security without written permission;",
+                    "overload the service;",
+                    "upload malware, personal data of others without the right to do so, or sensitive or classified official information;",
+                    "use the service to harass, mislead or impersonate;",
+                    "scrape the service or reverse engineer it, except as law allows."
+                ]
+            },
+            "yourContent": {
+                "title": "Your content",
+                "paragraphs": [
+                    "You keep ownership of what you upload. You grant us a limited, non-exclusive licence to host, process and display it solely to run the service for you and your organisation, including AI quiz drafting.",
+                    "You confirm you have the right to upload it. You can delete it, and backups clear on a rolling basis."
+                ]
+            },
+            "aiOutput": {
+                "title": "AI output",
+                "paragraphs": [
+                    "Recommendations, competency estimates, quiz questions, explanations, translations and tutor answers can be wrong or incomplete. They are aids, not official assessments, certifications or professional advice. Review them before relying on them.",
+                    "Trainers are responsible for approving the questions they publish."
+                ]
+            },
+            "thirdParty": {
+                "title": "Third-party services",
+                "paragraphs": [
+                    "Links and integrations (iGOT Karmayogi, Google and others) are governed by their own terms. SAMARTH AI is not affiliated with or endorsed by them."
+                ]
+            },
+            "ip": {
+                "title": "Intellectual property",
+                "paragraphs": [
+                    "The SAMARTH AI name, wordmark, software and design belong to the team (open-source licence {{licence}} where stated). Third-party names and trademarks belong to their owners. We may use feedback without obligation."
+                ]
+            },
+            "availability": {
+                "title": "Availability",
+                "paragraphs": [
+                    "The service is provided \"as is\". The free hosting may sleep, be slow or go down."
+                ]
+            },
+            "liability": {
+                "title": "Liability",
+                "paragraphs": [
+                    "To the extent permitted by Indian law, the team is not liable for indirect or consequential loss, or for loss from reliance on AI output or simulated data. Nothing limits liability that cannot be limited by law."
+                ]
+            },
+            "termination": {
+                "title": "Termination",
+                "paragraphs": [
+                    "You may stop using the service and request deletion at any time. We may suspend or end accounts that breach these Terms or put the service at risk."
+                ]
+            },
+            "governingLaw": {
+                "title": "Governing law",
+                "paragraphs": [
+                    "The laws of India apply, including the Information Technology Act, 2000. Courts at {{jurisdictionCity}} have jurisdiction, subject to any mandatory rights you have."
+                ]
+            },
+            "changes": {
+                "title": "Changes and contact",
+                "paragraphs": [
+                    "We may update these Terms with a new version and date. Questions: {{supportEmail}}."
+                ]
+            }
+        }
+    }
+}

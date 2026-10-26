@@ -19,8 +19,9 @@ const declaration = {
   },
 };
 
-const ROUTES = ['/404', '/403', '/500', '/offline', '/maintenance', '/session-expired', '/account-suspended', '/account-locked', '/verify-email', '/verify-email/pending', '/forgot-password', '/reset-password', '/cookies-disabled', '/unsupported-browser', '/429'];
-const ALIASES = { '/404': ['NotFound'], '/403': ['Forbidden', 'NotAuthorised', 'Unauthorized'], '/500': ['ServerError', 'SomethingWrong'], '/429': ['TooManyRequests', 'RateLimited'] };
+// Canonical routes per DECISIONS R3 / docs/23 §2. /403 /404 /500 are redirect aliases; /429 and /unsupported-browser are inline-only (rule 09).
+const ROUTES = ['/not-found', '/unauthorized', '/server-error', '/offline', '/maintenance', '/session-expired', '/account-suspended', '/account-locked', '/verify-email', '/verify-email-sent', '/forgot-password', '/reset-password', '/cookies-disabled', '/confirm-email-change', '/undo-email-change'];
+const ALIASES = {};
 const pageName = (r) => ALIASES[r]?.[0] ?? r.slice(1).split(/[/-]/).map((w) => w[0].toUpperCase() + w.slice(1)).join('');
 const pageNames = (r) => (ALIASES[r] ?? [pageName(r)]).map((n) => `${n}Page.jsx`);
 const pages = {

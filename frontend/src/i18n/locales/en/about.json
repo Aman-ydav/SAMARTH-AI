@@ -1,0 +1,166 @@
+{
+    "hero": {
+        "overline": "About SAMARTH AI",
+        "title": "Capable people make better statistics.",
+        "sub": "SAMARTH AI is a student prototype that helps India's statistical workforce see their skills, close their gaps and keep learning.",
+        "chip": "Prototype for SIH26101"
+    },
+    "mission": {
+        "title": "Our mission",
+        "statement": "Every official in the statistical system should be able to see where their skills stand, what to learn next and how far they have come, and every institution should be able to see the same, securely and fairly."
+    },
+    "problem": {
+        "title": "The problem we picked",
+        "body": [
+            "Officials need continuous upskilling, but the large iGOT Karmayogi catalogue does not tell them what fits their role. There is no intelligent skill-gap assessment for official statistics, trainers lack a fast way to create assessments, and administrators lack workforce-level visibility.",
+            "SAMARTH AI is our answer."
+        ],
+        "facts": [
+            { "label": "Problem statement", "value": "SIH26101" },
+            { "label": "Organisation", "value": "MoSPI" },
+            { "label": "Theme", "value": "Blockchain and Cybersecurity" }
+        ]
+    },
+    "principles": {
+        "title": "What we hold ourselves to",
+        "items": [
+            {
+                "title": "Explainable",
+                "body": "Every recommendation and question shows its reason or source."
+            },
+            {
+                "title": "Numbers by code, language by AI",
+                "body": "Levels and gaps come from tested formulas. AI drafts, extracts and ranks inside validated limits."
+            },
+            {
+                "title": "People decide",
+                "body": "Trainers approve questions. Administrators can override."
+            },
+            {
+                "title": "Privacy by design",
+                "body": "Minimum data, and no personal data sent to the AI model."
+            },
+            {
+                "title": "Honest about limits",
+                "body": "We label what is simulated or planned."
+            },
+            {
+                "title": "Accessible and bilingual",
+                "body": "Keyboard friendly, WCAG 2.2 AA target, English and Hindi."
+            }
+        ]
+    },
+    "ladder": {
+        "title": "The proficiency ladder",
+        "intro": "Every competency is rated on six levels, from 0 to 5.",
+        "levelTitle": "Level {{level}}: {{name}}",
+        "levels": [
+            {
+                "name": "None",
+                "summary": "No exposure to the competency yet."
+            },
+            {
+                "name": "Awareness",
+                "summary": "Knows the terms and the purpose, and needs guidance."
+            },
+            {
+                "name": "Basic",
+                "summary": "Performs simple tasks with supervision."
+            },
+            {
+                "name": "Working",
+                "summary": "Performs routine tasks independently."
+            },
+            {
+                "name": "Advanced",
+                "summary": "Handles complex cases and guides others."
+            },
+            {
+                "name": "Expert",
+                "summary": "Sets standards and designs methods."
+            }
+        ]
+    },
+    "roadmap": {
+        "title": "Project timeline",
+        "intro": "Weeks are counted from project kickoff. Calendar dates are still to be set by the team.",
+        "statusLabel": "Status",
+        "stripLabel": "Project phases, scrolls sideways",
+        "status": {
+            "done": "Done",
+            "inProgress": "In progress",
+            "planned": "Planned"
+        },
+        "phases": [
+            {
+                "period": "Week 1",
+                "title": "Setup",
+                "body": "Stack running, contracts agreed, framework draft."
+            },
+            {
+                "period": "Weeks 2 to 3",
+                "title": "Foundations",
+                "body": "Login and roles, profile, framework, iGOT mock, UI shell."
+            },
+            {
+                "period": "Weeks 3 to 5",
+                "title": "Core AI",
+                "body": "Gap analysis, recommendations, content pipeline, quiz generation with review."
+            },
+            {
+                "period": "Weeks 5 to 6",
+                "title": "Loop closure and dashboards",
+                "body": "Quiz attempts, evidence to score to recommendation, admin analytics, tutor."
+            },
+            {
+                "period": "Weeks 6 to 7",
+                "title": "Security and polish",
+                "body": "Audit chain, anchoring, mock SSO, Hindi, labs, hardening."
+            },
+            {
+                "period": "Weeks 7 to 8",
+                "title": "Test, deploy, present",
+                "body": "Stable demo URL, evaluation numbers, rehearsals."
+            }
+        ]
+    },
+    "tech": {
+        "title": "Technology",
+        "intro": "Modular, adapter-based architecture: the AI model, iGOT, email, storage and ledger sit behind swappable adapters.",
+        "aiProvider": "AI provider: {{provider}}",
+        "listLabel": "Technologies used in this prototype",
+        "pause": "Pause technology strip",
+        "play": "Play technology strip"
+    },
+    "team": {
+        "title": "The team",
+        "intro": "Six people, six areas of ownership.",
+        "placeholderBadge": "Placeholder",
+        "placeholderNote": "Names, photos and bios are placeholders. The team will add them before launch.",
+        "namePlaceholder": "Team member name",
+        "bioPlaceholder": "One-line bio to be added.",
+        "mentor": "Mentor and acknowledgements: {{mentor}}",
+        "slots": [
+            { "role": "Backend core and security" },
+            { "role": "Assessment engine" },
+            { "role": "Competency and recommendation" },
+            { "role": "Frontend lead, learner experience" },
+            { "role": "Admin and trainer UI, data visualisation" },
+            { "role": "Integration, DevOps and QA" }
+        ]
+    },
+    "facts": {
+        "title": "The product in numbers",
+        "intro": "Figures from the competency framework in this prototype.",
+        "items": [
+            { "label": "competency domains" },
+            { "label": "competencies" },
+            { "label": "proficiency levels, 0 to 5" },
+            { "label": "seed roles" }
+        ]
+    },
+    "disclaimer": {
+        "title": "Prototype disclaimer",
+        "body": "SAMARTH AI is a student prototype built in response to Smart India Hackathon problem statement SIH26101 (MoSPI). It is not an official Government of India website or service, and it is not endorsed by or affiliated with MoSPI, NSSTA, iGOT Karmayogi or the Government of India. Courses, integrations and some figures are simulated for demonstration."
+    }
+}

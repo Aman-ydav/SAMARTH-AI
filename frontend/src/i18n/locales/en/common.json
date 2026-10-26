@@ -1,0 +1,67 @@
+{
+    "brand": {
+        "name": "SAMARTH AI",
+        "tagline": "Smart Competency Intelligence for Official Statistics"
+    },
+    "documentTitle": "{{page}} | SAMARTH AI",
+    "prototype": "Prototype",
+    "prototypeNotice": "Prototype for SIH26101. Not an official Government of India website.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "opensInNewTab": "(opens in a new tab)",
+    "save": "Save",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "close": "Close",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "retry": "Try again",
+    "loading": "Loading…",
+    "goHome": "Go to home",
+    "goBack": "Go back",
+    "goToDashboard": "Go to dashboard",
+    "or": "or",
+    "language": {
+        "label": "Language",
+        "en": "English",
+        "hi": "हिन्दी"
+    },
+    "role": {
+        "learner": "Learner",
+        "trainer": "Trainer",
+        "admin": "Admin",
+        "superadmin": "Platform admin"
+    },
+    "banner": {
+        "offline": "You are offline. Actions that need the internet are unavailable until you reconnect.",
+        "waking": "Waking up the server. This can take up to a minute."
+    },
+    "pages": {
+        "landing": "SAMARTH AI",
+        "about": "About",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Use",
+        "getStarted": "Get started",
+        "labs": "Virtual labs",
+        "verifyCertificate": "Verify a certificate",
+        "dashboard": "Dashboard",
+        "onboarding": "Onboarding"
+    },
+    "ui": {
+        "breadcrumb": "Breadcrumb",
+        "more": "More",
+        "pagination": "Pagination",
+        "previous": "Previous",
+        "goToPreviousPage": "Go to previous page",
+        "goToNextPage": "Go to next page",
+        "morePages": "More pages",
+        "sidebar": "Sidebar",
+        "sidebarDescription": "Displays the mobile sidebar.",
+        "toggleSidebar": "Toggle sidebar"
+    }
+}

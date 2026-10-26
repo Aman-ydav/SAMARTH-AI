@@ -1,0 +1,31 @@
+{
+    "navLabel": "Footer",
+    "product": {
+        "title": "Product",
+        "howItWorks": "How it works",
+        "assessment": "Assessment engine",
+        "mapping": "Competency mapping",
+        "recommendations": "Recommendations",
+        "dashboards": "Dashboards"
+    },
+    "company": {
+        "title": "Company",
+        "about": "About",
+        "faq": "FAQ",
+        "getStarted": "Get started"
+    },
+    "legal": {
+        "title": "Legal",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Use",
+        "cookies": "Cookies"
+    },
+    "contact": {
+        "title": "Contact",
+        "pending": "Contact details will be published before launch."
+    },
+    "copyright": "© {{year}} SAMARTH AI team",
+    "disclaimer": "SAMARTH AI is a student prototype built in response to Smart India Hackathon problem statement SIH26101 (MoSPI). It is not an official Government of India website or service, and it is not endorsed by or affiliated with MoSPI, NSSTA, iGOT Karmayogi or the Government of India. Courses, integrations and some figures are simulated for demonstration.",
+    "demoData": "Screens show demo data.",
+    "preferences": "Language and theme"
+}

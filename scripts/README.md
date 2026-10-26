@@ -8,6 +8,7 @@ Tooling that enforces the rulebook in `../docs/rules` (zero dependencies, Node 2
 - `rules/<group>.mjs`: the checks, one small function each, grouped fs, ui, frontend, backend, auth, db, anim, test, media, edge.
 - `hooks/claude-hook.mjs`: Claude Code hook helper wired up in `../../.claude/settings.json` (session reminder, new-path guard, git/dependency guard, post-edit check, stop gate).
 - `dev.mjs`: starts backend and frontend together with prefixed output (`npm run dev`).
+- `check-postman-coverage.mjs`: Postman coverage gate (TEST-30, TEST-45). Lists every registered Express route by running the `route-in-postman` check, fails when a route has no request in `backend/postman/` or a request has no route, and warns about routes missing from `docs/08-api-design.md`. Root `npm run test:api` runs it before newman; run it alone with `node scripts/check-postman-coverage.mjs` (`--json` for machine output).
 - Tests: `check-rules-test.mjs`, `check-rules-golden-test.mjs`, `hooks/claude-hook-test.mjs`.
 
 ## Running the checker
