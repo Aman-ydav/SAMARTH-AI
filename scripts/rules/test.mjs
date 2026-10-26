@@ -63,7 +63,7 @@ const coverage = {
   id: 'coverage-threshold', ruleIds: ['TEST-29', 'TEST-27'], severity: 'error', scope: 'project', globs: [],
   desc: 'vitest coverage thresholds at or above TEST-29; retry stays 0',
   run(project) {
-    const files = ['backend/vitest.config.js', 'frontend/vitest.config.js', 'frontend/vite.config.js'].filter((p) => project.has(p));
+    const files = ['backend/vitest.config.js', 'frontend/vitest.config.js', 'frontend/vite.config.js'].filter((p) => project.has(p) && (!p.endsWith('vite.config.js') || /\btest\s*:/.test(project.file(p).code ?? '')));
     if (!files.length) return [{ severity: 'info', message: 'no vitest config yet: coverage-threshold skipped' }];
     const out = [];
     for (const rel of files) {

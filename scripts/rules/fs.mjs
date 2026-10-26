@@ -57,7 +57,8 @@ const IDS = [
 ];
 const project0 = (f) => f.project.rels[0];
 const checks = IDS.map(([id, desc]) => pathCheck(id, desc));
-checks.find((c) => c.id === 'fs-allowed-root-dirs').ruleIds = ['FS-10', 'FS-33'];
+const RULES = { 'fs-backend-file-pattern': ['FS-11', 'FS-31'], 'fs-frontend-file-pattern': ['FS-19', 'FS-32'], 'fs-folder-kebab': ['FS-30'], 'fs-allowed-root-dirs': ['FS-10', 'FS-33'], 'fs-no-stray-root-files': ['FS-06'], 'fs-no-barrel-outside-boundary': ['FS-42'], 'fs-ui-dir-shadcn-only': ['FS-21'] };
+for (const c of checks) if (RULES[c.id]) c.ruleIds = RULES[c.id];
 checks.find((c) => c.id === 'fs-no-leftover').ruleIds = ['FS-05', 'FS-07', 'FS-08'];
 
 export const sizeCheck = (id, rules, desc, only) => ({

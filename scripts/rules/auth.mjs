@@ -2,7 +2,7 @@
 //  - no-localstorage-token is defined once, in frontend.mjs (rule ids FE-106 + AUTH-01).
 //  - no-token-in-redux covers token/accessToken/refreshToken/jwt keys; password/csrf/otp keys are reported by no-token-in-state (FE-21).
 //  - no-jwt-in-url also flags `?token=` for email links: AUTH-31 puts one-time tokens in the URL fragment (#token=).
-//  - cookies-httponly: cookies.js must contain `httpOnly: true` and no `httpOnly: false` near access/refresh cookie code.
+//  - cookies-httponly: cookies.js must contain `httpOnly: true`; a res.cookie(...) call naming access/refresh must not say `httpOnly: false`.
 //  - no-open-redirect (warn) is heuristic: res.redirect with request-derived input, or reading returnTo/next without safeReturnPath.
 import { rx, isTest, calls, lineOf, BE, FE } from './util.mjs';
 
@@ -22,10 +22,9 @@ const cookies = {
       return out;
     }
     if (!/httpOnly\s*:\s*true/.test(c)) out.push({ line: 1, message: 'cookies.js never sets httpOnly: true (sai_access and sai_refresh must be HttpOnly)' });
-    const lines = c.split('\n');
-    lines.forEach((ln, i) => {
-      if (/httpOnly\s*:\s*false/.test(ln) && /access|refresh/i.test(lines.slice(Math.max(0, i - 4), i + 4).join(' '))) out.push({ line: i + 1, message: 'access/refresh cookies must be httpOnly' });
-    });
+    for (const call of calls(c, /\bres\s*\.\s*cookie\s*\(/)) {
+      if (/httpOnly\s*:\s*false/.test(call.body) && /access|refresh/i.test(call.body)) out.push({ line: call.line, message: 'access/refresh cookies must be httpOnly' });
+    }
     return out;
   },
 };

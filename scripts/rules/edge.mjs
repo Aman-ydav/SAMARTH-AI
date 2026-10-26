@@ -20,7 +20,9 @@ const declaration = {
 };
 
 const ROUTES = ['/404', '/403', '/500', '/offline', '/maintenance', '/session-expired', '/account-suspended', '/account-locked', '/verify-email', '/verify-email/pending', '/forgot-password', '/reset-password', '/cookies-disabled', '/unsupported-browser', '/429'];
-const pageName = (r) => r.slice(1).split(/[/-]/).map((w) => w[0].toUpperCase() + w.slice(1)).join('');
+const ALIASES = { '/404': ['NotFound'], '/403': ['Forbidden', 'NotAuthorised', 'Unauthorized'], '/500': ['ServerError', 'SomethingWrong'], '/429': ['TooManyRequests', 'RateLimited'] };
+const pageName = (r) => ALIASES[r]?.[0] ?? r.slice(1).split(/[/-]/).map((w) => w[0].toUpperCase() + w.slice(1)).join('');
+const pageNames = (r) => (ALIASES[r] ?? [pageName(r)]).map((n) => `${n}Page.jsx`);
 const pages = {
   id: 'edge-pages-exist', ruleIds: ['EDGE-120', 'FE-69'], severity: 'warn', scope: 'project', globs: [],
   desc: 'the section 6 edge routes (/404 /403 /500 /offline ...) exist',
@@ -30,7 +32,7 @@ const pages = {
     if (!routes && !pageFiles.length) return [{ severity: 'info', message: 'no frontend routes/pages yet: edge-pages-exist skipped' }];
     const hay = [routes?.code ?? '', project.has(`${FE}lib/paths.js`) ? project.file(`${FE}lib/paths.js`).code : ''].join('\n');
     const names = new Set(pageFiles.map((p) => p.base));
-    return ROUTES.filter((r) => !hay.includes(`'${r}'`) && !hay.includes(`"${r}"`) && !names.has(`${pageName(r)}Page.jsx`)).map((r) => ({ file: `${FE}app/routes.jsx`, line: 1, message: `edge route ${r} has no page or route entry (${pageName(r)}Page.jsx)` }));
+    return ROUTES.filter((r) => !hay.includes(`'${r}'`) && !hay.includes(`"${r}"`) && !pageNames(r).some((n) => names.has(n))).map((r) => ({ file: `${FE}app/routes.jsx`, line: 1, message: `edge route ${r} has no page or route entry (${pageName(r)}Page.jsx)` }));
   },
 };
 

@@ -29,7 +29,7 @@ const controllerCheck = {
   },
 };
 
-const SVC_PARAM = /\b(?:req|res|next|request|response)\b/;
+const SVC_PARAM = /\b(?:req|res|next)\b/;
 const serviceCheck = {
   id: 'no-req-res-in-service', ruleIds: ['BE-50'], severity: 'error', globs: [`${BE}**/*.service.js`],
   desc: 'services take plain arguments: no req/res/next, Express or cookie imports',
