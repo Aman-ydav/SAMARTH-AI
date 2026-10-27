@@ -434,7 +434,6 @@ describe("apiClient: 401 handling and single-flight refresh", () => {
         });
         expect(refresh.calls).toBe(0);
     });
-
 });
 
 describe("apiClient: boot hydrate exception (R5)", () => {

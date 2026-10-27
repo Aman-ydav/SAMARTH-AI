@@ -62,10 +62,16 @@ describe("DashboardPage", () => {
 
     it.each([
         ["trainer", ["Content library", "Generate quiz", "Review questions"]],
-        ["admin", ["Users", "Invites", "Audit log"]],
+        ["admin", ["Users", "Team invitations", "Audit log"]],
         [
             "superadmin",
-            ["Organisations", "Competency framework", "System settings"],
+            [
+                "Users",
+                "Team invitations",
+                "Organisations",
+                "Competency framework",
+                "System settings",
+            ],
         ],
     ])("suggests role-appropriate areas for a %s", (role, titles) => {
         render({ role });
@@ -76,6 +82,33 @@ describe("DashboardPage", () => {
                 .map((card) => card.textContent)
         ).toEqual(titles);
     });
+
+    it.each(["admin", "superadmin"])(
+        "points a %s at the built Users and Team invitations screens, not at placeholders",
+        (role) => {
+            render({ role });
+            const section = screen.getByRole("region", {
+                name: "What comes next",
+            });
+            expect(
+                within(section).getByRole("link", { name: "Open Users" })
+            ).toHaveAttribute("href", "/admin/users");
+            expect(
+                within(section).getByRole("link", {
+                    name: "Open Team invitations",
+                })
+            ).toHaveAttribute("href", "/admin/invites");
+            const cards = within(section)
+                .getAllByRole("heading", { level: 3 })
+                .map((heading) => heading.closest("[data-slot=card]"));
+            const [users, invites] = cards;
+            expect(within(users).queryByText("Coming soon")).toBeNull();
+            expect(within(invites).queryByText("Coming soon")).toBeNull();
+            expect(
+                screen.getByText(/Invite trainers/, { selector: "p" })
+            ).toBeInTheDocument();
+        }
+    );
 
     it("never links a learner to administrative areas", () => {
         const { container } = render({ role: "learner" });
