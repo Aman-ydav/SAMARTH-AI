@@ -60,6 +60,7 @@ function PinnedStory({ steps, renderVisual, className }) {
             </ol>
             <div
                 aria-hidden="true"
+                inert
                 className="sticky top-0 grid h-svh place-items-center"
             >
                 {steps.map((step, index) => (
@@ -72,7 +73,7 @@ function PinnedStory({ steps, renderVisual, className }) {
                                 : "pointer-events-none opacity-0"
                         )}
                     >
-                        {renderVisual(step, index)}
+                        {renderVisual(step, index, index === active)}
                     </div>
                 ))}
             </div>
@@ -89,7 +90,9 @@ function StackedStory({ steps, renderVisual, className }) {
                     className="grid items-center gap-6 md:grid-cols-2 md:gap-16"
                 >
                     <StepText step={step} index={index} active />
-                    <div aria-hidden="true">{renderVisual(step, index)}</div>
+                    <div aria-hidden="true" inert>
+                        {renderVisual(step, index, true)}
+                    </div>
                 </li>
             ))}
         </ol>
@@ -98,7 +101,8 @@ function StackedStory({ steps, renderVisual, className }) {
 
 /**
  * Sticky stage with text steps that swap the visual while scrolling (ANIM-34). `steps` is
- * `[{ id, title, body }]` in reading order and `renderVisual(step, index)` returns the decorative visual.
+ * `[{ id, title, body }]` in reading order and `renderVisual(step, index, active)` returns the decorative visual (`active` is true for the
+ * current step, always true when stacked, so a visual can animate when its step comes into focus). Visuals are `inert`.
  * Every step text stays in the DOM in order; React state changes only when the active step number changes.
  * Lite and reduced tiers stack each step with its visual.
  */

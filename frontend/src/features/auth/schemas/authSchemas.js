@@ -97,7 +97,7 @@ export function evaluatePasswordPolicy(
     };
 }
 
-const emailField = z
+export const emailField = z
     .string(MESSAGES.emailRequired)
     .transform(normalizeEmail)
     .pipe(

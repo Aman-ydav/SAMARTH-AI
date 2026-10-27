@@ -1,21 +1,26 @@
 import { screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { routes } from "@/app/routes";
 import AboutPage from "@/features/marketing/pages/AboutPage";
 import {
     ABOUT_PLACEHOLDERS,
+    BUILD_CHAPTERS,
     LADDER_LEVELS,
     PRODUCT_FACTS,
     ROADMAP_PHASES,
-    TEAM_SLOTS,
+    STORY_STOPS,
     TECH_STACK,
 } from "@/features/marketing/data/aboutContent";
+import { DEVELOPERS } from "@/features/marketing/data/developers";
 import { i18n } from "@/i18n";
+import { anonymousAuth } from "@/test/authState";
 import { expectAccessible } from "@/test/axeCheck";
 import { setMotionTier, stubIntersectionVisible } from "@/test/motionTier";
 import { renderPage } from "@/test/pageHarness";
+import { renderRoutes } from "@/test/renderWithProviders";
 
 // Long documents and lazily loaded sections are slow under a loaded machine (axe walks the whole page).
-vi.setConfig({ testTimeout: 20_000 });
+vi.setConfig({ testTimeout: 30_000 });
 
 const originalObserver = window.IntersectionObserver;
 
@@ -36,10 +41,12 @@ async function openAbout(t) {
     await screen.findByRole(
         "heading",
         { level: 2, name: t("facts.title") },
-        { timeout: 10_000 }
+        { timeout: 15_000 }
     );
     return view;
 }
+
+const section = (container, id) => container.querySelector(`#about-${id}`);
 
 describe.each(["en", "hi"])("AboutPage (%s)", (lng) => {
     beforeEach(async () => {
@@ -47,8 +54,9 @@ describe.each(["en", "hi"])("AboutPage (%s)", (lng) => {
         setMotionTier("reduced");
     });
     const t = (key, options) => i18n.getFixedT(lng, "about")(key, options);
+    const tl = (key, options) => i18n.getFixedT(lng, "landing")(key, options);
 
-    it("renders one h1, the main landmark and the page title", async () => {
+    it("renders one h1 with the story headline, the main landmark and the page title", async () => {
         await openAbout(t);
         expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
         expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
@@ -60,30 +68,99 @@ describe.each(["en", "hi"])("AboutPage (%s)", (lng) => {
         );
     });
 
-    it("keeps the section order of the About rule (ANIM-51)", async () => {
-        await openAbout(t);
+    it("keeps the section order of the About rule (ANIM-51), one h2 per section", async () => {
+        const { container } = await openAbout(t);
         const headings = screen
             .getAllByRole("heading", { level: 2 })
             .map((heading) => heading.textContent);
         expect(headings).toEqual([
+            t("story.title"),
             t("mission.title"),
-            t("problem.title"),
+            tl("acronym.title"),
+            t("how.title"),
             t("ladder.title"),
             t("principles.title"),
             t("roadmap.title"),
             t("tech.title"),
-            t("team.title"),
+            t("developers.title"),
             t("facts.title"),
+        ]);
+        const ids = [...container.querySelectorAll("main > div[id^='about-']")]
+            .map((node) => node.id)
+            .filter(Boolean);
+        expect(ids).toEqual([
+            "about-story",
+            "about-mission",
+            "about-acronym",
+            "about-how",
+            "about-ladder",
+            "about-principles",
+            "about-roadmap",
+            "about-tech",
+            "about-developers",
+            "about-disclaimer",
         ]);
     });
 
-    it("states the problem statement SIH26101, MoSPI and the theme", async () => {
-        await openAbout(t);
-        const facts = t("problem.facts", { returnObjects: true });
-        for (const fact of facts) {
-            expect(screen.getAllByText(fact.value).length).toBeGreaterThan(0);
+    it("tells the SIH26101 story as five ordered steps with the problem statement facts", async () => {
+        const { container } = await openAbout(t);
+        const story = within(section(container, "story"));
+        const stops = t("story.stops", { returnObjects: true });
+        expect(stops).toHaveLength(STORY_STOPS.length);
+        const list = story.getByRole("list", {
+            name: t("story.timelineLabel"),
+        });
+        expect(
+            within(list)
+                .getAllByRole("heading", { level: 3 })
+                .map((heading) => heading.textContent)
+        ).toEqual(stops.map((stop) => stop.title));
+        for (const stop of stops)
+            expect(story.getByText(stop.body)).toBeInTheDocument();
+        expect(story.getByText("SIH26101")).toBeInTheDocument();
+        expect(story.getByText("MoSPI")).toBeInTheDocument();
+        expect(
+            story.getByText(t("story.facts", { returnObjects: true })[2].value)
+        ).toBeInTheDocument();
+    });
+
+    it("reuses the SAMARTH acronym section with its seven letter cards in order", async () => {
+        const { container } = await openAbout(t);
+        const acronym = within(section(container, "acronym"));
+        const words = ["s", "a1", "m", "a2", "r", "t", "h"].map((id) =>
+            tl(`acronym.cards.${id}.word`)
+        );
+        expect(
+            acronym
+                .getAllByRole("heading", { level: 3 })
+                .map((heading) => heading.textContent)
+        ).toEqual(words);
+        const title = acronym.getByRole("heading", { level: 2 });
+        expect(
+            section(container, "acronym").querySelector("section")
+        ).toHaveAttribute("aria-labelledby", title.id);
+    });
+
+    it("lists the five build chapters in order, each with a status and its highlights", async () => {
+        const { container } = await openAbout(t);
+        const how = within(section(container, "how"));
+        const chapters = t("how.chapters", { returnObjects: true });
+        expect(chapters).toHaveLength(BUILD_CHAPTERS.length);
+        const list = how.getByRole("list", { name: t("how.listLabel") });
+        expect(
+            within(list)
+                .getAllByRole("heading", { level: 3 })
+                .map((heading) => heading.textContent)
+        ).toEqual(chapters.map((chapter) => chapter.title));
+        for (const chapter of chapters) {
+            expect(how.getByText(chapter.body)).toBeInTheDocument();
+            for (const point of chapter.points)
+                expect(how.getByText(point)).toBeInTheDocument();
         }
-        expect(screen.getAllByText("SIH26101").length).toBeGreaterThan(0);
+        const status = t("roadmap.status", { returnObjects: true });
+        expect(within(list).getAllByText(status.done)).toHaveLength(1);
+        expect(within(list).getAllByText(status.inProgress)).toHaveLength(3);
+        expect(within(list).getAllByText(status.planned)).toHaveLength(1);
     });
 
     it("lists all six principles", async () => {
@@ -115,19 +192,20 @@ describe.each(["en", "hi"])("AboutPage (%s)", (lng) => {
         });
     });
 
-    it("shows the project timeline with a status badge per phase", async () => {
-        await openAbout(t);
+    it("shows the project roadmap with a status badge per phase", async () => {
+        const { container } = await openAbout(t);
+        const roadmap = within(section(container, "roadmap"));
         const phases = t("roadmap.phases", { returnObjects: true });
         expect(phases).toHaveLength(ROADMAP_PHASES.length);
         for (const phase of phases) {
             expect(
-                screen.getByRole("heading", { level: 3, name: phase.title })
+                roadmap.getByRole("heading", { level: 3, name: phase.title })
             ).toBeInTheDocument();
         }
         const status = t("roadmap.status", { returnObjects: true });
-        expect(screen.getAllByText(status.done)).toHaveLength(1);
-        expect(screen.getAllByText(status.inProgress)).toHaveLength(1);
-        expect(screen.getAllByText(status.planned)).toHaveLength(4);
+        expect(roadmap.getAllByText(status.done)).toHaveLength(1);
+        expect(roadmap.getAllByText(status.inProgress)).toHaveLength(1);
+        expect(roadmap.getAllByText(status.planned)).toHaveLength(4);
     });
 
     it("lists the technology chips without logos", async () => {
@@ -146,26 +224,35 @@ describe.each(["en", "hi"])("AboutPage (%s)", (lng) => {
         expect(screen.queryByRole("img")).not.toBeInTheDocument();
     });
 
-    it("flags the six team slots as placeholders, with no real names", async () => {
+    it("shows six clearly marked developer placeholders, no links and no real names", async () => {
         const { container } = await openAbout(t);
-        const slots = container.querySelectorAll(
-            '[data-team-slot="placeholder"]'
-        );
-        expect(slots).toHaveLength(TEAM_SLOTS.length);
-        for (const slot of slots) {
-            expect(slot).toHaveTextContent(t("team.placeholderBadge"));
-            expect(slot).toHaveTextContent(t("team.namePlaceholder"));
-        }
-        expect(screen.getByText(t("team.placeholderNote"))).toBeInTheDocument();
+        const developers = within(section(container, "developers"));
+        const cards = container.querySelectorAll("[data-developer]");
+        expect(cards).toHaveLength(6);
         expect(
-            screen.getByText(
-                t("team.mentor", { mentor: ABOUT_PLACEHOLDERS.mentor })
+            container.querySelectorAll("[data-developer-placeholder='true']")
+        ).toHaveLength(6);
+        DEVELOPERS.forEach((developer, index) => {
+            const card = cards[index];
+            expect(card).toHaveAttribute("data-developer", developer.id);
+            expect(
+                within(card).getByRole("heading", {
+                    level: 3,
+                    name: `Developer ${index + 1}`,
+                })
+            ).toBeInTheDocument();
+            expect(card).toHaveTextContent(t("developers.placeholderBadge"));
+        });
+        expect(
+            developers.getByText(t("developers.placeholderNote"))
+        ).toBeInTheDocument();
+        expect(
+            developers.getByText(
+                t("developers.mentor", { mentor: ABOUT_PLACEHOLDERS.mentor })
             )
         ).toBeInTheDocument();
-        const roles = t("team.slots", { returnObjects: true });
-        for (const { role } of roles) {
-            expect(screen.getByText(role)).toBeInTheDocument();
-        }
+        expect(developers.queryByRole("link")).not.toBeInTheDocument();
+        expect(developers.queryByRole("img")).not.toBeInTheDocument();
     });
 
     it("shows only the real product figures and the full disclaimer", async () => {
@@ -185,19 +272,64 @@ describe.each(["en", "hi"])("AboutPage (%s)", (lng) => {
     });
 });
 
-describe("AboutPage with the full motion tier", () => {
-    beforeEach(() => {
-        setMotionTier("full");
-    });
+describe("AboutPage motion tiers", () => {
+    const t = i18n.getFixedT("en", "about");
 
-    it("renders all content and passes axe", async () => {
-        const t = i18n.getFixedT("en", "about");
+    it("full: pins the build chapters, draws the story line and keeps all content", async () => {
+        setMotionTier("full");
         const { container } = await openAbout(t);
         expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-        expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(8);
-        for (const level of t("ladder.levels", { returnObjects: true })) {
+        expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(10);
+        expect(
+            section(container, "how").querySelectorAll("li.sticky")
+        ).toHaveLength(BUILD_CHAPTERS.length);
+        expect(
+            section(container, "story").querySelector(".origin-top")
+        ).not.toBeNull();
+        for (const level of t("ladder.levels", { returnObjects: true }))
             expect(screen.getByText(level.summary)).toBeInTheDocument();
-        }
         await expectAccessible(container);
+    });
+
+    it.each(["lite", "reduced"])(
+        "%s: build chapters and story are static and complete",
+        async (tier) => {
+            setMotionTier(tier);
+            const { container } = await openAbout(t);
+            expect(
+                section(container, "how").querySelector(".sticky")
+            ).toBeNull();
+            expect(
+                section(container, "story").querySelector("[style]")
+            ).toBeNull();
+            for (const chapter of t("how.chapters", { returnObjects: true }))
+                expect(screen.getByText(chapter.body)).toBeInTheDocument();
+            for (const stop of t("story.stops", { returnObjects: true }))
+                expect(screen.getByText(stop.body)).toBeInTheDocument();
+            await expectAccessible(container);
+        }
+    );
+});
+
+describe("/about route", () => {
+    it("renders inside the marketing frame with About as the current navbar link", async () => {
+        setMotionTier("reduced");
+        renderRoutes(routes, {
+            route: "/about",
+            preloadedState: { auth: anonymousAuth },
+        });
+        const t = i18n.getFixedT("en", "about");
+        expect(
+            await screen.findByRole(
+                "heading",
+                { level: 1, name: t("hero.title") },
+                { timeout: 15_000 }
+            )
+        ).toBeInTheDocument();
+        const nav = screen.getByRole("navigation", { name: "Main navigation" });
+        expect(
+            within(nav).getByRole("link", { name: "About" })
+        ).toHaveAttribute("aria-current", "page");
+        expect(screen.getByRole("contentinfo")).toBeInTheDocument();
     });
 });

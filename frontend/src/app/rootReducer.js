@@ -8,6 +8,7 @@ import {
     registrationReducer,
     sessionsReducer,
 } from "@/features/auth";
+import { adminUsersReducer, invitesReducer } from "@/features/admin";
 import { uiReducer } from "@/features/preferences";
 
 const appReducer = combineReducers({
@@ -16,6 +17,8 @@ const appReducer = combineReducers({
     profile: profileReducer,
     registration: registrationReducer,
     sessions: sessionsReducer,
+    invites: invitesReducer,
+    adminUsers: adminUsersReducer,
     ui: uiReducer,
 });
 

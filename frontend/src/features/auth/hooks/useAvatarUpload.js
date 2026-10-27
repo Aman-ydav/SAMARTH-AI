@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { useAsyncAction } from "@/features/auth/hooks/useAsyncAction";
-import { useNotify } from "@/features/auth/hooks/useNotify";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { useNotify } from "@/hooks/useNotify";
 import {
     checkAvatarSignature,
     validateAvatarFile,

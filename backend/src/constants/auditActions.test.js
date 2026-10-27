@@ -22,6 +22,9 @@ describe("AUDIT_ACTIONS (AUTH-63, doc 20 section 14)", () => {
             "LOGOUT_ALL",
             "TOKEN_REUSE_DETECTED",
             "ROLE_CHANGED",
+            "INVITE_REVOKED",
+            "INVITE_RESENT",
+            "PLATFORM_ADMIN_CREATED",
         ]) {
             expect(AUDIT_ACTION_LIST).toContain(required);
         }

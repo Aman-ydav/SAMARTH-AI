@@ -12,11 +12,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { FieldSet } from "@/components/ui/field";
 import { AuthField } from "@/features/auth/components/AuthField";
-import { FormFailureAlert } from "@/features/auth/components/FormFailureAlert";
+import { FormFailureAlert } from "@/components/common/FormFailureAlert";
 import { ReauthFields } from "@/features/auth/components/ReauthFields";
-import { SubmitButton } from "@/features/auth/components/SubmitButton";
+import { SubmitButton } from "@/components/common/SubmitButton";
 import { useAuthFormSubmit } from "@/features/auth/hooks/useAuthFormSubmit";
-import { notify } from "@/features/auth/hooks/useNotify";
+import { notify } from "@/hooks/useNotify";
 import { buildDeleteAccountFormSchema } from "@/features/auth/schemas/settingsSchemas";
 import { deleteAccount } from "@/features/auth/slice/accountSlice";
 import { formatDate } from "@/lib/format";

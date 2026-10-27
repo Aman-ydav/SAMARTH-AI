@@ -81,8 +81,22 @@ const ROWS = [
         { exact: true },
     ],
     ["analytics", PATHS.adminAnalytics, "PieChartIcon", ADMINS, "admin"],
-    ["users", PATHS.adminUsers, "UsersIcon", ADMINS, "admin"],
-    ["invites", PATHS.adminInvites, "MailSendIcon", ADMINS, "admin"],
+    [
+        "users",
+        PATHS.adminUsers,
+        "UsersIcon",
+        ADMINS,
+        "admin",
+        { planned: false },
+    ],
+    [
+        "invites",
+        PATHS.adminInvites,
+        "MailSendIcon",
+        ADMINS,
+        "admin",
+        { planned: false },
+    ],
     ["departments", PATHS.adminDepartments, "BuildingIcon", ADMINS, "admin"],
     ["audit", PATHS.adminAudit, "ShieldIcon", ADMINS, "admin"],
     ["integrations", PATHS.adminIntegrations, "PlugIcon", ADMINS, "admin"],
@@ -156,6 +170,8 @@ const NEXT_STEPS = Object.freeze({
         { id: "audit", descriptionKey: "dashboard.steps.audit" },
     ],
     [SUPERADMIN]: [
+        { id: "users", descriptionKey: "dashboard.steps.users" },
+        { id: "invites", descriptionKey: "dashboard.steps.invites" },
         {
             id: "organisations",
             descriptionKey: "dashboard.steps.organisations",

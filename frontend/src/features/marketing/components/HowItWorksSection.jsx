@@ -30,7 +30,9 @@ export function HowItWorksSection() {
                 <StickyScrollStory
                     className="mt-10"
                     steps={steps}
-                    renderVisual={(step) => <HowStepVisual id={step.id} />}
+                    renderVisual={(step, _index, active) => (
+                        <HowStepVisual id={step.id} active={active} />
+                    )}
                 />
                 <div className="mt-10">
                     <Button asChild size="lg">

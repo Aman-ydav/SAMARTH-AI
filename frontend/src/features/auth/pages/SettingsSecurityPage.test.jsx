@@ -1,7 +1,7 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http } from "msw";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import SettingsSecurityPage from "@/features/auth/pages/SettingsSecurityPage";
 import { i18n } from "@/i18n";
 import { apiUrl, errorResponse, okResponse } from "@/mocks/fixtures/envelope";
@@ -9,6 +9,12 @@ import { signedInAuth } from "@/test/authState";
 import { expectAccessible } from "@/test/axeCheck";
 import { setupMockServer } from "@/test/mockServerLifecycle";
 import { renderPage } from "@/test/pageHarness";
+
+// The tests must not depend on the developer's real frontend/.env (a Google client id there would add a section).
+vi.mock("@/lib/env", async (importOriginal) => {
+    const actual = await importOriginal();
+    return { env: { ...actual.env, googleEnabled: false, googleClientId: "" } };
+});
 
 const server = setupMockServer();
 

@@ -6,11 +6,11 @@ import { useAppDispatch } from "@/app/hooks";
 import { CheckCircleIcon } from "@/components/icons";
 import { FieldSet } from "@/components/ui/field";
 import { AuthField } from "@/features/auth/components/AuthField";
-import { FormFailureAlert } from "@/features/auth/components/FormFailureAlert";
+import { FormFailureAlert } from "@/components/common/FormFailureAlert";
 import { PasswordStrengthHint } from "@/features/auth/components/PasswordStrengthHint";
 import { ReauthFields } from "@/features/auth/components/ReauthFields";
 import { SectionCard } from "@/features/auth/components/SectionCard";
-import { SubmitButton } from "@/features/auth/components/SubmitButton";
+import { SubmitButton } from "@/components/common/SubmitButton";
 import { useAuthFormSubmit } from "@/features/auth/hooks/useAuthFormSubmit";
 import {
     changePasswordSchema,

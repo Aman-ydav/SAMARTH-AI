@@ -33,7 +33,9 @@ describe("TickerMarquee", () => {
     });
 
     it("still renders both copies when the scroll boost is turned off (auth pages, ANIM-54)", () => {
-        render(<TickerMarquee items={ITEMS} ariaLabel="Skills" boost={false} />);
+        render(
+            <TickerMarquee items={ITEMS} ariaLabel="Skills" boost={false} />
+        );
         const group = screen.getByRole("group", { name: "Skills" });
         expect(group.querySelectorAll("ul")).toHaveLength(2);
     });

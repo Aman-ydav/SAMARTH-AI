@@ -110,6 +110,7 @@ import {
     MdTranslate,
     MdUnfoldMore,
 } from "react-icons/md";
+import { FaGithub, FaLinkedin } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
 
 export {
@@ -159,6 +160,7 @@ export {
     RiFilterFill as FilterIcon,
     RiFolderOpenFill as FolderOpenIcon,
     RiForbidFill as ForbidIcon,
+    FaGithub as GithubIcon,
     FcGoogle as GoogleIcon,
     RiGovernmentFill as GovernmentIcon,
     MdDragIndicator as GripIcon,
@@ -171,6 +173,7 @@ export {
     RiFlaskFill as LabIcon,
     RiGlobalFill as LanguageIcon,
     RiLightbulbFlashFill as LightbulbIcon,
+    FaLinkedin as LinkedinIcon,
     RiLockFill as LockIcon,
     RiLockPasswordFill as LockPasswordIcon,
     RiLoginBoxFill as LoginIcon,

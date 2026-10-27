@@ -5,9 +5,10 @@ import { runAsScript } from "#db/connect.js";
 import { hashPassword } from "#modules/auth/index.js";
 import { User } from "#modules/users/index.js";
 
-// Adds the staff accounts the Postman run needs (a trainer and an admin) next to the superadmin that `npm run seed`
-// creates. The role matrix of POST /media/signatures cannot be proven without them, because no HTTP route can grant a
-// role yet. Reads a JSON array `[{ email, password, role, name }]` from stdin; used by test:api only.
+// Adds the staff accounts the Postman run needs (a trainer and an admin) next to the platform admin that `npm run seed`
+// creates. The role matrices of the media and admin folders need signed-in staff with KNOWN passwords before any
+// invitation has been accepted, and an invitation can only be accepted by someone who chooses their own password.
+// Reads a JSON array `[{ email, password, role, name }]` from stdin; used by test:api only.
 const POLICY_VERSION = "api-test";
 
 /** Creates the staff users if they do not exist (idempotent, never overwrites a password). Returns how many were created. */

@@ -10,15 +10,20 @@ const ProblemSection = lazy(() =>
         default: module.ProblemSection,
     }))
 );
-const AcronymSection = lazy(() =>
-    import("@/features/marketing/components/AcronymSection").then((module) => ({
-        default: module.AcronymSection,
+const MeasureSection = lazy(() =>
+    import("@/features/marketing/components/MeasureSection").then((module) => ({
+        default: module.MeasureSection,
     }))
 );
 const HowItWorksSection = lazy(() =>
     import("@/features/marketing/components/HowItWorksSection").then(
         (module) => ({ default: module.HowItWorksSection })
     )
+);
+const JourneySection = lazy(() =>
+    import("@/features/marketing/components/JourneySection").then((module) => ({
+        default: module.JourneySection,
+    }))
 );
 const TourSection = lazy(() =>
     import("@/features/marketing/components/TourSection").then((module) => ({
@@ -57,8 +62,8 @@ const CtaSection = lazy(() =>
 );
 
 /**
- * Landing page (docs/23 section 3, ANIM-50 order): hero, problem, acronym spiral, how it works, product tour,
- * role views, framework wheel, trust, standards ticker, FAQ, final CTA. Every page owns its single
+ * Landing page (docs/23 section 3, ANIM-50 order): hero, problem, measure, how it works, journey, product tour,
+ * role views, framework wheel, trust, standards ticker, FAQ, final CTA. The acronym spiral left the Landing (ANIM-50). Every page owns its single
  * <main id="main-content">; MarketingLayout supplies the nav, footer, Lenis and progress bar only.
  * Hero is static; the rest mounts 600 px before it is seen.
  */
@@ -68,12 +73,13 @@ export default function LandingPage() {
             <LandingSeo />
             <HeroSection />
             <LazySection component={ProblemSection} reserve="min-h-[60svh]" />
-            <LazySection component={AcronymSection} reserve="min-h-[200svh]" />
+            <LazySection component={MeasureSection} reserve="min-h-[110svh]" />
             <LazySection
                 id={LANDING_SECTION_IDS.how}
                 component={HowItWorksSection}
                 reserve="min-h-[200svh]"
             />
+            <LazySection component={JourneySection} reserve="min-h-[130svh]" />
             <LazySection
                 id={LANDING_SECTION_IDS.features}
                 component={TourSection}

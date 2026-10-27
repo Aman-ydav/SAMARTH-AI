@@ -1,0 +1,162 @@
+{
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "pagination": {
+        "label": "Page {{page}} of {{pages}}",
+        "total_one": "{{count}} result",
+        "total_other": "{{count}} results",
+        "previous": "Previous page",
+        "next": "Next page"
+    },
+    "invites": {
+        "title": "Team invitations",
+        "subtitleAdmin": "Invite trainers to your organisation and keep track of every invitation.",
+        "subtitlePlatform": "Invite trainers and admins to your organisation and keep track of every invitation.",
+        "loadingLabel": "Loading invitations",
+        "form": {
+            "title": "Invite someone",
+            "description": "They get an email with a link that works once and expires after 7 days. Learners are not invited: they register themselves.",
+            "email": "Email address",
+            "emailPlaceholder": "name@example.org",
+            "role": "Role",
+            "rolePlaceholder": "Choose a role",
+            "roleRequired": "Choose a role for the invitation.",
+            "submit": "Send invitation",
+            "sent": "Invitation sent to {{email}}.",
+            "conflict": "This email address already has an account or an open invitation.",
+            "noRoles": "Your role cannot send invitations."
+        },
+        "list": {
+            "title": "Sent invitations",
+            "filterLabel": "Filter by status",
+            "allStatuses": "All statuses",
+            "caption": "Invitations, newest first"
+        },
+        "status": {
+            "sent": "Sent",
+            "accepted": "Accepted",
+            "revoked": "Revoked",
+            "expired": "Expired",
+            "unknown": "Unknown"
+        },
+        "table": {
+            "email": "Email",
+            "role": "Role",
+            "status": "Status",
+            "sent": "Sent",
+            "expires": "Expires",
+            "actions": "Actions",
+            "resends": "Resent {{used}} of {{max}} times"
+        },
+        "actions": {
+            "resend": "Resend",
+            "resendLabel": "Resend the invitation to {{email}}",
+            "revoke": "Revoke",
+            "revokeLabel": "Revoke the invitation for {{email}}",
+            "capReached": "Resend limit reached ({{max}} resends)."
+        },
+        "resend": {
+            "title": "Send this invitation again?",
+            "body": "{{email}} gets a new email. The previous link stops working and the new one is valid for 7 days. Resends used so far: {{used}} of {{max}}.",
+            "action": "Send again",
+            "done": "Invitation sent again to {{email}}.",
+            "capReached": "This invitation reached the resend limit. Revoke it and send a new invitation instead."
+        },
+        "revoke": {
+            "title": "Revoke this invitation?",
+            "body": "The link sent to {{email}} stops working immediately. You can invite the same address again afterwards.",
+            "action": "Revoke invitation",
+            "done": "The invitation for {{email}} was revoked."
+        },
+        "errors": {
+            "conflict": "This invitation can no longer be changed because it was already accepted or revoked. The list was refreshed.",
+            "notFound": "This invitation no longer exists. The list was refreshed."
+        },
+        "empty": {
+            "title": "No invitations yet",
+            "body": "Invitations you send appear here with their status.",
+            "filteredTitle": "No invitations match this filter",
+            "filteredBody": "Try another status or clear the filter.",
+            "clear": "Clear filter"
+        }
+    },
+    "users": {
+        "title": "Users",
+        "subtitleAdmin": "Find accounts in your organisation and suspend or reactivate learners and trainers.",
+        "subtitlePlatform": "Find accounts in your organisation, suspend or reactivate them and change roles.",
+        "loadingLabel": "Loading users",
+        "search": {
+            "label": "Search by email",
+            "placeholder": "Start of an email address"
+        },
+        "filters": {
+            "role": "Role",
+            "allRoles": "All roles",
+            "status": "Status",
+            "allStatuses": "All statuses",
+            "clear": "Clear filters"
+        },
+        "status": {
+            "invited": "Invited",
+            "pending_verification": "Awaiting verification",
+            "active": "Active",
+            "suspended": "Suspended",
+            "deactivated": "Deactivated",
+            "pending_deletion": "Deletion pending",
+            "deleted": "Deleted",
+            "unknown": "Unknown"
+        },
+        "table": {
+            "caption": "Accounts, newest first",
+            "name": "Name",
+            "email": "Email",
+            "role": "Role",
+            "status": "Status",
+            "lastSignIn": "Last sign-in",
+            "actions": "Actions",
+            "you": "You",
+            "never": "Never",
+            "noName": "No name yet"
+        },
+        "actions": {
+            "open": "Actions for {{name}}",
+            "suspend": "Suspend",
+            "reactivate": "Reactivate",
+            "changeRole": "Change role…"
+        },
+        "suspend": {
+            "title": "Suspend {{name}}?",
+            "body": "{{name}} is signed out on all devices right away and cannot sign in until you reactivate the account.",
+            "action": "Suspend account",
+            "done": "{{name}} was suspended."
+        },
+        "reactivate": {
+            "title": "Reactivate {{name}}?",
+            "body": "{{name}} will be able to sign in again.",
+            "action": "Reactivate account",
+            "done": "{{name}} was reactivated."
+        },
+        "roleDialog": {
+            "title": "Change the role of {{name}}",
+            "description": "{{name}} is currently {{role}}. Choose the new role.",
+            "legend": "New role",
+            "current": "current",
+            "warning": "{{name}} will be signed out on all devices and sees the new role after signing in again.",
+            "submit": "Change role",
+            "roleRequired": "Choose a new role.",
+            "done": "{{name}} is now {{role}}."
+        },
+        "errors": {
+            "conflict": "This account changed in the meantime, or the change is not possible. The list was refreshed.",
+            "notFound": "This account no longer exists or is not available to you. The list was refreshed.",
+            "forbidden": "You cannot manage this account."
+        },
+        "empty": {
+            "title": "No accounts to show",
+            "body": "Accounts appear here as people register or accept an invitation.",
+            "filteredTitle": "No accounts match these filters",
+            "filteredBody": "Try a shorter start of the email address or other filters.",
+            "clear": "Clear filters"
+        }
+    }
+}

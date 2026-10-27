@@ -9,9 +9,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FieldSet } from "@/components/ui/field";
 import { AuthCheckboxField } from "@/features/auth/components/AuthCheckboxField";
 import { AuthField } from "@/features/auth/components/AuthField";
-import { FormFailureAlert } from "@/features/auth/components/FormFailureAlert";
+import { FormFailureAlert } from "@/components/common/FormFailureAlert";
 import { GoogleButton } from "@/features/auth/components/GoogleButton";
-import { SubmitButton } from "@/features/auth/components/SubmitButton";
+import { SubmitButton } from "@/components/common/SubmitButton";
 import { UnverifiedNotice } from "@/features/auth/components/UnverifiedNotice";
 import { useAuthFormSubmit } from "@/features/auth/hooks/useAuthFormSubmit";
 import { useSignInFlow } from "@/features/auth/hooks/useSignInFlow";
@@ -163,9 +163,6 @@ export function LoginForm({ reactivate = false, defaultEmail = "" }) {
                         ? t("errors:accountDeactivated.primary")
                         : t("signIn")}
                 </SubmitButton>
-                <p className="text-sm text-muted-foreground">
-                    {t("login.hint")}
-                </p>
             </form>
             {!reactivate && (
                 <GoogleButton

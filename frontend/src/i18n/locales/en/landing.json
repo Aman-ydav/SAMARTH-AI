@@ -51,28 +51,145 @@
             "Leadership"
         ],
         "mock": {
-            "description": "Sample learner dashboard showing a competency radar chart, ranked skill gaps and a learning path, using demo data.",
-            "title": "My competencies",
-            "persona": "Deputy Director, Data Analyst role",
-            "demo": "Demo data",
-            "levelsTitle": "Levels against role",
-            "gapsTitle": "Ranked gaps",
-            "pathTitle": "Learning path",
-            "columnCompetency": "Competency",
-            "columnCurrent": "Now",
-            "columnRequired": "Needed",
-            "columnGap": "Gap",
             "simulated": "Simulated",
+            "app": {
+                "brand": "SAMARTH AI",
+                "pageTitle": "My competency",
+                "greeting": "Good morning, Asha",
+                "persona": "Deputy Director, Data Analyst role",
+                "search": "Search competencies and courses",
+                "language": "EN",
+                "initials": "AS",
+                "demo": "Demo data"
+            },
+            "nav": {
+                "dashboard": "Dashboard",
+                "competency": "My competency",
+                "path": "Learning path",
+                "quizzes": "Quizzes",
+                "tutor": "AI tutor",
+                "certificates": "Certificates",
+                "settings": "Settings",
+                "help": "Help"
+            },
+            "kpi": {
+                "readiness": "Overall readiness",
+                "assessed": "Competencies assessed",
+                "assessedOf": "of {{total}} in the framework",
+                "gaps": "Open gaps",
+                "gapsHint": "ranked by priority",
+                "hours": "Learning hours",
+                "hoursHint": "this month",
+                "streak": "Learning streak",
+                "streakHint": "days in a row",
+                "delta": "+{{value}}"
+            },
+            "levels": {
+                "title": "Competency levels",
+                "current": "Current",
+                "required": "Required"
+            },
+            "domains": {
+                "statistical": "Statistical",
+                "technical": "Technical",
+                "digitalGovernance": "Digital governance",
+                "behavioural": "Behavioural"
+            },
             "competencies": {
                 "sampling": "Survey sampling",
-                "privacy": "Data privacy",
+                "surveyDesign": "Survey design",
+                "dataQuality": "Data quality",
+                "sdmx": "SDMX",
                 "python": "Python",
-                "ml": "AI and machine learning"
+                "privacy": "Data privacy",
+                "ml": "AI and machine learning",
+                "leadership": "Leadership"
+            },
+            "gaps": {
+                "title": "Ranked gaps",
+                "competency": "Competency",
+                "gap": "Gap",
+                "priority": "Priority"
+            },
+            "priority": {
+                "high": "High",
+                "medium": "Medium",
+                "low": "Low"
+            },
+            "sources": {
+                "igot": "iGOT Karmayogi",
+                "nssta": "NSSTA TPAC"
             },
             "path": {
-                "privacy": "Data privacy essentials",
-                "python": "Python for official statistics",
-                "ml": "Machine learning basics"
+                "title": "Learning path",
+                "hours": "{{value}} h",
+                "items": {
+                    "privacy": "Data privacy and the DPDP Act",
+                    "python": "Python for official statistics",
+                    "ml": "Machine learning basics",
+                    "sdmx": "SDMX for data exchange"
+                }
+            },
+            "feed": {
+                "title": "Recent activity",
+                "items": {
+                    "pathReady": "Learning path ready: 4 items",
+                    "quizPassed": "Quiz passed: Data privacy, 8 of 10",
+                    "courseStarted": "Started: Python for official statistics",
+                    "endorsed": "Trainer endorsed Survey sampling at level 4",
+                    "profile": "Starting levels estimated from your profile"
+                },
+                "when": {
+                    "now": "Just now",
+                    "today": "Today",
+                    "yesterday": "Yesterday",
+                    "days": "3 days ago"
+                }
+            },
+            "sessions": {
+                "title": "Upcoming sessions",
+                "items": {
+                    "sampling": "Sampling methods workshop",
+                    "quality": "Data quality clinic",
+                    "python": "Python lab: pandas for surveys"
+                },
+                "when": {
+                    "tue": "Tue, 11:00",
+                    "thu": "Thu, 15:00",
+                    "fri": "Fri, 10:30"
+                },
+                "mode": {
+                    "online": "Online",
+                    "inPerson": "In person"
+                }
+            }
+        },
+        "laptop": {
+            "description": "Sample learner web app shown on a laptop: the My competency page with readiness figures, competency levels against the role requirement, ranked gaps, a recommended learning path, recent activity and upcoming sessions, all demo data. A short tour shows four steps: the profile is estimated, gaps are found, a path is recommended, and a passed quiz updates a level.",
+            "stepLabel": "Step {{current}} of {{total}}",
+            "steps": {
+                "profile": {
+                    "title": "Your profile is estimated",
+                    "body": "Starting levels come from your role, experience and past training."
+                },
+                "gaps": {
+                    "title": "Gaps are found",
+                    "body": "Levels are compared with what the role needs and ranked."
+                },
+                "path": {
+                    "title": "A path is recommended",
+                    "body": "Courses are ordered by the gap they close."
+                },
+                "evidence": {
+                    "title": "Evidence updates a level",
+                    "body": "A passed quiz moves Data privacy from level 2 to 3."
+                }
+            },
+            "controls": {
+                "label": "Product tour",
+                "pause": "Pause the product tour",
+                "play": "Play the product tour",
+                "goTo": "Show step {{step}}: {{title}}"
             }
         }
     },
@@ -84,6 +201,29 @@
             "Trainers: assessments built slowly, by hand.",
             "Administrators: no workforce-level view of skills."
         ]
+    },
+    "measure": {
+        "title": "Skills are invisible until they are measured.",
+        "sub": "Nobody can see a competency. SAMARTH AI turns each one into a level from 0 to 5, then shows how far it is from what the role needs.",
+        "points": {
+            "measured": {
+                "title": "Measured",
+                "body": "Your profile and your evidence turn each skill into a level."
+            },
+            "gap": {
+                "title": "Compared",
+                "body": "The role's requirement sits on the same bar. The difference is your gap."
+            }
+        },
+        "card": {
+            "title": "Competency levels",
+            "demo": "Demo data",
+            "unknown": "?",
+            "unmeasured": "Not measured",
+            "gap": "Gap {{value}}",
+            "current": "Current level",
+            "required": "Required for the role"
+        }
     },
     "acronym": {
         "title": "Seven ideas, one name.",
@@ -146,14 +286,105 @@
             }
         },
         "visual": {
-            "designation": "Designation",
-            "role": "Role",
-            "experience": "Experience",
-            "estimate": "Estimated starting levels",
-            "quiz": "Quiz result",
-            "completed": "Course completed",
-            "updated": "Level updated",
-            "why": "Why: closes your data privacy gap"
+            "window": {
+                "profile": "Onboarding",
+                "gaps": "Gap analysis",
+                "path": "Learning path",
+                "evidence": "Evidence"
+            },
+            "demo": "Demo data",
+            "profile": {
+                "formTitle": "Your profile",
+                "designation": "Designation",
+                "designationValue": "Deputy Director",
+                "role": "Role",
+                "roleValue": "Data Analyst",
+                "experience": "Years of experience",
+                "experienceValue": "12",
+                "decrease": "Fewer years",
+                "increase": "More years",
+                "qualifications": "Qualifications",
+                "qualificationItems": [
+                    "M.Sc. Statistics",
+                    "PG Diploma in Data Science"
+                ],
+                "training": "Past training",
+                "trainingItems": [
+                    "Survey methods workshop",
+                    "Python basics"
+                ],
+                "resultTitle": "Estimated starting levels",
+                "live": "Live estimate",
+                "level": "Level",
+                "confidence": "Confidence",
+                "required": "Required for the role",
+                "note": "Estimates improve as quizzes and courses add evidence."
+            },
+            "confidence": {
+                "high": "High",
+                "medium": "Medium",
+                "low": "Low"
+            },
+            "gaps": {
+                "competency": "Competency",
+                "now": "Now",
+                "needed": "Needed",
+                "gap": "Gap",
+                "priority": "Priority",
+                "why": "{{gap}} below the role level, importance {{importance}}",
+                "note": "Priority is the gap times the role's importance for the competency."
+            },
+            "importance": {
+                "high": "high",
+                "medium": "medium",
+                "low": "low"
+            },
+            "path": {
+                "total": "Total time",
+                "closes": "Closes the gap in {{competency}}",
+                "done": "Done",
+                "note": "Sources are simulated in this prototype."
+            },
+            "evidence": {
+                "timelineTitle": "New evidence",
+                "quiz": "Quiz passed: Data privacy, 8 of 10",
+                "completed": "Course completed: Data privacy and the DPDP Act",
+                "endorsed": "Trainer endorsed Survey sampling at level 4",
+                "levelTitle": "Data privacy",
+                "level": "Level",
+                "needed": "needed",
+                "readiness": "Overall readiness",
+                "refreshed": "Recommendations refreshed",
+                "refreshedBody": "The next course was re-ranked."
+            }
+        }
+    },
+    "journey": {
+        "title": "A path, not a pile of courses.",
+        "sub": "Courses are ordered by the gap they close. Finish one, pass its quiz, and the level moves.",
+        "label": "Learning path with a quiz",
+        "stops": {
+            "privacy": {
+                "title": "Data privacy and the DPDP Act",
+                "body": "Closes your biggest gap first, and says why."
+            },
+            "quiz": {
+                "title": "Quiz: data privacy",
+                "body": "Eight of ten correct. A passed quiz is evidence, so the level moves and the next recommendations refresh."
+            },
+            "python": {
+                "title": "Python for official statistics",
+                "body": "The next gap in line, re-ranked after the quiz."
+            },
+            "ml": {
+                "title": "Machine learning basics",
+                "body": "Builds on the Python step and closes the last large gap."
+            }
+        },
+        "level": {
+            "title": "Data privacy",
+            "label": "Level",
+            "needed": "needed for the role"
         }
     },
     "tour": {
@@ -288,6 +519,13 @@
             "ai": "No names, emails or employee IDs are sent to the AI model.",
             "anchor": "Optional anchoring of hashes, never personal data, on a public test blockchain.",
             "dpdp": "Built to align with the principles of India's DPDP Act 2023. We do not claim certification."
+        },
+        "chain": {
+            "label": "Illustration: audit entries linked by hashes. If one entry is changed, every later link stops matching.",
+            "entry": "Entry {{number}}",
+            "hash": "hash",
+            "prev": "prev",
+            "verified": "Verified"
         }
     },
     "standards": {

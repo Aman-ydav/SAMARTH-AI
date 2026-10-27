@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import { useAppDispatch } from "@/app/hooks";
-import { useAsyncAction } from "@/features/auth/hooks/useAsyncAction";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { logoutUser } from "@/features/auth/slice/sessionsSlice";
 import { PATHS } from "@/lib/paths";
 

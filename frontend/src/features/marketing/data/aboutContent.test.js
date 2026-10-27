@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
     ABOUT_PLACEHOLDERS,
+    BUILD_CHAPTERS,
     LADDER_LEVELS,
     PRODUCT_FACTS,
     ROADMAP_PHASES,
-    TEAM_SLOTS,
+    STATUS_BADGE_VARIANT,
+    STORY_STOPS,
     TECH_STACK,
 } from "@/features/marketing/data/aboutContent";
 import enAbout from "@/i18n/locales/en/about.json";
@@ -36,8 +38,34 @@ describe("About content data", () => {
         for (const value of Object.values(ABOUT_PLACEHOLDERS)) {
             expect(value).toMatch(/^\[[A-Z_]+: placeholder\]$/);
         }
-        expect(TEAM_SLOTS).toHaveLength(6);
-        expect(new Set(TEAM_SLOTS.map((slot) => slot.id)).size).toBe(6);
+    });
+
+    it("defines five story stops and five build chapters with unique ids", () => {
+        expect(STORY_STOPS).toHaveLength(5);
+        expect(BUILD_CHAPTERS).toHaveLength(5);
+        expect(new Set(STORY_STOPS.map((stop) => stop.id)).size).toBe(5);
+        expect(new Set(BUILD_CHAPTERS.map((chapter) => chapter.id)).size).toBe(
+            5
+        );
+        expect(BUILD_CHAPTERS.map((chapter) => chapter.id)).toEqual([
+            "idea",
+            "framework",
+            "backend",
+            "interface",
+            "next",
+        ]);
+    });
+
+    it("gives every chapter a known status and a badge variant, and calls unfinished work unfinished", () => {
+        for (const { status } of BUILD_CHAPTERS) {
+            expect(Object.keys(STATUS_BADGE_VARIANT)).toContain(status);
+        }
+        expect(
+            BUILD_CHAPTERS.find((chapter) => chapter.id === "next").status
+        ).toBe("planned");
+        expect(
+            BUILD_CHAPTERS.some((chapter) => chapter.status !== "done")
+        ).toBe(true);
     });
 
     it("gives every roadmap phase a known status and a unique id", () => {
@@ -59,9 +87,12 @@ describe("About copy in en and hi", () => {
             expect(copy.principles.items).toHaveLength(6);
             expect(copy.ladder.levels).toHaveLength(LADDER_LEVELS.length);
             expect(copy.roadmap.phases).toHaveLength(ROADMAP_PHASES.length);
-            expect(copy.team.slots).toHaveLength(TEAM_SLOTS.length);
+            expect(copy.story.stops).toHaveLength(STORY_STOPS.length);
+            expect(copy.how.chapters).toHaveLength(BUILD_CHAPTERS.length);
+            for (const chapter of copy.how.chapters)
+                expect(chapter.points).toHaveLength(3);
             expect(copy.facts.items).toHaveLength(PRODUCT_FACTS.length);
-            expect(copy.problem.facts).toHaveLength(3);
+            expect(copy.story.facts).toHaveLength(3);
         }
     });
 
@@ -78,7 +109,7 @@ describe("About copy in en and hi", () => {
     });
 
     it("names the problem statement SIH26101 and MoSPI", () => {
-        const values = enAbout.problem.facts.map((fact) => fact.value);
+        const values = enAbout.story.facts.map((fact) => fact.value);
         expect(values).toContain("SIH26101");
         expect(values).toContain("MoSPI");
     });

@@ -40,6 +40,7 @@ const CATALOG = {
     CSRF_INVALID: [403, "The request could not be verified."],
     CORS_ORIGIN_DENIED: [403, "This origin is not allowed."],
     REAUTH_REQUIRED: [403, "Please confirm your identity again."],
+    SELF_ACTION_FORBIDDEN: [403, "You cannot do this to your own account."],
     DOMAIN_NOT_ALLOWED: [403, "This email domain is not allowed."],
     EMAIL_NOT_VERIFIED: [403, "The email address is not verified."],
     ACCOUNT_SUSPENDED: [403, "The account is suspended."],

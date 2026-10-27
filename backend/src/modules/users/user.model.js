@@ -160,6 +160,11 @@ userSchema.index(
     { orgId: 1, role: 1, status: 1 },
     { name: "users_orgId_role_status" }
 );
+// serves: GET /admin/users, the default newest-first page of an org (role and status filters narrow it further)
+userSchema.index(
+    { orgId: 1, createdAt: -1 },
+    { name: "users_orgId_createdAt" }
+);
 // serves: the deletion job that anonymises accounts whose grace period ended
 userSchema.index(
     { status: 1, deletionScheduledAt: 1 },

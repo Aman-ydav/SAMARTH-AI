@@ -30,6 +30,33 @@ describe("MarketingFooter", () => {
         ).toHaveAttribute("href", "/#how");
     });
 
+    it("marks About as the current page only on /about, with a keyboard-focusable link", async () => {
+        const first = renderWithProviders(<MarketingFooter />, {
+            route: "/about",
+        });
+        const nav = screen.getByRole("navigation", { name: "Footer" });
+        const about = within(nav).getByRole("link", { name: "About" });
+        expect(about).toHaveAttribute("aria-current", "page");
+        expect(
+            within(nav).getByRole("link", { name: "Get started" })
+        ).not.toHaveAttribute("aria-current");
+        about.focus();
+        expect(about).toHaveFocus();
+        first.unmount();
+        renderWithProviders(<MarketingFooter />, { route: "/" });
+        expect(screen.getByRole("link", { name: "About" })).not.toHaveAttribute(
+            "aria-current"
+        );
+    });
+
+    it("shows About in Hindi in the footer", async () => {
+        await i18n.changeLanguage("hi");
+        renderWithProviders(<MarketingFooter />);
+        expect(
+            screen.getByRole("link", { name: "हमारे बारे में" })
+        ).toHaveAttribute("href", "/about");
+    });
+
     it("links the legal pages, including the cookie anchor", () => {
         renderWithProviders(<MarketingFooter />);
         expect(

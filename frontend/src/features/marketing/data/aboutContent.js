@@ -1,7 +1,7 @@
 /*
  * Non-translatable facts for the About page (docs/23 section 4). Copy lives in the `about` i18n namespace.
  * Everything here is either a proper noun, a figure that exists in the product docs (doc 06, doc 13) or a
- * clearly flagged placeholder. No invented statistics (ANIM-41).
+ * clearly flagged placeholder. No invented statistics (ANIM-41). The six developers live in `developers.js`.
  */
 
 /** Square brackets mark a value the team still has to supply (docs/23 section 8). */
@@ -9,6 +9,27 @@ export const ABOUT_PLACEHOLDERS = Object.freeze({
     llmProvider: "[LLM_PROVIDER: placeholder]",
     mentor: "[MENTOR: placeholder]",
 });
+
+/** Stops of the story timeline, in order; titles and text come from `about:story.stops` in this order. */
+export const STORY_STOPS = Object.freeze([
+    { id: "scattered" },
+    { id: "unmeasured" },
+    { id: "slow" },
+    { id: "blind" },
+    { id: "measured" },
+]);
+
+/**
+ * Build chapters, in order; copy comes from `about:how.chapters` in this order. `status` is set by the team:
+ * done, inProgress or planned (same words as the roadmap).
+ */
+export const BUILD_CHAPTERS = Object.freeze([
+    { id: "idea", status: "done" },
+    { id: "framework", status: "inProgress" },
+    { id: "backend", status: "inProgress" },
+    { id: "interface", status: "inProgress" },
+    { id: "next", status: "planned" },
+]);
 
 /** Proficiency levels 0-5 (doc 06). Names and summaries come from `about:ladder.levels`, in this order. */
 export const LADDER_LEVELS = Object.freeze([0, 1, 2, 3, 4, 5]);
@@ -34,16 +55,6 @@ export const ROADMAP_PHASES = Object.freeze([
     { id: "launch", status: "planned" },
 ]);
 
-/** Six team slots, M1 to M6 (doc 11 / doc 13). Names, photos and bios are placeholders until the team supplies them. */
-export const TEAM_SLOTS = Object.freeze([
-    { id: "m1", initials: "M1" },
-    { id: "m2", initials: "M2" },
-    { id: "m3", initials: "M3" },
-    { id: "m4", initials: "M4" },
-    { id: "m5", initials: "M5" },
-    { id: "m6", initials: "M6" },
-]);
-
 /** Technology strip: proper nouns, shown as plain chips (no logos, no endorsement implied). */
 export const TECH_STACK = Object.freeze([
     "React",
@@ -59,3 +70,10 @@ export const TECH_STACK = Object.freeze([
     "Vercel",
     "Render",
 ]);
+
+/** Badge variant per roadmap or chapter status (success, info, outline), shared by the roadmap and the build chapters. */
+export const STATUS_BADGE_VARIANT = Object.freeze({
+    done: "success",
+    inProgress: "info",
+    planned: "outline",
+});

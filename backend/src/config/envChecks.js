@@ -3,6 +3,7 @@ import {
     REFRESH_REMEMBER_ABSOLUTE_CAP_MS,
 } from "#constants/tokenTypes.js";
 import { parseDuration } from "#utils/dates.js";
+import { MAX_PLATFORM_ADMINS, mergePlatformAdmins } from "./platformAdmins.js";
 
 // Field-level checks may have failed already; NaN keeps the comparisons below false instead of throwing.
 const toMs = (value) => {
@@ -84,6 +85,16 @@ export function crossChecks(env, ctx) {
                 fail(name, "is required when LLM_PROVIDER is not mock (R14)");
             }
         }
+    }
+    const platformAdmins = mergePlatformAdmins(env.PLATFORM_ADMINS, {
+        email: env.SEED_ADMIN_EMAIL,
+        password: env.SEED_ADMIN_PASSWORD,
+    });
+    if (platformAdmins.length > MAX_PLATFORM_ADMINS) {
+        fail(
+            "PLATFORM_ADMINS",
+            `at most ${MAX_PLATFORM_ADMINS} platform admins are allowed, counting the legacy SEED_ADMIN_EMAIL entry`
+        );
     }
     if (production) productionChecks(env, fail);
 }
