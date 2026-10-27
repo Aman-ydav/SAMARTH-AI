@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { RequestLinkForm } from "@/features/auth/components/RequestLinkForm";
 import { StatePanel } from "@/features/auth/components/StatePanel";
 import { TokenConfirmPanel } from "@/features/auth/components/TokenConfirmPanel";
-import { useAsyncAction } from "@/features/auth/hooks/useAsyncAction";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { LINK_ERROR_CODES } from "@/features/auth/hooks/useAuthFormSubmit";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useFragmentToken } from "@/features/auth/hooks/useFragmentToken";

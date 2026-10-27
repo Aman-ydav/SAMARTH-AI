@@ -3,13 +3,10 @@ import { useTranslation } from "react-i18next";
 import { HorizontalScrollGallery } from "@/components/motion/HorizontalScrollGallery";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ROADMAP_PHASES } from "@/features/marketing/data/aboutContent";
-
-const STATUS_VARIANT = {
-    done: "success",
-    inProgress: "info",
-    planned: "outline",
-};
+import {
+    ROADMAP_PHASES,
+    STATUS_BADGE_VARIANT,
+} from "@/features/marketing/data/aboutContent";
 
 /**
  * Project timeline from doc 13 (ANIM-51, fifth; HORIZONTAL_GALLERY per the placement matrix). Status badges
@@ -52,7 +49,9 @@ export function AboutRoadmapSection() {
                                 <span className="type-small font-mono text-muted-foreground">
                                     {item.period}
                                 </span>
-                                <Badge variant={STATUS_VARIANT[item.status]}>
+                                <Badge
+                                    variant={STATUS_BADGE_VARIANT[item.status]}
+                                >
                                     <span className="sr-only">
                                         {t("roadmap.statusLabel")}:{" "}
                                     </span>

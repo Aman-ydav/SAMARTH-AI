@@ -77,54 +77,67 @@ describe("createInvite (doc 20 section 8)", () => {
         );
     });
 
-    it("only admins and superadmins may invite", async () => {
-        for (const role of ["learner", "trainer"]) {
-            const actor = await createUser({ role });
-            await expect(
-                createInvite(
-                    { email: "x@example.test", role: "learner" },
-                    asActor(actor),
-                    makeAuthCtx()
-                )
-            ).rejects.toMatchObject({ statusCode: 403, code: "FORBIDDEN" });
+    it("learners and trainers can never invite, whatever role they ask for (R68)", async () => {
+        for (const actorRole of ["learner", "trainer"]) {
+            const actor = await createUser({ role: actorRole });
+            for (const role of ["learner", "trainer", "admin"]) {
+                await expect(
+                    createInvite(
+                        { email: "x@example.test", role },
+                        asActor(actor),
+                        makeAuthCtx()
+                    )
+                ).rejects.toMatchObject({ statusCode: 403, code: "FORBIDDEN" });
+            }
         }
+        expect(await Invite.countDocuments({})).toBe(0);
     });
 
-    it("never grants superadmin, nor a role above the inviter's own (AUTH-61)", async () => {
+    it("an admin may invite trainers only; a platform admin may invite trainers and admins (R68, AUTH-61)", async () => {
         const admin = await createUser({ role: "admin" });
-        const superadmin = await createUser({ role: "superadmin" });
+        const platform = await createUser({ role: "superadmin" });
+        for (const role of ["admin", "learner", "superadmin", "root"]) {
+            await expect(
+                createInvite(
+                    { email: "x@example.test", role },
+                    asActor(admin),
+                    makeAuthCtx()
+                )
+            ).rejects.toMatchObject({ code: "FORBIDDEN" });
+        }
         await expect(
             createInvite(
-                { email: "x@example.test", role: "superadmin" },
-                asActor(superadmin),
-                makeAuthCtx()
-            )
-        ).rejects.toMatchObject({
-            code: "FORBIDDEN",
-        });
-        await expect(
-            createInvite(
-                { email: "x@example.test", role: "root" },
+                { email: "t1@example.test", role: "trainer" },
                 asActor(admin),
                 makeAuthCtx()
             )
-        ).rejects.toMatchObject({
-            code: "FORBIDDEN",
-        });
-        await expect(
-            createInvite(
-                { email: "ok@example.test", role: "admin" },
-                asActor(admin),
-                makeAuthCtx()
-            )
-        ).resolves.toBeTruthy();
+        ).resolves.toMatchObject({ role: "trainer" });
+        for (const role of ["trainer", "admin"]) {
+            await expect(
+                createInvite(
+                    { email: `p-${role}@example.test`, role },
+                    asActor(platform),
+                    makeAuthCtx()
+                )
+            ).resolves.toMatchObject({ role });
+        }
+        for (const role of ["superadmin", "learner"]) {
+            await expect(
+                createInvite(
+                    { email: "nope@example.test", role },
+                    asActor(platform),
+                    makeAuthCtx()
+                )
+            ).rejects.toMatchObject({ code: "FORBIDDEN" });
+        }
+        expect(await User.countDocuments({ role: "superadmin" })).toBe(1);
     });
 
     it("refuses a second open invite and an address that already has an account", async () => {
         const { admin, ctx } = await invited();
         await expect(
             createInvite(
-                { email: "new.invitee@example.test", role: "learner" },
+                { email: "new.invitee@example.test", role: "trainer" },
                 asActor(admin),
                 ctx
             )
@@ -133,13 +146,32 @@ describe("createInvite (doc 20 section 8)", () => {
             code: "CONFLICT",
         });
         const existing = await createUser();
-        await expect(
-            createInvite(
-                { email: existing.email, role: "learner" },
-                asActor(admin),
-                ctx
-            )
-        ).rejects.toMatchObject({ code: "CONFLICT" });
+        const clash = await createInvite(
+            { email: existing.email, role: "trainer" },
+            asActor(admin),
+            ctx
+        ).catch((error) => error);
+        expect(clash).toMatchObject({ statusCode: 409, code: "CONFLICT" });
+        // The answer is the same generic text for an open invite and for a registered address: it names neither.
+        expect(clash.message).not.toContain(existing.email);
+        expect(JSON.stringify(clash.errors)).not.toContain(existing.email);
+    });
+
+    it("a lapsed invite (still `sent` after 7 days) no longer blocks a new invite; it is closed as expired", async () => {
+        vi.useFakeTimers({ toFake: ["Date"] });
+        vi.setSystemTime(new Date("2026-10-26T10:00:00Z"));
+        const { admin, invite, ctx } = await invited();
+        vi.setSystemTime(new Date("2026-11-03T10:00:00Z"));
+        const again = await createInvite(
+            { email: "new.invitee@example.test", role: "trainer" },
+            asActor(admin),
+            ctx
+        );
+        expect(String(again._id)).not.toBe(String(invite._id));
+        expect((await Invite.findById(invite._id).lean()).status).toBe(
+            "expired"
+        );
+        expect((await Invite.findById(again._id).lean()).status).toBe("sent");
     });
 
     it("applies the domain policy", async () => {
@@ -147,7 +179,7 @@ describe("createInvite (doc 20 section 8)", () => {
         const admin = await createUser({ role: "admin" });
         await expect(
             createInvite(
-                { email: "x@gmail.example", role: "learner" },
+                { email: "x@gmail.example", role: "trainer" },
                 asActor(admin),
                 ctx
             )
@@ -191,7 +223,7 @@ describe("acceptInvite (doc 08 #22)", () => {
     });
 
     it("ignores any role the caller tries to add (the schema is strict; the service only uses the invite)", async () => {
-        const { ctx, token } = await invited({ role: "learner" });
+        const { ctx, token } = await invited({ role: "trainer" });
         const result = await acceptInvite(
             {
                 token,
@@ -201,7 +233,7 @@ describe("acceptInvite (doc 08 #22)", () => {
             },
             ctx
         );
-        expect(result.user.role).toBe("learner");
+        expect(result.user.role).toBe("trainer");
     });
 
     it("is single use", async () => {

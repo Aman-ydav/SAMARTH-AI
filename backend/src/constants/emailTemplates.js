@@ -26,4 +26,5 @@ export const PASSWORD_RESET_VARIANTS = Object.freeze({
     ACTIVE: "active",
     GOOGLE_ONLY: "google_only",
     UNVERIFIED: "unverified",
+    SETUP: "setup",
 });

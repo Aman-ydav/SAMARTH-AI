@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { LockPasswordIcon } from "@/components/icons";
 import { AuthCard } from "@/features/auth/components/AuthCard";
 import { ChangePasswordForm } from "@/features/auth/components/ChangePasswordForm";
-import { FormFailureAlert } from "@/features/auth/components/FormFailureAlert";
+import { FormFailureAlert } from "@/components/common/FormFailureAlert";
 import { StatePanel } from "@/features/auth/components/StatePanel";
 import { useLogoutAction } from "@/features/auth/hooks/useLogoutAction";
 import { destinationFor } from "@/features/auth/hooks/useSignInFlow";

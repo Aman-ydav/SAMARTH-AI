@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
 import { AvatarRemoveDialog } from "@/features/auth/components/AvatarRemoveDialog";
-import { FormFailureAlert } from "@/features/auth/components/FormFailureAlert";
+import { FormFailureAlert } from "@/components/common/FormFailureAlert";
 import { SectionCard } from "@/features/auth/components/SectionCard";
 import { useAvatarUpload } from "@/features/auth/hooks/useAvatarUpload";
 import { AVATAR_ACCEPT } from "@/features/auth/schemas/settingsSchemas";

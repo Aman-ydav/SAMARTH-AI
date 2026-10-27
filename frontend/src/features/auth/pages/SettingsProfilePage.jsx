@@ -5,7 +5,7 @@ import { AvatarEditor } from "@/features/auth/components/AvatarEditor";
 import { ProfileForm } from "@/features/auth/components/ProfileForm";
 import { SectionCard } from "@/features/auth/components/SectionCard";
 import { SettingsLayout } from "@/features/auth/components/SettingsLayout";
-import { SettingsLoadError } from "@/features/auth/components/SettingsLoadError";
+import { LoadErrorAlert } from "@/components/common/LoadErrorAlert";
 import { SettingsSkeleton } from "@/features/auth/components/SettingsSkeleton";
 import { selectCurrentUser } from "@/features/auth/slice/authSlice";
 import {
@@ -41,7 +41,7 @@ export default function SettingsProfilePage() {
         details = <ProfileForm user={user} timezone={timezone} />;
     } else if (status === STATUS.FAILED) {
         details = (
-            <SettingsLoadError
+            <LoadErrorAlert
                 error={error}
                 onRetry={() => dispatch(fetchProfile({ force: true }))}
             />

@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { notify, useNotify } from "@/features/auth/hooks/useNotify";
+import { notify, useNotify } from "@/hooks/useNotify";
 
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 

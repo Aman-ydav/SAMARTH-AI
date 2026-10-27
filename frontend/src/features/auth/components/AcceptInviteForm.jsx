@@ -6,9 +6,9 @@ import { useAppDispatch } from "@/app/hooks";
 import { FieldSet } from "@/components/ui/field";
 import { AuthField } from "@/features/auth/components/AuthField";
 import { ErrorSummary } from "@/features/auth/components/ErrorSummary";
-import { FormFailureAlert } from "@/features/auth/components/FormFailureAlert";
+import { FormFailureAlert } from "@/components/common/FormFailureAlert";
 import { PasswordStrengthHint } from "@/features/auth/components/PasswordStrengthHint";
-import { SubmitButton } from "@/features/auth/components/SubmitButton";
+import { SubmitButton } from "@/components/common/SubmitButton";
 import {
     LINK_ERROR_CODES,
     useAuthFormSubmit,

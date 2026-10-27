@@ -3,12 +3,12 @@ import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { ComputerIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import { ConfirmActionDialog } from "@/features/auth/components/ConfirmActionDialog";
+import { ConfirmActionDialog } from "@/components/common/ConfirmActionDialog";
 import { LogoutAllButton } from "@/features/auth/components/LogoutAllButton";
 import { SessionRow } from "@/features/auth/components/SessionRow";
-import { SettingsLoadError } from "@/features/auth/components/SettingsLoadError";
+import { LoadErrorAlert } from "@/components/common/LoadErrorAlert";
 import { SettingsSkeleton } from "@/features/auth/components/SettingsSkeleton";
-import { notify } from "@/features/auth/hooks/useNotify";
+import { notify } from "@/hooks/useNotify";
 import {
     fetchSessions,
     revokeOtherSessions,
@@ -80,7 +80,7 @@ export function SessionsPanel() {
 
     if (sessions.length === 0 && status === STATUS.FAILED)
         return (
-            <SettingsLoadError
+            <LoadErrorAlert
                 error={error}
                 onRetry={() => dispatch(fetchSessions())}
             />

@@ -1,52 +1,108 @@
 {
     "hero": {
         "overline": "About SAMARTH AI",
-        "title": "Capable people make better statistics.",
-        "sub": "SAMARTH AI is a student prototype that helps India's statistical workforce see their skills, close their gaps and keep learning.",
+        "title": "From scattered training to a measured path.",
+        "sub": "The story of SAMARTH AI: the problem a student team picked, how we built the answer, and who built it.",
         "chip": "Prototype for SIH26101"
+    },
+    "story": {
+        "title": "Why we built it",
+        "intro": "Smart India Hackathon problem statement SIH26101 comes from the Ministry of Statistics and Programme Implementation (MoSPI). It asks how India's official statistics staff can keep their skills current, and how training can follow what each person actually needs.",
+        "timelineLabel": "The problem, from scattered training to a measured path",
+        "factsTitle": "The problem statement",
+        "stopLabel": "Step {{number}}",
+        "facts": [
+            {
+                "label": "Problem statement",
+                "value": "SIH26101"
+            },
+            {
+                "label": "Organisation",
+                "value": "MoSPI"
+            },
+            {
+                "label": "Theme",
+                "value": "Blockchain and Cybersecurity"
+            }
+        ],
+        "stops": [
+            {
+                "title": "Scattered training",
+                "body": "Officials are expected to keep upskilling. The iGOT Karmayogi catalogue is large, but it does not say which courses fit a given role."
+            },
+            {
+                "title": "Gaps nobody measures",
+                "body": "There is no intelligent skill-gap assessment for official statistics, so courses get chosen by habit or availability, not by measured need."
+            },
+            {
+                "title": "Assessments take too long",
+                "body": "Trainers lack a fast way to create assessments, so checking what people know stays rare and slow."
+            },
+            {
+                "title": "No view of the workforce",
+                "body": "Administrators cannot see competencies across a whole workforce, so training plans stay guesswork."
+            },
+            {
+                "title": "A measured path",
+                "body": "SAMARTH AI is our answer: measure each competency, compare it with what the role needs, and recommend learning that closes the biggest gaps."
+            }
+        ]
     },
     "mission": {
         "title": "Our mission",
         "statement": "Every official in the statistical system should be able to see where their skills stand, what to learn next and how far they have come, and every institution should be able to see the same, securely and fairly."
     },
-    "problem": {
-        "title": "The problem we picked",
-        "body": [
-            "Officials need continuous upskilling, but the large iGOT Karmayogi catalogue does not tell them what fits their role. There is no intelligent skill-gap assessment for official statistics, trainers lack a fast way to create assessments, and administrators lack workforce-level visibility.",
-            "SAMARTH AI is our answer."
-        ],
-        "facts": [
-            { "label": "Problem statement", "value": "SIH26101" },
-            { "label": "Organisation", "value": "MoSPI" },
-            { "label": "Theme", "value": "Blockchain and Cybersecurity" }
-        ]
-    },
-    "principles": {
-        "title": "What we hold ourselves to",
-        "items": [
+    "how": {
+        "title": "How we built it",
+        "intro": "Five chapters, from the first idea to what comes next. Chapters marked in progress or planned are not finished.",
+        "listLabel": "Build chapters",
+        "chapterLabel": "Chapter {{number}}",
+        "statusLabel": "Status",
+        "chapters": [
             {
-                "title": "Explainable",
-                "body": "Every recommendation and question shows its reason or source."
+                "title": "Start from the brief",
+                "body": "We read problem statement SIH26101 and turned it into one goal: help every official see their skills, close their gaps and keep learning. Then we wrote down who uses the product: learners, trainers, administrators and platform administrators.",
+                "points": [
+                    "One goal in plain words",
+                    "Four kinds of user",
+                    "A prototype, not an official site"
+                ]
             },
             {
-                "title": "Numbers by code, language by AI",
-                "body": "Levels and gaps come from tested formulas. AI drafts, extracts and ranks inside validated limits."
+                "title": "A framework to measure against",
+                "body": "Skills need a shared scale. The competency framework has 4 domains, 43 competencies and 6 proficiency levels from 0 to 5, and 10 seed roles that say what each job needs. A gap is the required level minus the current level. The framework is written down; loading it into the product is still in progress.",
+                "points": [
+                    "4 domains, 43 competencies",
+                    "Levels 0 to 5",
+                    "10 seed roles"
+                ]
             },
             {
-                "title": "People decide",
-                "body": "Trainers approve questions. Administrators can override."
+                "title": "A backend you can trust",
+                "body": "An Express and MongoDB API. Milestone 1 is built: accounts, sessions, uploads and a hash-chained audit trail. The learning features come next.",
+                "points": [
+                    "HttpOnly cookie sessions with CSRF checks",
+                    "Role checks on every protected route",
+                    "Tamper-evident audit log"
+                ]
             },
             {
-                "title": "Privacy by design",
-                "body": "Minimum data, and no personal data sent to the AI model."
+                "title": "An interface for everyone",
+                "body": "React with shadcn components and one set of colour tokens for light and dark themes. The marketing site and account screens are built; the dashboards are placeholders for now.",
+                "points": [
+                    "English and Hindi",
+                    "Keyboard friendly, WCAG 2.2 AA target",
+                    "Reduced motion respected"
+                ]
             },
             {
-                "title": "Honest about limits",
-                "body": "We label what is simulated or planned."
-            },
-            {
-                "title": "Accessible and bilingual",
-                "body": "Keyboard friendly, WCAG 2.2 AA target, English and Hindi."
+                "title": "What comes next",
+                "body": "A mock iGOT adapter, competency profiles and gap analysis, AI-drafted quizzes that trainers review, recommendations with reasons, and dashboards. All of this is planned and none of it is finished.",
+                "points": [
+                    "Gap analysis and recommendations",
+                    "Quizzes grounded in uploaded material",
+                    "Dashboards for every role"
+                ]
             }
         ]
     },
@@ -78,6 +134,35 @@
             {
                 "name": "Expert",
                 "summary": "Sets standards and designs methods."
+            }
+        ]
+    },
+    "principles": {
+        "title": "What we hold ourselves to",
+        "items": [
+            {
+                "title": "Explainable",
+                "body": "Every recommendation and question shows its reason or source."
+            },
+            {
+                "title": "Numbers by code, language by AI",
+                "body": "Levels and gaps come from tested formulas. AI drafts, extracts and ranks inside validated limits."
+            },
+            {
+                "title": "People decide",
+                "body": "Trainers approve questions. Administrators can override."
+            },
+            {
+                "title": "Privacy by design",
+                "body": "Minimum data, and no personal data sent to the AI model."
+            },
+            {
+                "title": "Honest about limits",
+                "body": "We label what is simulated or planned."
+            },
+            {
+                "title": "Accessible and bilingual",
+                "body": "Keyboard friendly, WCAG 2.2 AA target, English and Hindi."
             }
         ]
     },
@@ -132,31 +217,37 @@
         "pause": "Pause technology strip",
         "play": "Play technology strip"
     },
-    "team": {
-        "title": "The team",
-        "intro": "Six people, six areas of ownership.",
+    "developers": {
+        "title": "The developers",
+        "intro": "Six people built SAMARTH AI. Each card says what they built.",
+        "listLabel": "Developers",
         "placeholderBadge": "Placeholder",
-        "placeholderNote": "Names, photos and bios are placeholders. The team will add them before launch.",
-        "namePlaceholder": "Team member name",
-        "bioPlaceholder": "One-line bio to be added.",
-        "mentor": "Mentor and acknowledgements: {{mentor}}",
-        "slots": [
-            { "role": "Backend core and security" },
-            { "role": "Assessment engine" },
-            { "role": "Competency and recommendation" },
-            { "role": "Frontend lead, learner experience" },
-            { "role": "Admin and trainer UI, data visualisation" },
-            { "role": "Integration, DevOps and QA" }
-        ]
+        "placeholderNote": "Names, roles, notes, photos and links are placeholders. The team will replace them before launch.",
+        "roleLabel": "What they built",
+        "portraitAlt": "Portrait of {{name}}",
+        "linksLabel": "Links for {{name}}",
+        "github": "{{name}} on GitHub",
+        "githubName": "GitHub",
+        "linkedin": "{{name}} on LinkedIn",
+        "linkedinName": "LinkedIn",
+        "mentor": "Mentor and acknowledgements: {{mentor}}"
     },
     "facts": {
         "title": "The product in numbers",
         "intro": "Figures from the competency framework in this prototype.",
         "items": [
-            { "label": "competency domains" },
-            { "label": "competencies" },
-            { "label": "proficiency levels, 0 to 5" },
-            { "label": "seed roles" }
+            {
+                "label": "competency domains"
+            },
+            {
+                "label": "competencies"
+            },
+            {
+                "label": "proficiency levels, 0 to 5"
+            },
+            {
+                "label": "seed roles"
+            }
         ]
     },
     "disclaimer": {

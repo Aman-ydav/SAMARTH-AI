@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { AuthCard } from "@/features/auth/components/AuthCard";
-import { FormFailureAlert } from "@/features/auth/components/FormFailureAlert";
+import { FormFailureAlert } from "@/components/common/FormFailureAlert";
 
 /**
  * Confirm screen for a one-time email link (R2, AUTH-32). Opening the link only renders this panel; nothing is

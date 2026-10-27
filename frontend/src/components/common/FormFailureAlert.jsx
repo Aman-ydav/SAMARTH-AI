@@ -6,10 +6,15 @@ import { formatCountdown } from "@/lib/format";
 
 /**
  * The form-level server error, always above the submit button as a `role="alert"` (FE-76, FE-107). The text comes
- * from `errors:codes.<CODE>` and never from the server body; 5xx failures add the request id (FE-108) and a 429
+ * from `errors:codes.<CODE>` (or the caller's translated `message` for codes a screen words itself) and never from the server body; 5xx failures add the request id (FE-108) and a 429
  * adds the remaining wait.
  */
-export function FormFailureAlert({ failure, cooldownSec = 0, children }) {
+export function FormFailureAlert({
+    failure,
+    cooldownSec = 0,
+    message,
+    children,
+}) {
     const { t } = useTranslation(["auth", "errors"]);
     if (!failure) return null;
 
@@ -18,9 +23,10 @@ export function FormFailureAlert({ failure, cooldownSec = 0, children }) {
             <ErrorIcon aria-hidden="true" />
             <AlertDescription className="flex flex-col gap-1">
                 <p>
-                    {t(errorMessageKey(failure.code), {
-                        defaultValue: t("errors:codes.UNKNOWN"),
-                    })}
+                    {message ??
+                        t(errorMessageKey(failure.code), {
+                            defaultValue: t("errors:codes.UNKNOWN"),
+                        })}
                 </p>
                 {cooldownSec > 0 && (
                     <p>

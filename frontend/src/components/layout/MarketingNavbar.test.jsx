@@ -82,6 +82,53 @@ describe("MarketingNavbar", () => {
         ).not.toHaveAttribute("aria-current");
     });
 
+    it("links About to /about and not as the current page on other routes", () => {
+        renderNavbar({ route: "/" });
+        const nav = screen.getByRole("navigation", { name: "Main navigation" });
+        const about = within(nav).getByRole("link", { name: "About" });
+        expect(about).toHaveAttribute("href", "/about");
+        expect(about).not.toHaveAttribute("aria-current");
+    });
+
+    it("draws the active bar on About only when it is the current page", () => {
+        const first = renderNavbar({ route: "/about" });
+        const active = within(
+            screen.getByRole("navigation", { name: "Main navigation" })
+        ).getByRole("link", { name: "About" });
+        expect(active.className).toMatch(/after:bg-primary/);
+        first.unmount();
+        renderNavbar({ route: "/privacy" });
+        const idle = within(
+            screen.getByRole("navigation", { name: "Main navigation" })
+        ).getByRole("link", { name: "About" });
+        expect(idle.className).not.toMatch(/after:bg-primary/);
+    });
+
+    it("reaches About by keyboard in link order and opens it with Enter", async () => {
+        const { router } = renderNavbar();
+        const nav = screen.getByRole("navigation", { name: "Main navigation" });
+        const about = within(nav).getByRole("link", { name: "About" });
+        await userEvent.tab();
+        for (
+            let step = 0;
+            step < 12 && document.activeElement !== about;
+            step++
+        )
+            await userEvent.tab();
+        expect(about).toHaveFocus();
+        await userEvent.keyboard("{Enter}");
+        expect(router.state.location.pathname).toBe("/about");
+    });
+
+    it("shows About in Hindi", async () => {
+        await i18n.changeLanguage("hi");
+        renderNavbar({ route: "/about" });
+        const nav = screen.getByRole("navigation", { name: "मुख्य नेविगेशन" });
+        expect(
+            within(nav).getByRole("link", { name: "हमारे बारे में" })
+        ).toHaveAttribute("aria-current", "page");
+    });
+
     it("swaps the CTAs for Dashboard and the avatar menu when signed in", () => {
         renderNavbar({ auth: signedInAuth() });
         expect(
@@ -205,6 +252,21 @@ describe("MarketingNavbar mobile menu", () => {
         );
         expect(router.state.location.pathname).toBe("/about");
         expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+
+    it("marks About as the current page in the mobile menu", async () => {
+        renderNavbar({ route: "/about" });
+        await openMenu();
+        const dialog = await screen.findByRole("dialog", { name: "Menu" });
+        const nav = within(dialog).getByRole("navigation", {
+            name: "Mobile navigation",
+        });
+        expect(
+            within(nav).getByRole("link", { name: "About" })
+        ).toHaveAttribute("aria-current", "page");
+        expect(
+            within(nav).getByRole("link", { name: "Home" })
+        ).not.toHaveAttribute("aria-current");
     });
 
     it("shows the account actions instead of the CTAs when signed in", async () => {

@@ -88,6 +88,7 @@ export {
     changeEmailSchema,
     changePasswordSchema,
     deleteAccountSchema,
+    emailField,
     evaluatePasswordPolicy,
     forgotPasswordSchema,
     loginSchema,

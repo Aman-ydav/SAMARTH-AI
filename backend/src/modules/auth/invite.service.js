@@ -1,7 +1,7 @@
 import { AUDIT_ACTIONS } from "#constants/auditActions.js";
 import { EMAIL_TEMPLATES } from "#constants/emailTemplates.js";
 import { ERROR_CODES } from "#constants/errorCodes.js";
-import { INVITABLE_ROLES, ROLE_LIST, ROLES } from "#constants/roles.js";
+import { INVITE_GRANTS } from "#constants/roles.js";
 import {
     AUTH_PROVIDERS,
     INVITE_STATUSES,
@@ -13,7 +13,7 @@ import { buildFrontendLink } from "#integrations/email/emailLinks.mapper.js";
 import { appendAudit } from "#modules/audit/index.js";
 import { Invite, User } from "#modules/users/index.js";
 import { ApiError } from "#utils/apiError.js";
-import { gt } from "#utils/mongoOps.js";
+import { gt, lte } from "#utils/mongoOps.js";
 import { normalizeEmail } from "#utils/strings.js";
 import { FRONTEND_PATHS, POLICY_VERSION } from "./auth.constants.js";
 import { assertEmailDomainAllowed } from "./domainPolicy.service.js";
@@ -30,14 +30,11 @@ const TYPE = AUTH_TOKEN_TYPES.INVITE;
 const ORG_LABEL = "SAMARTH AI";
 const invalidInvite = () => ApiError.badRequest(ERROR_CODES.INVITE_INVALID);
 
-// No implicit hierarchy anywhere else (AUTH-60), but an invite may never grant more than the inviter holds (AUTH-61).
-const RANK = Object.freeze(
-    Object.fromEntries(ROLE_LIST.map((role, index) => [role, index]))
-);
-
 /**
- * Creates an invite and mails the link (doc 20 section 8). Called by the admin module; it enforces the role rules itself:
- * only admins and superadmins invite, `superadmin` is never invitable, and nobody can grant a role above their own.
+ * Creates an invite and mails the link (doc 20 section 8). Called by the admin module; it enforces the role rules itself
+ * through INVITE_GRANTS (R68, AUTH-61): a platform admin (`superadmin`) may invite trainers and admins, an admin may invite
+ * trainers only, learners and trainers invite nobody, and `superadmin` is never invitable. An invite that lapsed
+ * (still `sent` after its 7 days) no longer blocks a new one for the same address; it is closed as `expired`.
  *
  * @param {{ email: string, role: string, departmentId?: string }} input
  * @param {{ userId: string, role: string, orgId: string }} actor the signed-in inviter (from `req.auth`)
@@ -48,10 +45,9 @@ export async function createInvite(
     ctx,
     now = new Date()
 ) {
-    if (![ROLES.ADMIN, ROLES.SUPERADMIN].includes(actor.role)) {
-        throw ApiError.forbidden(ERROR_CODES.FORBIDDEN);
-    }
-    if (!INVITABLE_ROLES.includes(role) || RANK[role] > RANK[actor.role]) {
+    const grants = INVITE_GRANTS[actor.role];
+    if (!grants) throw ApiError.forbidden(ERROR_CODES.FORBIDDEN);
+    if (!grants.includes(role)) {
         throw ApiError.forbidden(ERROR_CODES.FORBIDDEN, {
             message: "You cannot grant this role.",
         });
@@ -64,6 +60,7 @@ export async function createInvite(
             orgId: actor.orgId,
             email: address,
             status: INVITE_STATUSES.SENT,
+            expiresAt: gt(now),
         }),
     ]);
     if (clash.some(Boolean)) throw ApiError.conflict(ERROR_CODES.CONFLICT);
@@ -72,6 +69,16 @@ export async function createInvite(
         .select("name locale")
         .lean();
     const { invite, token } = await withTransaction(async (session) => {
+        await Invite.updateMany(
+            {
+                orgId: actor.orgId,
+                email: address,
+                status: INVITE_STATUSES.SENT,
+                expiresAt: lte(now),
+            },
+            { $set: { status: INVITE_STATUSES.EXPIRED } },
+            { session }
+        );
         const issued = await issueEmailToken(
             {
                 type: TYPE,

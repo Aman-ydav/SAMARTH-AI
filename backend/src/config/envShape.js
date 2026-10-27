@@ -1,4 +1,5 @@
 import { parseDuration } from "#utils/dates.js";
+import { mergePlatformAdmins } from "./platformAdmins.js";
 
 /**
  * Turns the validated flat environment (UPPER_SNAKE names) into the typed, grouped config object.
@@ -59,6 +60,13 @@ export function shapeConfig(v) {
             dailyCapPerUser: v.LLM_DAILY_CAP_PER_USER,
             cacheTtlDays: v.LLM_CACHE_TTL_DAYS,
         },
+        // Platform admins (R68): PLATFORM_ADMINS plus the legacy seed pair, synced on every server start.
+        platformAdmins: Object.freeze(
+            mergePlatformAdmins(v.PLATFORM_ADMINS, {
+                email: v.SEED_ADMIN_EMAIL,
+                password: v.SEED_ADMIN_PASSWORD,
+            }).map((entry) => Object.freeze({ ...entry }))
+        ),
         seed: {
             adminEmail: v.SEED_ADMIN_EMAIL,
             adminPassword: v.SEED_ADMIN_PASSWORD,

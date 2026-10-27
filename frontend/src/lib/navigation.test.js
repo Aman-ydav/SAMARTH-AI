@@ -66,7 +66,12 @@ describe("planned flags", () => {
         const ready = NAV_ITEMS.filter((entry) => !entry.planned).map(
             (entry) => entry.id
         );
-        expect(ready.sort()).toEqual(["dashboard", "settings"]);
+        expect(ready.sort()).toEqual([
+            "dashboard",
+            "invites",
+            "settings",
+            "users",
+        ]);
     });
 });
 
@@ -241,7 +246,10 @@ describe("getNextSteps", () => {
         [ROLES.LEARNER, ["competencies", "gaps", "recommendations", "path"]],
         [ROLES.TRAINER, ["content", "generate", "review"]],
         [ROLES.ADMIN, ["users", "invites", "audit"]],
-        [ROLES.SUPERADMIN, ["organisations", "framework", "system"]],
+        [
+            ROLES.SUPERADMIN,
+            ["users", "invites", "organisations", "framework", "system"],
+        ],
     ])("suggests role-appropriate areas for %s", (role, expected) => {
         const steps = getNextSteps(user(role));
         expect(steps.map((entry) => entry.id)).toEqual(expected);

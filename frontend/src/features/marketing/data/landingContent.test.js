@@ -1,14 +1,25 @@
 import { describe, expect, it } from "vitest";
 import {
     ACRONYM_CARDS,
+    CHAIN_BLOCKS,
     FRAMEWORK_DOMAINS,
     FRAMEWORK_FIGURES,
     HOW_STEP_IDS,
+    JOURNEY_STOPS,
+    MEASURE_ROW_IDS,
     ROLE_CARDS,
     TOUR_PANELS,
     TRUST_ITEMS,
 } from "@/features/marketing/data/landingContent";
 import { getMediaSlot } from "@/assets/mediaManifest";
+import {
+    MOCK_COMPETENCIES,
+    MOCK_FEED,
+    MOCK_NAV,
+    MOCK_PATH,
+    MOCK_SESSIONS,
+    TOUR_STEPS,
+} from "@/features/marketing/data/heroMock";
 import en from "@/i18n/locales/en/landing.json";
 import hi from "@/i18n/locales/hi/landing.json";
 
@@ -60,6 +71,39 @@ describe("landing content structure", () => {
         ).toBe(43);
     });
 
+    it("keeps the acronym list for the About page that reuses it", () => {
+        expect(ACRONYM_CARDS).toHaveLength(7);
+    });
+
+    it("builds the measure rows from known competencies", () => {
+        const ids = MOCK_COMPETENCIES.map((item) => item.id);
+        expect(MEASURE_ROW_IDS.length).toBeLessThanOrEqual(8);
+        for (const id of MEASURE_ROW_IDS) expect(ids, id).toContain(id);
+    });
+
+    it("puts a quiz stop after the first course in the journey", () => {
+        expect(JOURNEY_STOPS.map((stop) => stop.id)).toEqual([
+            "privacy",
+            "quiz",
+            "python",
+            "ml",
+        ]);
+        expect(
+            JOURNEY_STOPS.filter((stop) => stop.kind === "quiz")
+        ).toHaveLength(1);
+        for (const stop of JOURNEY_STOPS.filter((item) => item.source)) {
+            expect(["igot", "nssta"]).toContain(stop.source);
+        }
+    });
+
+    it("chains the illustrative audit blocks: each names the hash before it", () => {
+        CHAIN_BLOCKS.forEach((block, index) => {
+            if (index > 0)
+                expect(block.prev).toBe(CHAIN_BLOCKS[index - 1].hash);
+        });
+        expect(CHAIN_BLOCKS.length).toBeLessThanOrEqual(6);
+    });
+
     it("keeps four steps, five tour panels and four roles", () => {
         expect(HOW_STEP_IDS).toHaveLength(4);
         expect(TOUR_PANELS).toHaveLength(5);
@@ -96,6 +140,40 @@ describe("landing content structure", () => {
                     `roles.items.${r.id}.sub`,
                     `roles.items.${r.id}.bullets`,
                 ]),
+                ...TOUR_STEPS.flatMap((step) => [
+                    `hero.laptop.steps.${step.id}.title`,
+                    `hero.laptop.steps.${step.id}.body`,
+                ]),
+                ...MOCK_COMPETENCIES.map(
+                    (item) => `hero.mock.competencies.${item.id}`
+                ),
+                ...MOCK_NAV.map((item) => `hero.mock.nav.${item.id}`),
+                ...MOCK_PATH.flatMap((item) => [
+                    `hero.mock.path.items.${item.id}`,
+                    `hero.mock.sources.${item.source}`,
+                ]),
+                ...MOCK_FEED.flatMap((item) => [
+                    `hero.mock.feed.items.${item.id}`,
+                    `hero.mock.feed.when.${item.when}`,
+                ]),
+                ...MOCK_SESSIONS.flatMap((item) => [
+                    `hero.mock.sessions.items.${item.id}`,
+                    `hero.mock.sessions.when.${item.when}`,
+                    `hero.mock.sessions.mode.${item.mode}`,
+                ]),
+                ...JOURNEY_STOPS.flatMap((stop) => [
+                    `journey.stops.${stop.id}.title`,
+                    `journey.stops.${stop.id}.body`,
+                ]),
+                ...["high", "medium", "low"].flatMap((level) => [
+                    `hero.mock.priority.${level}`,
+                    `how.visual.confidence.${level}`,
+                    `how.visual.importance.${level}`,
+                ]),
+                "trust.chain.label",
+                "trust.chain.entry",
+                "measure.title",
+                "measure.card.gap",
                 ...FRAMEWORK_FIGURES.map((f) => `framework.figures.${f.id}`),
                 ...FRAMEWORK_DOMAINS.map((d) => `framework.domains.${d.id}`),
                 ...TRUST_ITEMS.flatMap((t) => [

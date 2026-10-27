@@ -66,6 +66,11 @@ inviteSchema.index(
         partialFilterExpression: { status: INVITE_STATUSES.SENT },
     }
 );
+// serves: GET /admin/invites, newest first within an org, optionally by status
+inviteSchema.index(
+    { orgId: 1, status: 1, createdAt: -1 },
+    { name: "invites_orgId_status_createdAt" }
+);
 // serves: accept-invite, which finds the invite by the consumed token's id
 inviteSchema.index({ tokenId: 1 }, { name: "invites_tokenId" });
 

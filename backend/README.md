@@ -34,9 +34,20 @@ The auth system lives in `src/modules/auth` (routes under `/api/v1/auth`), `src/
 (hash-chained audit log). Contract: `../../docs/08-api-design.md` section 3 and `../../docs/20-auth-and-user-lifecycle.md`.
 
 - Tokens live only in cookies (`sai_access`, `sai_refresh`, `sai_csrf`); every unsafe request needs the `X-CSRF-Token` header.
-- `npm run seed` creates the first superadmin from `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` (idempotent; the account must change its password on first login).
+- `npm run seed` and every server start run the platform-admin sync (see Roles below): idempotent, nobody is ever demoted, an env password is temporary.
 - In development with `EMAIL_TRANSPORT=log` the verify and reset links are printed in the server log, labelled `DEV ONLY` (R40). Tests read them from the memory outbox (`GET /api/v1/__test__/outbox`, test mode only).
 - Per-IP rate limits are multiplied by `RATE_LIMIT_IP_MULTIPLIER`; per-email and per-user limits and lockouts never are.
+
+## Roles and how accounts are created (R68, R69)
+
+| Role | Created by |
+|---|---|
+| Learner | Registers or signs in with Google; the role is always `learner` |
+| Trainer | An invitation (`POST /api/v1/admin/invites`) from an admin or a platform admin |
+| Admin | An invitation from a platform admin only |
+| Platform admin (stored as `superadmin`) | The server environment, `PLATFORM_ADMINS` |
+
+`PLATFORM_ADMINS` is a comma separated list of `email` or `email:password` (split at the first colon; at most 10; see `.env.sample` and `../../docs/15-env-variables.md`). On every start, after the database connects (production included), the sync creates a platform admin for each new email, promotes an existing verified and active account, skips an unverified one with a warning, and never demotes anyone. An entry without a password gets one set-password email at creation (the password-reset link, 30 minutes; later use "Forgot password"). An entry with a password is temporary: the first sign-in must change it. A password equal to or containing the email address is refused on purpose. The admin area is `src/modules/admin` (`/api/v1/admin/invites`, `/api/v1/admin/users`); the sync is `platformAdmins.service.js`. Flows: `../../docs/20-auth-and-user-lifecycle.md` section 1a; API: `../../docs/08-api-design.md` section 6.1.
 
 ## API testing
 
@@ -50,7 +61,7 @@ Every route of the Express app is a request in `postman/samarthAi.postman_collec
 
 **Test-only outbox.** Verification, reset and email-change tokens arrive only by mail. With `NODE_ENV=test` and `EMAIL_TRANSPORT=memory` (and only then; every other combination answers 404 and the memory transport is refused in production) the API serves `GET /api/v1/__test__/outbox?to=...&templateKey=...`, which lists the captured mails with their `links` and one-time `token`. Mail is queued after the response, so the collection polls the outbox for up to five seconds before reading it. The outbox is not in `openapi.yaml`; the one-time tokens are kept in collection variables only until they are used.
 
-**Run against a local dev server.** Start `npm run dev` with `EMAIL_TRANSPORT=log`: there is no outbox, so run the Smoke folder and requests that need no mail, or use the links the server logs. In development with the `log` transport the verify and reset links are printed in the server log, labelled `DEV ONLY` (R40, never in test or production); open the link in the frontend or copy the `#token=` value into a request body by hand. The Google sign-in request is negative-only (it answers 403 FORBIDDEN when `GOOGLE_CLIENT_ID` is not set, 401 GOOGLE_TOKEN_INVALID when it is and `googleConfigured` is `true`), and the invite request is negative-only because invites have no HTTP route yet. The avatar requests read their files (`avatar-valid.png`, `avatar-too-large.png`, `avatar-spoofed.png`, `avatar-empty.png`, `avatar-not-allowed.gif`) from newman's working directory; `test:api` generates them per run, in the Postman app pick any small PNG, GIF or text file for them.
+**Run against a local dev server.** Start `npm run dev` with `EMAIL_TRANSPORT=log`: there is no outbox, so run the Smoke folder and requests that need no mail, or use the links the server logs. In development with the `log` transport the verify and reset links are printed in the server log, labelled `DEV ONLY` (R40, never in test or production); open the link in the frontend or copy the `#token=` value into a request body by hand. The Google sign-in request is negative-only (it answers 403 FORBIDDEN when `GOOGLE_CLIENT_ID` is not set, 401 GOOGLE_TOKEN_INVALID when it is and `googleConfigured` is `true`). The "Admin - invites and users" folder needs the seeded platform admin and org admin (test:api creates both) and the memory outbox for the invitation links, so against a dev server it is skipped unless you supply the same variables. The avatar requests read their files (`avatar-valid.png`, `avatar-too-large.png`, `avatar-spoofed.png`, `avatar-empty.png`, `avatar-not-allowed.gif`) from newman's working directory; `test:api` generates them per run, in the Postman app pick any small PNG, GIF or text file for them.
 
 ## Environment
 

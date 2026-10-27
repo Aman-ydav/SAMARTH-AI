@@ -33,9 +33,9 @@ const configWith = (extra = {}) =>
 describe("superadmin seed (DB-36)", () => {
     it("creates one active, verified superadmin that must change its password", async () => {
         const log = quiet();
-        await expect(seed({ log, config: configWith() })).resolves.toEqual({
-            created: true,
-        });
+        await expect(
+            seed({ log, config: configWith() })
+        ).resolves.toMatchObject({ created: true });
         const user = await User.findOne({ email: "root.admin@example.test" })
             .select("+passwordHash")
             .lean();
@@ -45,7 +45,7 @@ describe("superadmin seed (DB-36)", () => {
             emailVerified: true,
             mustChangePassword: true,
             authProviders: ["local"],
-            name: "Super Admin",
+            name: "Platform admin",
         });
         expect(user.passwordHash).toMatch(/^\$2b\$12\$/);
         expect(user.passwordHash).not.toContain("Seeded-Passphrase");
@@ -63,7 +63,7 @@ describe("superadmin seed (DB-36)", () => {
         );
         await expect(
             seed({ log: quiet(), config: configWith() })
-        ).resolves.toEqual({ created: false });
+        ).resolves.toMatchObject({ created: false });
         expect(await User.countDocuments({})).toBe(1);
         expect(
             await User.findOne({}).select("+passwordHash").lean()
@@ -78,6 +78,41 @@ describe("superadmin seed (DB-36)", () => {
         });
         expect(log.warn).toHaveBeenCalled();
         expect(await User.countDocuments({})).toBe(0);
+    });
+
+    it("seeds every PLATFORM_ADMINS entry and delivers the set-password mail before returning", async () => {
+        const { emailService } = await import("#services/email.service.js");
+        emailService.outbox.clear();
+        const config = makeTestEnv({
+            PLATFORM_ADMINS:
+                "ops@example.test, root@example.test:Granite-Orchid-Lantern-81",
+            ...{
+                SEED_ADMIN_EMAIL: "legacy@example.test",
+                SEED_ADMIN_PASSWORD: "Seeded-Passphrase-Value-1",
+            },
+        });
+        const result = await seed({ log: quiet(), config });
+        expect(result).toMatchObject({
+            created: true,
+            outcome: { created: 3 },
+        });
+        expect(await User.countDocuments({ role: "superadmin" })).toBe(3);
+        expect(
+            emailService.outbox.find({
+                to: "ops@example.test",
+                templateKey: "password-reset",
+            })
+        ).toHaveLength(1);
+        await expect(seed({ log: quiet(), config })).resolves.toMatchObject({
+            created: false,
+            outcome: { unchanged: 3 },
+        });
+        expect(
+            emailService.outbox.find({
+                to: "ops@example.test",
+                templateKey: "password-reset",
+            })
+        ).toHaveLength(1);
     });
 
     it("is picked up by the seed runner (and skips cleanly without the env variables)", async () => {

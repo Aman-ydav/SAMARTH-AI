@@ -223,4 +223,22 @@ describe("renderEmail", () => {
         expect(active.text).not.toContain("Google");
         expect(active.text).toContain("30 minutes");
     });
+
+    it("the setup variant tells a new platform admin to choose a first password and where to get a new link", () => {
+        const rendered = renderEmail({
+            templateKey: EMAIL_TEMPLATES.PASSWORD_RESET,
+            data: {
+                ...SAMPLE[EMAIL_TEMPLATES.PASSWORD_RESET],
+                variant: PASSWORD_RESET_VARIANTS.SETUP,
+            },
+        });
+        expect(rendered.subject).toBe(
+            "Set your SAMARTH AI platform admin password"
+        );
+        expect(rendered.text).toContain("platform admin account was created");
+        expect(rendered.text).toContain("Forgot password");
+        expect(rendered.text).toContain("30 minutes");
+        expect(rendered.text).not.toContain("request to reset");
+        expect(rendered.html).not.toMatch(/<img/i);
+    });
 });

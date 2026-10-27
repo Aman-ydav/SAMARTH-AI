@@ -12,8 +12,9 @@ import { renderWithProviders } from "@/test/renderWithProviders";
 
 const SECTION_TITLES_EN = [
     "The problem we are solving",
-    "Seven ideas, one name.",
+    "Skills are invisible until they are measured.",
     "From profile to progress in four steps.",
+    "A path, not a pile of courses.",
     "A look inside the prototype",
     "Built for four kinds of users.",
     "The framework at a glance.",
@@ -30,8 +31,9 @@ function Layout() {
 
 const SECTION_MODULES = [
     "ProblemSection",
-    "AcronymSection",
+    "MeasureSection",
     "HowItWorksSection",
+    "JourneySection",
     "TourSection",
     "RolesSection",
     "FrameworkSection",
@@ -119,25 +121,32 @@ describe("LandingPage", { timeout: 30000 }, () => {
         ).toHaveAttribute("href", "/privacy");
     });
 
-    it("shows all seven SAMARTH letters with honest status badges", async () => {
+    it("no longer shows the SAMARTH acronym section (it lives on the About page)", async () => {
         await renderLanding();
-        const cards = screen
-            .getAllByRole("heading", { level: 3 })
-            .map((h) => h.textContent);
-        for (const word of [
-            "Skill assessment",
-            "Adaptive learning",
-            "Mapping competencies",
-            "AI-driven analytics",
-            "Recommendations",
-            "Training pathways",
-            "Holistic capacity building",
-        ]) {
-            expect(cards).toContain(word);
+        expect(
+            screen.queryByRole("heading", { name: "Seven ideas, one name." })
+        ).toBeNull();
+        expect(screen.queryByText("Holistic capacity building")).toBeNull();
+        expect(screen.queryByText("Partly planned")).toBeNull();
+    });
+
+    it("tells the story in order: invisible, measured, steps, path, evidence, trust", async () => {
+        const { container } = await renderLanding();
+        const order = [
+            "measure-title",
+            "how-title",
+            "journey-title",
+            "tour-title",
+            "trust-title",
+        ].map((id) => container.querySelector(`#${id}`));
+        order.forEach((node) => expect(node).not.toBeNull());
+        for (let index = 1; index < order.length; index += 1) {
+            expect(
+                order[index - 1].compareDocumentPosition(order[index]) &
+                    Node.DOCUMENT_POSITION_FOLLOWING
+            ).toBeTruthy();
         }
-        expect(screen.getByText("Planned")).toBeInTheDocument();
-        expect(screen.getAllByText("Partly planned")).toHaveLength(2);
-        expect(screen.getByText("Simulated data")).toBeInTheDocument();
+        expect(screen.getAllByText("Verified")).toHaveLength(4);
     });
 
     it("shows the four how-it-works steps, five tour panels and four roles", async () => {
@@ -258,7 +267,10 @@ describe("LandingPage", { timeout: 30000 }, () => {
         expect(
             await screen.findByRole(
                 "heading",
-                { level: 2, name: "सात विचार, एक नाम।" },
+                {
+                    level: 2,
+                    name: "कौशल तब तक अदृश्य हैं, जब तक उन्हें मापा न जाए।",
+                },
                 { timeout: LOAD_TIMEOUT_MS }
             )
         ).toBeInTheDocument();

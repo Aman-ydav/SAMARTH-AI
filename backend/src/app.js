@@ -18,6 +18,7 @@ import {
     TEST_OUTBOX_PATH,
     testOutboxRouter,
 } from "#middlewares/testOutbox.js";
+import { createAdminRouter } from "#modules/admin/index.js";
 import { createAuthRouter } from "#modules/auth/index.js";
 import { mediaRouter } from "#modules/media/index.js";
 import { createUsersRouter } from "#modules/users/index.js";
@@ -35,6 +36,7 @@ import { sanitizingQueryParser } from "#utils/sanitize.js";
 function mountModules(api, deps) {
     api.use("/auth", createAuthRouter(deps));
     api.use("/profile", createUsersRouter(deps));
+    api.use("/admin", createAdminRouter(deps));
     // Serves /media/* and /me/avatar, so it is mounted at "/" and declares absolute paths (see media.routes.js).
     api.use("/", mediaRouter);
     return api;

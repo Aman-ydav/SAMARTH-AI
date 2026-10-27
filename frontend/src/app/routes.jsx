@@ -7,6 +7,47 @@ import { RootLayout } from "@/app/providers/RootLayout";
 import { RouteErrorBoundary } from "@/app/providers/RouteErrorBoundary";
 import { PATHS, PATH_ALIASES } from "@/lib/paths";
 import { ROLE_SETS } from "@/lib/permissions";
+import {
+    lazyMarketingLayout,
+    lazyAuthLayout,
+    lazyAppShell,
+    lazyLanding,
+    lazyAbout,
+    lazyPrivacy,
+    lazyTerms,
+    lazyGetStarted,
+    lazyNotFound,
+    lazyUnauthorized,
+    lazyServerError,
+    lazyMaintenance,
+    lazyOffline,
+    lazyCookiesDisabled,
+    lazyComingSoon,
+    lazyVerifyCertificate,
+    lazyLogin,
+    lazySignup,
+    lazyForgotPassword,
+    lazyResetPassword,
+    lazyVerifyEmail,
+    lazyVerifyEmailSent,
+    lazyConfirmEmail,
+    lazyUndoEmail,
+    lazyAcceptInvite,
+    lazySessionExpired,
+    lazyChangePassword,
+    lazySsoCallback,
+    lazyAccountSuspended,
+    lazyAccountLocked,
+    lazyAccountDeactivated,
+    lazyProfile,
+    lazySecurity,
+    lazySessions,
+    lazyLabs,
+    lazyDashboard,
+    lazyOnboarding,
+    lazyAdminInvites,
+    lazyAdminUsers,
+} from "@/app/lazyPages";
 
 /*
  * Route table (FE-65..69). Route authority: docs/23 section 2 plus R3. Every page loads through the route `lazy`
@@ -14,92 +55,6 @@ import { ROLE_SETS } from "@/lib/permissions";
  * Guards are layout routes: GuestRoute (login, signup), ProtectedRoute (signed in), RoleRoute (explicit roles).
  * Frames: MarketingLayout (public pages), AuthSplitLayout (sign-in, email-link and account pages), AppShell (signed-in app).
  */
-const toRoute = (module) => ({ Component: module.default });
-const toLayout = (name) => (module) => ({ Component: module[name] });
-
-/* Frames are lazy route modules too: they carry Lenis, motion and the whole sidebar kit, which must stay out of the initial bundle (FE-111, ANIM-78). */
-const lazyMarketingLayout = () =>
-    import("@/components/layout/MarketingLayout.jsx").then(
-        toLayout("MarketingLayout")
-    );
-const lazyAuthLayout = () =>
-    import("@/components/layout/AuthSplitLayout.jsx").then(
-        toLayout("AuthSplitLayout")
-    );
-const lazyAppShell = () =>
-    import("@/components/layout/AppShell.jsx").then(toLayout("AppShell"));
-
-const lazyLanding = () =>
-    import("@/features/marketing/pages/LandingPage.jsx").then(toRoute);
-const lazyAbout = () =>
-    import("@/features/marketing/pages/AboutPage.jsx").then(toRoute);
-const lazyPrivacy = () =>
-    import("@/features/marketing/pages/PrivacyPage.jsx").then(toRoute);
-const lazyTerms = () =>
-    import("@/features/marketing/pages/TermsPage.jsx").then(toRoute);
-const lazyGetStarted = () =>
-    import("@/features/marketing/pages/GetStartedPage.jsx").then(toRoute);
-const lazyNotFound = () =>
-    import("@/features/marketing/pages/NotFoundPage.jsx").then(toRoute);
-const lazyUnauthorized = () =>
-    import("@/features/marketing/pages/UnauthorizedPage.jsx").then(toRoute);
-const lazyServerError = () =>
-    import("@/features/marketing/pages/ServerErrorPage.jsx").then(toRoute);
-const lazyMaintenance = () =>
-    import("@/features/marketing/pages/MaintenancePage.jsx").then(toRoute);
-const lazyOffline = () =>
-    import("@/features/marketing/pages/OfflinePage.jsx").then(toRoute);
-const lazyCookiesDisabled = () =>
-    import("@/features/marketing/pages/CookiesDisabledPage.jsx").then(toRoute);
-const lazyComingSoon = () =>
-    import("@/features/marketing/pages/ComingSoonPage.jsx").then(toRoute);
-const lazyVerifyCertificate = () =>
-    import("@/features/marketing/pages/VerifyCertificatePage.jsx").then(
-        toRoute
-    );
-const lazyLogin = () =>
-    import("@/features/auth/pages/LoginPage.jsx").then(toRoute);
-const lazySignup = () =>
-    import("@/features/auth/pages/SignupPage.jsx").then(toRoute);
-const lazyForgotPassword = () =>
-    import("@/features/auth/pages/ForgotPasswordPage.jsx").then(toRoute);
-const lazyResetPassword = () =>
-    import("@/features/auth/pages/ResetPasswordPage.jsx").then(toRoute);
-const lazyVerifyEmail = () =>
-    import("@/features/auth/pages/VerifyEmailPage.jsx").then(toRoute);
-const lazyVerifyEmailSent = () =>
-    import("@/features/auth/pages/VerifyEmailSentPage.jsx").then(toRoute);
-const lazyConfirmEmail = () =>
-    import("@/features/auth/pages/ConfirmEmailChangePage.jsx").then(toRoute);
-const lazyUndoEmail = () =>
-    import("@/features/auth/pages/UndoEmailChangePage.jsx").then(toRoute);
-const lazyAcceptInvite = () =>
-    import("@/features/auth/pages/AcceptInvitePage.jsx").then(toRoute);
-const lazySessionExpired = () =>
-    import("@/features/auth/pages/SessionExpiredPage.jsx").then(toRoute);
-const lazyChangePassword = () =>
-    import("@/features/auth/pages/ChangePasswordPage.jsx").then(toRoute);
-const lazySsoCallback = () =>
-    import("@/features/auth/pages/SsoCallbackPage.jsx").then(toRoute);
-const lazyAccountSuspended = () =>
-    import("@/features/auth/pages/AccountSuspendedPage.jsx").then(toRoute);
-const lazyAccountLocked = () =>
-    import("@/features/auth/pages/AccountLockedPage.jsx").then(toRoute);
-const lazyAccountDeactivated = () =>
-    import("@/features/auth/pages/AccountDeactivatedPage.jsx").then(toRoute);
-const lazyProfile = () =>
-    import("@/features/auth/pages/SettingsProfilePage.jsx").then(toRoute);
-const lazySecurity = () =>
-    import("@/features/auth/pages/SettingsSecurityPage.jsx").then(toRoute);
-const lazySessions = () =>
-    import("@/features/auth/pages/SettingsSessionsPage.jsx").then(toRoute);
-const lazyLabs = () =>
-    import("@/features/labs/pages/LabsPage.jsx").then(toRoute);
-const lazyDashboard = () =>
-    import("@/features/dashboard/pages/DashboardPage.jsx").then(toRoute);
-const lazyOnboarding = () =>
-    import("@/features/onboarding/pages/OnboardingPage.jsx").then(toRoute);
-
 const route = (path, lazy, title) => ({ path, lazy, handle: { title } });
 /* A page whose document title is the `title` key of an `auth` section. */
 const acct = (path, lazy, section) =>
@@ -202,8 +157,8 @@ const trainerRoutes = [
 const adminRoutes = [
     soon(PATHS.admin, "nav:sidebar.adminOverview"),
     soon(PATHS.adminAnalytics, "nav:sidebar.analytics"),
-    soon(PATHS.adminUsers, "nav:sidebar.users"),
-    soon(PATHS.adminInvites, "nav:sidebar.invites"),
+    route(PATHS.adminUsers, lazyAdminUsers, "nav:sidebar.users"),
+    route(PATHS.adminInvites, lazyAdminInvites, "nav:sidebar.invites"),
     soon(PATHS.adminDepartments, "nav:sidebar.departments"),
     soon(PATHS.adminAudit, "nav:sidebar.audit"),
     soon(PATHS.adminIntegrations, "nav:sidebar.integrations"),

@@ -48,6 +48,15 @@ describe("Invite model", () => {
         ).rejects.toThrow();
     });
 
+    it("has a list index for newest-first pages by status", async () => {
+        const indexes = await Invite.collection.indexes();
+        expect(
+            indexes.find(
+                (index) => index.name === "invites_orgId_status_createdAt"
+            ).key
+        ).toEqual({ orgId: 1, status: 1, createdAt: -1 });
+    });
+
     it("has one OPEN invite per org and email (partial unique index); history rows may repeat", async () => {
         const indexes = await Invite.collection.indexes();
         const partial = indexes.find(

@@ -1,5 +1,6 @@
 import { env } from "#config/env.js";
 import { connectDb, disconnectDb } from "#db/connect.js";
+import { syncPlatformAdmins } from "#modules/admin/index.js";
 import { emailService } from "#services/email.service.js";
 import { whenBackgroundIdle } from "#utils/backgroundTasks.js";
 import { logger } from "#utils/logger.js";
@@ -12,10 +13,25 @@ import { createApp } from "./app.js";
 // Render's load balancer keeps idle connections for 60 s: stay above it to avoid sporadic 502s.
 const KEEP_ALIVE_MS = 65_000;
 
+/**
+ * Makes the PLATFORM_ADMINS accounts exist before the first request (R68, AUTH-66). It runs in every environment,
+ * production included. A failing entry is isolated and logged inside the sync, so one bad entry never stops the others
+ * or the server; only the sync itself breaking (for example the database going away) fails startup, like any DB error.
+ */
+async function runPlatformAdminSync() {
+    const outcome = await syncPlatformAdmins({
+        config: env,
+        log: logger,
+        emailService,
+    });
+    logger.info(outcome, "platform admins synced");
+}
+
 /** Entry point (BE-01): connect the database, THEN listen (DB-34), and wire graceful shutdown (BE-06). */
 async function start() {
     registerProcessGuards({ logger });
     await connectDb();
+    await runPlatformAdminSync();
     const server = createApp().listen(env.port, () =>
         logger.info({ port: env.port, nodeEnv: env.nodeEnv }, "api listening")
     );

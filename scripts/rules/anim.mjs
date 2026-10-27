@@ -4,7 +4,7 @@
 //    outside TickerMarquee.jsx, ui/skeleton.jsx, ui/spinner.jsx.
 //  - no-manual-scroll-listener also flags overflow-hidden|auto|scroll on *Layout.jsx files (ANIM-25: sticky ancestors).
 //  - below-fold-sections-lazy: on marketing pages only Hero*, *Nav*, LazySection, ScrollProgressBar and *Layout may be imported statically;
-//    "pinned" components counted = ZoomScrollSection, StickyScrollStory, SpiralCards3D, HorizontalScrollGallery, ScrollMedia, ScrollRotate.
+//    "pinned" components counted = ZoomScrollSection, StickyScrollStory, SpiralCards3D, HorizontalScrollGallery, ScrollMedia, ScrollRotate, StackedCards.
 import { rx, bannedPkgs, isTest, calls, jsxTags, FE } from './util.mjs';
 import { combine } from './frontend.mjs';
 import { GRADIENT, BLUR, GLOW, COLOR } from './ui.mjs';
@@ -96,11 +96,11 @@ const marketingFlat = rx('no-gradient-or-glow-in-marketing', ['ANIM-62', 'UI-40'
 
 const hero = {
   id: 'hero-required-parts', ruleIds: ['ANIM-60'], severity: 'error', globs: [`${FE}features/marketing/components/HeroSection.jsx`],
-  desc: 'hero contains TextReveal, TickerMarquee, ZoomScrollSection',
-  run: (f) => ['TextReveal', 'TickerMarquee', 'ZoomScrollSection'].filter((n) => !new RegExp(`<${n}\\b`).test(f.code)).map((n) => ({ line: 1, message: `HeroSection is missing <${n}>` })),
+  desc: 'hero contains TextReveal, TickerMarquee, HeroLaptop',
+  run: (f) => ['TextReveal', 'TickerMarquee', 'HeroLaptop'].filter((n) => !new RegExp(`<${n}\\b`).test(f.code)).map((n) => ({ line: 1, message: `HeroSection is missing <${n}>` })),
 };
 
-const PINNED = /^(?:ZoomScrollSection|StickyScrollStory|SpiralCards3D|HorizontalScrollGallery|ScrollMedia|ScrollRotate)$/;
+const PINNED = /^(?:ZoomScrollSection|StickyScrollStory|SpiralCards3D|HorizontalScrollGallery|ScrollMedia|ScrollRotate|StackedCards)$/;
 const lazy = {
   id: 'below-fold-sections-lazy', ruleIds: ['ANIM-77', 'ANIM-52'], severity: 'error', globs: [`${FE}features/marketing/pages/*.jsx`],
   desc: 'only hero/nav are static on Landing/About; at most 5 pinned components',

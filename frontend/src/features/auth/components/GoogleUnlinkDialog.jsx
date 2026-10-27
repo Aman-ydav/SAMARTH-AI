@@ -9,9 +9,9 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { FormFailureAlert } from "@/features/auth/components/FormFailureAlert";
+import { FormFailureAlert } from "@/components/common/FormFailureAlert";
 import { GoogleCredentialButton } from "@/features/auth/components/GoogleCredentialButton";
-import { useAsyncAction } from "@/features/auth/hooks/useAsyncAction";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { unlinkGoogle } from "@/features/auth/slice/accountSlice";
 
 /**

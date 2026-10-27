@@ -45,3 +45,9 @@ export function errorResponse(
         { status, headers }
     );
 }
+
+/** `meta` of a paged list (backend `PageMeta`). */
+export function pageMeta({ page = 1, limit = 20, total = 0 } = {}) {
+    const totalPages = Math.ceil(total / limit);
+    return { page, limit, total, totalPages, hasNext: page < totalPages };
+}

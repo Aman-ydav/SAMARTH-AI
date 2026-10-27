@@ -12,7 +12,8 @@ import {
 
 /**
  * Generic confirm step for a destructive action (rule 09 defaults): Radix traps focus, starts on Cancel and returns focus
- * to the control that opened it. `onConfirm` runs after the dialog closes.
+ * to the control that opened it. `onConfirm` runs after the dialog closes. `destructive` (default) styles the action as a
+ * destructive one; pass `false` for a neutral confirmation such as reactivating an account.
  */
 export function ConfirmActionDialog({
     open,
@@ -21,6 +22,7 @@ export function ConfirmActionDialog({
     description,
     actionLabel,
     onConfirm,
+    destructive = true,
 }) {
     const { t } = useTranslation("common");
     return (
@@ -35,7 +37,7 @@ export function ConfirmActionDialog({
                 <AlertDialogFooter>
                     <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
                     <AlertDialogAction
-                        variant="destructive"
+                        variant={destructive ? "destructive" : "default"}
                         onClick={onConfirm}
                     >
                         {actionLabel}

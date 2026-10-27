@@ -150,10 +150,13 @@ describe("LoginForm semantics", () => {
         ).toBeInTheDocument();
     });
 
-    it("always shows the Google-or-reset hint, before any attempt", () => {
+    it("shows no Google-or-reset hint line (AUTH-34), only the forgot link", () => {
         renderLogin();
         expect(
-            screen.getByText("Sign in with Google or reset your password.")
+            screen.queryByText("Sign in with Google or reset your password.")
+        ).not.toBeInTheDocument();
+        expect(
+            screen.getByRole("link", { name: "Forgot password?" })
         ).toBeInTheDocument();
     });
 
@@ -305,8 +308,8 @@ describe("LoginForm server errors", () => {
             await screen.findByText("Invalid email or password.")
         ).toBeInTheDocument();
         expect(
-            screen.getByText("Sign in with Google or reset your password.")
-        ).toBeInTheDocument();
+            screen.queryByText("Sign in with Google or reset your password.")
+        ).not.toBeInTheDocument();
         expect(screen.getByLabelText("Email")).toHaveValue(
             "Asha.Verma@Example.Test"
         );

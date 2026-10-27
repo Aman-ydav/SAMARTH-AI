@@ -1,4 +1,5 @@
 import { vi } from "vitest";
+import { createAdminRouter } from "#modules/admin/index.js";
 import { createAuthRouter } from "#modules/auth/index.js";
 import { createUsersRouter } from "#modules/users/index.js";
 import { TEST_PASSWORD } from "#tests/factories/user.factory.js";
@@ -7,7 +8,7 @@ import { createAuthAgent } from "./authAgent.js";
 import { latestToken } from "./outbox.js";
 
 /**
- * Builds an app with the real auth and profile routers on a fresh config, outbox and rate-limit counters.
+ * Builds an app with the real auth, profile and admin routers on a fresh config, outbox and rate-limit counters.
  * `verifyGoogleCredential` is a stub unless given (TEST-22: no network); `extraRoutes(api, deps)` adds test-only routes.
  */
 export function buildAuthApp({
@@ -25,6 +26,7 @@ export function buildAuthApp({
                 createAuthRouter({ ...deps, verifyGoogleCredential })
             );
             api.use("/profile", createUsersRouter(deps));
+            api.use("/admin", createAdminRouter(deps));
             extraRoutes?.(api, deps);
         },
     });

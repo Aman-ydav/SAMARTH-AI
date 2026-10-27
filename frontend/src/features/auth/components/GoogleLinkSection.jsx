@@ -5,12 +5,12 @@ import { GoogleIcon, InfoIcon } from "@/components/icons";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FormFailureAlert } from "@/features/auth/components/FormFailureAlert";
+import { FormFailureAlert } from "@/components/common/FormFailureAlert";
 import { GoogleCredentialButton } from "@/features/auth/components/GoogleCredentialButton";
 import { GoogleUnlinkDialog } from "@/features/auth/components/GoogleUnlinkDialog";
 import { SectionCard } from "@/features/auth/components/SectionCard";
-import { useAsyncAction } from "@/features/auth/hooks/useAsyncAction";
-import { useNotify } from "@/features/auth/hooks/useNotify";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { useNotify } from "@/hooks/useNotify";
 import { loginWithGoogle } from "@/features/auth/slice/authSlice";
 import { env } from "@/lib/env";
 

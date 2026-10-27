@@ -10,7 +10,9 @@ describe("rootReducer", () => {
     it("has one key per slice, equal to the slice name", () => {
         expect(Object.keys(setupStore().getState()).sort()).toEqual([
             "account",
+            "adminUsers",
             "auth",
+            "invites",
             "profile",
             "registration",
             "sessions",
@@ -45,6 +47,18 @@ describe("resetApp", () => {
                 lastFetchedAt: 1,
                 revoke: { status: "idle", error: null },
             },
+            invites: {
+                ids: ["i1"],
+                entities: { i1: { id: "i1" } },
+                status: "succeeded",
+                error: null,
+                lastFetchedAt: 1,
+                queryKey: "k",
+                requestId: "r",
+                loadedKey: "k",
+                meta: { page: 2, limit: 20, total: 30, totalPages: 2 },
+                ops: {},
+            },
             ui: {
                 theme: "dark",
                 language: "hi",
@@ -64,6 +78,9 @@ describe("resetApp", () => {
             lastFetchedAt: null,
         });
         expect(state.sessions.ids).toEqual([]);
+        expect(state.invites.ids).toEqual([]);
+        expect(state.invites.loadedKey).toBeNull();
+        expect(state.adminUsers.ids).toEqual([]);
         expect(state.account.ops).toEqual({});
         expect(state.ui).toEqual({
             theme: "dark",

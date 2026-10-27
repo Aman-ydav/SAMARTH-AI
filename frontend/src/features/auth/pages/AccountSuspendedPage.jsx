@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { UserForbidIcon } from "@/components/icons";
-import { FormFailureAlert } from "@/features/auth/components/FormFailureAlert";
+import { FormFailureAlert } from "@/components/common/FormFailureAlert";
 import { StatePanel } from "@/features/auth/components/StatePanel";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useLogoutAction } from "@/features/auth/hooks/useLogoutAction";

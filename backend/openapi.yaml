@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
     title: SAMARTH AI API
     version: 1.0.0
-    summary: "Milestone 1: health, auth, profile, media"
+    summary: "Milestone 1: health, auth, profile, media, admin"
     description: |-
         Hand-kept contract of the routes registered by the Express app (see docs/08-api-design.md). Every route is also a request in backend/postman/samarthAi.postman_collection.json.
 
@@ -20,6 +20,7 @@ tags:
     - name: Auth
     - name: Profile
     - name: Media
+    - name: Admin
 security: []
 paths:
     /health:
@@ -1717,6 +1718,500 @@ paths:
                 "403":
                     $ref: "#/components/responses/Error403"
                     description: "Codes: CSRF_INVALID."
+    /admin/invites:
+        post:
+            tags:
+                - Admin
+            operationId: createInvite
+            summary: Invite a trainer or an admin
+            description: "A platform admin may invite trainer and admin; an admin may invite trainer only (inviting an admin is 403). superadmin and learner are not accepted in the body (400): platform admins come from PLATFORM_ADMINS and learners register themselves. The 7-day link is mailed. An address with an account or an open invitation is 409 CONFLICT with the same text for both. 30 per hour per user, shared with revoke and resend. Guard order: authenticate, authorize (admin or platform admin), per-user rate limit, validation, service. Learners and trainers get 403 FORBIDDEN. Scoped to the caller's org; a missing, foreign or out-of-grant id is 404."
+            security: *a8
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            required:
+                                - email
+                                - role
+                            properties:
+                                email:
+                                    type: string
+                                    maxLength: 254
+                                role:
+                                    enum:
+                                        - trainer
+                                        - admin
+                                departmentId:
+                                    type: string
+                                    pattern: ^[a-f0-9]{24}$
+            responses:
+                "201":
+                    description: Invitation created and mailed
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 201
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  invite:
+                                                      $ref: "#/components/schemas/AdminInvite"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR, INVALID_JSON."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: FORBIDDEN, CSRF_INVALID, DOMAIN_NOT_ALLOWED, ACCOUNT_SUSPENDED."
+                "409":
+                    $ref: "#/components/responses/Error409"
+                    description: "Codes: CONFLICT."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+        get:
+            tags:
+                - Admin
+            operationId: listInvites
+            summary: List invitations (paged)
+            description: "Newest first by default. A platform admin sees every role; an admin sees trainer invitations only. An open invitation past its 7 days reads expired. 300 per 15 minutes per user. Guard order: authenticate, authorize (admin or platform admin), per-user rate limit, validation, service. Learners and trainers get 403 FORBIDDEN. Scoped to the caller's org; a missing, foreign or out-of-grant id is 404."
+            security: *a8
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                      type: integer
+                      minimum: 1
+                - name: limit
+                  in: query
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                - name: sort
+                  in: query
+                  schema:
+                      enum:
+                          - createdAt
+                          - email
+                - name: order
+                  in: query
+                  schema:
+                      enum:
+                          - asc
+                          - desc
+                - name: status
+                  in: query
+                  schema:
+                      enum:
+                          - sent
+                          - accepted
+                          - revoked
+                          - expired
+            responses:
+                "200":
+                    description: A page of invitations
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  invites:
+                                                      type: array
+                                                      items:
+                                                          $ref: "#/components/schemas/AdminInvite"
+                                          meta:
+                                              $ref: "#/components/schemas/PageMeta"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: FORBIDDEN."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+    /admin/invites/{id}:
+        delete:
+            tags:
+                - Admin
+            operationId: revokeInvite
+            summary: Revoke an open invitation
+            description: "The emailed link stops working at once (accept answers INVITE_INVALID) and the address can be invited again. Accepted or already revoked invitations are 409. 30 per hour per user. Guard order: authenticate, authorize (admin or platform admin), per-user rate limit, validation, service. Learners and trainers get 403 FORBIDDEN. Scoped to the caller's org; a missing, foreign or out-of-grant id is 404."
+            security: *a8
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: A 24-character hexadecimal id. Anything else is 400 INVALID_ID.
+                  schema:
+                      type: string
+                      pattern: ^[a-f0-9]{24}$
+                - *a1
+            responses:
+                "200":
+                    description: Invitation revoked
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  invite:
+                                                      $ref: "#/components/schemas/AdminInvite"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: INVALID_ID."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: FORBIDDEN, CSRF_INVALID."
+                "404":
+                    $ref: "#/components/responses/Error404"
+                    description: "Codes: NOT_FOUND."
+                "409":
+                    $ref: "#/components/responses/Error409"
+                    description: "Codes: CONFLICT."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+    /admin/invites/{id}/resend:
+        post:
+            tags:
+                - Admin
+            operationId: resendInvite
+            summary: Send an open invitation again
+            description: "Expires the old token, issues a new one with 7 fresh days, mails the new link and counts the resend (at most 5, then 422). Revoked or accepted invitations are 409. 30 per hour per user. Guard order: authenticate, authorize (admin or platform admin), per-user rate limit, validation, service. Learners and trainers get 403 FORBIDDEN. Scoped to the caller's org; a missing, foreign or out-of-grant id is 404."
+            security: *a8
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: A 24-character hexadecimal id. Anything else is 400 INVALID_ID.
+                  schema:
+                      type: string
+                      pattern: ^[a-f0-9]{24}$
+                - *a1
+            responses:
+                "200":
+                    description: Invitation sent again
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  invite:
+                                                      $ref: "#/components/schemas/AdminInvite"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: INVALID_ID."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: FORBIDDEN, CSRF_INVALID, DOMAIN_NOT_ALLOWED."
+                "404":
+                    $ref: "#/components/responses/Error404"
+                    description: "Codes: NOT_FOUND."
+                "409":
+                    $ref: "#/components/responses/Error409"
+                    description: "Codes: CONFLICT."
+                "422":
+                    $ref: "#/components/responses/Error422"
+                    description: "Codes: UNPROCESSABLE."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+    /admin/users:
+        get:
+            tags:
+                - Admin
+            operationId: listUsers
+            summary: List the users of the org (paged, filtered)
+            description: "Filters role, status and q (an escaped, case-insensitive email prefix of 1 to 64 characters). Platform admins are not listed for an admin. Never returns hashes, token versions or devices. 300 per 15 minutes per user. Guard order: authenticate, authorize (admin or platform admin), per-user rate limit, validation, service. Learners and trainers get 403 FORBIDDEN. Scoped to the caller's org; a missing, foreign or out-of-grant id is 404."
+            security: *a8
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                      type: integer
+                      minimum: 1
+                - name: limit
+                  in: query
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                - name: sort
+                  in: query
+                  schema:
+                      enum:
+                          - createdAt
+                          - email
+                          - name
+                - name: order
+                  in: query
+                  schema:
+                      enum:
+                          - asc
+                          - desc
+                - name: role
+                  in: query
+                  schema:
+                      enum:
+                          - learner
+                          - trainer
+                          - admin
+                          - superadmin
+                - name: status
+                  in: query
+                  schema:
+                      enum:
+                          - invited
+                          - pending_verification
+                          - active
+                          - suspended
+                          - deactivated
+                          - pending_deletion
+                          - deleted
+                - name: q
+                  in: query
+                  schema:
+                      type: string
+                      minLength: 1
+                      maxLength: 64
+            responses:
+                "200":
+                    description: A page of users
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  users:
+                                                      type: array
+                                                      items:
+                                                          $ref: "#/components/schemas/AdminUser"
+                                          meta:
+                                              $ref: "#/components/schemas/PageMeta"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: FORBIDDEN."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+    /admin/users/{id}/status:
+        patch:
+            tags:
+                - Admin
+            operationId: setUserStatus
+            summary: Suspend or reactivate an account
+            description: "Only active to suspended and suspended to active; anything else is 409. An admin acts on learners and trainers, a platform admin also on admins; nobody acts on themselves (403 SELF_ACTION_FORBIDDEN) or on a platform admin (403 for a platform admin, 404 for an admin). Suspending bumps tokenVersion and revokes every session. 60 per hour per user. Guard order: authenticate, authorize (admin or platform admin), per-user rate limit, validation, service. Learners and trainers get 403 FORBIDDEN. Scoped to the caller's org; a missing, foreign or out-of-grant id is 404."
+            security: *a8
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: A 24-character hexadecimal id. Anything else is 400 INVALID_ID.
+                  schema:
+                      type: string
+                      pattern: ^[a-f0-9]{24}$
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            required:
+                                - status
+                            properties:
+                                status:
+                                    enum:
+                                        - active
+                                        - suspended
+            responses:
+                "200":
+                    description: Status updated
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  user:
+                                                      $ref: "#/components/schemas/AdminUser"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR, INVALID_ID, INVALID_JSON."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: FORBIDDEN, SELF_ACTION_FORBIDDEN, CSRF_INVALID."
+                "404":
+                    $ref: "#/components/responses/Error404"
+                    description: "Codes: NOT_FOUND."
+                "409":
+                    $ref: "#/components/responses/Error409"
+                    description: "Codes: CONFLICT, LAST_ADMIN."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
+    /admin/users/{id}/role:
+        patch:
+            tags:
+                - Admin
+            operationId: changeUserRole
+            summary: Change a role between learner, trainer and admin (platform admin only)
+            description: "Never to or from superadmin, never on oneself, never to the same role (409). Bumps tokenVersion and revokes every session so the new role applies at the next sign-in; demoting the last active admin is 409 LAST_ADMIN. 60 per hour per user. Guard order: authenticate, authorize (admin or platform admin), per-user rate limit, validation, service. Learners and trainers get 403 FORBIDDEN. Scoped to the caller's org; a missing, foreign or out-of-grant id is 404."
+            security: *a8
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: A 24-character hexadecimal id. Anything else is 400 INVALID_ID.
+                  schema:
+                      type: string
+                      pattern: ^[a-f0-9]{24}$
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            required:
+                                - role
+                            properties:
+                                role:
+                                    enum:
+                                        - learner
+                                        - trainer
+                                        - admin
+            responses:
+                "200":
+                    description: Role updated
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  user:
+                                                      $ref: "#/components/schemas/AdminUser"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR, INVALID_ID, INVALID_JSON."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: FORBIDDEN, SELF_ACTION_FORBIDDEN, CSRF_INVALID."
+                "404":
+                    $ref: "#/components/responses/Error404"
+                    description: "Codes: NOT_FOUND."
+                "409":
+                    $ref: "#/components/responses/Error409"
+                    description: "Codes: CONFLICT, LAST_ADMIN."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
 components:
     securitySchemes:
         accessCookie:
@@ -2293,6 +2788,121 @@ components:
                 - maxBytes
                 - expiresAt
                 - uploadParams
+        PageMeta:
+            type: object
+            additionalProperties: false
+            required:
+                - page
+                - limit
+                - total
+                - totalPages
+                - hasNext
+            properties:
+                page:
+                    type: integer
+                limit:
+                    type: integer
+                total:
+                    type: integer
+                totalPages:
+                    type: integer
+                hasNext:
+                    type: boolean
+        AdminInvite:
+            type: object
+            additionalProperties: false
+            description: An invitation. Never carries the token or its id. An open invitation past its 7 days reads expired.
+            required:
+                - id
+                - email
+                - role
+                - status
+                - invitedBy
+                - resentCount
+                - expiresAt
+                - createdAt
+            properties:
+                id:
+                    type: string
+                email:
+                    type: string
+                role:
+                    enum:
+                        - learner
+                        - trainer
+                        - admin
+                status:
+                    enum:
+                        - sent
+                        - accepted
+                        - revoked
+                        - expired
+                departmentId:
+                    type:
+                        - string
+                        - "null"
+                invitedBy:
+                    type: string
+                resentCount:
+                    type: integer
+                    maximum: 5
+                expiresAt:
+                    type: string
+                    format: date-time
+                acceptedAt:
+                    type:
+                        - string
+                        - "null"
+                    format: date-time
+                createdAt:
+                    type: string
+                    format: date-time
+        AdminUser:
+            type: object
+            additionalProperties: false
+            description: The admin view of an account. Never a hash, token version, device list or lock counters.
+            required:
+                - id
+                - email
+                - name
+                - role
+                - status
+                - emailVerified
+                - authProviders
+                - mustChangePassword
+                - createdAt
+            properties:
+                id:
+                    type: string
+                email:
+                    type: string
+                name:
+                    type: string
+                role:
+                    enum:
+                        - learner
+                        - trainer
+                        - admin
+                        - superadmin
+                    description: superadmin is shown as "Platform admin" in the UI.
+                status:
+                    type: string
+                emailVerified:
+                    type: boolean
+                authProviders:
+                    type: array
+                    items:
+                        type: string
+                mustChangePassword:
+                    type: boolean
+                lastLoginAt:
+                    type:
+                        - string
+                        - "null"
+                    format: date-time
+                createdAt:
+                    type: string
+                    format: date-time
 x-error-statuses:
     VALIDATION_ERROR: 400
     BAD_REQUEST: 400
@@ -2322,6 +2932,7 @@ x-error-statuses:
     CSRF_INVALID: 403
     CORS_ORIGIN_DENIED: 403
     REAUTH_REQUIRED: 403
+    SELF_ACTION_FORBIDDEN: 403
     DOMAIN_NOT_ALLOWED: 403
     EMAIL_NOT_VERIFIED: 403
     ACCOUNT_SUSPENDED: 403

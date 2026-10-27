@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { useTranslation } from "react-i18next";
 import { SpiralCards3D } from "@/components/motion/SpiralCards3D";
 import { Badge } from "@/components/ui/badge";
@@ -29,17 +30,18 @@ function AcronymCard({ card, t }) {
     );
 }
 
-/** SAMARTH acronym: seven cards in S-A-M-A-R-T-H order on a 3D spiral (SPIRAL_3D, pinned). */
+/**
+ * SAMARTH acronym: seven cards in S-A-M-A-R-T-H order on a 3D spiral (SPIRAL_3D, pinned). Self-contained (own
+ * `useId` heading id, `h2`, own vertical rhythm), so it mounts on Landing or About through a `LazySection`.
+ */
 export function AcronymSection() {
     const { t } = useTranslation("landing");
+    const titleId = useId();
 
     return (
-        <section aria-labelledby="acronym-title">
+        <section aria-labelledby={titleId}>
             <div className="mx-auto max-w-7xl px-4 pt-12 sm:px-6 md:pt-20 lg:px-8">
-                <h2
-                    id="acronym-title"
-                    className="type-h1 max-w-3xl text-foreground"
-                >
+                <h2 id={titleId} className="type-h1 max-w-3xl text-foreground">
                     {t("acronym.title")}
                 </h2>
                 <p className="mt-4 max-w-2xl type-body-lg text-muted-foreground">

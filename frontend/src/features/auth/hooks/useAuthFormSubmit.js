@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { errorMessageKey } from "@/lib/apiError";
 import { applyServerErrors } from "@/lib/forms";
-import { useAsyncAction } from "@/features/auth/hooks/useAsyncAction";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
 
 export const NO_CODE_FIELDS = Object.freeze({});
 

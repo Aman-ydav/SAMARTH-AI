@@ -36,13 +36,11 @@ describe("DELETE /auth/google", () => {
     const credential = "google-credential-value-123";
 
     it("unlinks Google from an account that also has a password", async () => {
-        const verify = vi
-            .fn()
-            .mockResolvedValue({
-                sub: "g-1",
-                email: "x@example.test",
-                name: "X",
-            });
+        const verify = vi.fn().mockResolvedValue({
+            sub: "g-1",
+            email: "x@example.test",
+            name: "X",
+        });
         const { app } = buildAuthApp({ verifyGoogleCredential: verify });
         const user = await createUser({
             googleSub: "g-1",
@@ -59,13 +57,11 @@ describe("DELETE /auth/google", () => {
     });
 
     it("answers AUTH_METHOD_REQUIRED 409 when it is the last method, REAUTH_REQUIRED 403 for another Google account", async () => {
-        const verify = vi
-            .fn()
-            .mockResolvedValue({
-                sub: "g-1",
-                email: "x@example.test",
-                name: "X",
-            });
+        const verify = vi.fn().mockResolvedValue({
+            sub: "g-1",
+            email: "x@example.test",
+            name: "X",
+        });
         const { app } = buildAuthApp({ verifyGoogleCredential: verify });
         const googleOnly = await createUser({
             googleSub: "g-1",
@@ -222,12 +218,10 @@ describe("email change: POST /auth/change-email, /confirm and /undo", () => {
         const user = await createUser();
         const { agent } = await loginAs(app, user.email);
         expectError(
-            await agent
-                .post(`${API}/change-email`)
-                .send({
-                    newEmail: NEW_EMAIL,
-                    currentPassword: "Wrong-Password-Value-1",
-                }),
+            await agent.post(`${API}/change-email`).send({
+                newEmail: NEW_EMAIL,
+                currentPassword: "Wrong-Password-Value-1",
+            }),
             401,
             "INVALID_CREDENTIALS"
         );
@@ -254,12 +248,10 @@ describe("email change: POST /auth/change-email, /confirm and /undo", () => {
         const user = await createUser();
         const { agent } = await loginAs(app, user.email);
         expectError(
-            await agent
-                .post(`${API}/change-email`)
-                .send({
-                    newEmail: "x@gmail.example",
-                    currentPassword: TEST_PASSWORD,
-                }),
+            await agent.post(`${API}/change-email`).send({
+                newEmail: "x@gmail.example",
+                currentPassword: TEST_PASSWORD,
+            }),
             403,
             "DOMAIN_NOT_ALLOWED"
         );
@@ -441,13 +433,11 @@ describe("POST /auth/accept-invite", () => {
         const { app, emailService } = buildAuthApp();
         const token = await inviteToken(app, emailService, "trainer");
         const agent = await createAuthAgent(app);
-        const response = await agent
-            .post(`${API}/accept-invite`)
-            .send({
-                token,
-                name: "Invited Person",
-                password: "Sturdy-Meadow-Lantern-Quartz-55",
-            });
+        const response = await agent.post(`${API}/accept-invite`).send({
+            token,
+            name: "Invited Person",
+            password: "Sturdy-Meadow-Lantern-Quartz-55",
+        });
         const body = expectSuccess(response);
         expect(body.data.user).toMatchObject({
             email: "invited.person@example.test",
@@ -456,13 +446,11 @@ describe("POST /auth/accept-invite", () => {
         });
         expect(agent.cookie("sai_access")).toBeTruthy();
         expectError(
-            await agent
-                .post(`${API}/accept-invite`)
-                .send({
-                    token,
-                    name: "Again",
-                    password: "Sturdy-Meadow-Lantern-Quartz-55",
-                }),
+            await agent.post(`${API}/accept-invite`).send({
+                token,
+                name: "Again",
+                password: "Sturdy-Meadow-Lantern-Quartz-55",
+            }),
             400,
             "INVITE_INVALID"
         );
@@ -470,17 +458,15 @@ describe("POST /auth/accept-invite", () => {
 
     it("cannot be used to pick a role: the body is strict", async () => {
         const { app, emailService } = buildAuthApp();
-        const token = await inviteToken(app, emailService, "learner");
+        const token = await inviteToken(app, emailService, "trainer");
         const agent = await createAuthAgent(app);
         expectError(
-            await agent
-                .post(`${API}/accept-invite`)
-                .send({
-                    token,
-                    name: "N",
-                    password: "Sturdy-Meadow-Lantern-Quartz-55",
-                    role: "superadmin",
-                }),
+            await agent.post(`${API}/accept-invite`).send({
+                token,
+                name: "N",
+                password: "Sturdy-Meadow-Lantern-Quartz-55",
+                role: "superadmin",
+            }),
             400,
             "VALIDATION_ERROR"
         );
@@ -491,13 +477,11 @@ describe("POST /auth/accept-invite", () => {
         const token = await inviteToken(app, emailService);
         const agent = await createAuthAgent(app);
         expectError(
-            await agent
-                .post(`${API}/accept-invite`)
-                .send({
-                    token: "i".repeat(43),
-                    name: "N",
-                    password: "Sturdy-Meadow-Lantern-Quartz-55",
-                }),
+            await agent.post(`${API}/accept-invite`).send({
+                token: "i".repeat(43),
+                name: "N",
+                password: "Sturdy-Meadow-Lantern-Quartz-55",
+            }),
             400,
             "INVITE_INVALID"
         );

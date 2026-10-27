@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { DB_NAME } from "#constants/dbName.js";
 import { parseDuration } from "#utils/dates.js";
+import { platformAdminsField } from "./platformAdmins.js";
 
 // Reusable field types for the environment schema. Keep messages free of configured values.
 export const text = (schema = z.string()) => schema.trim();
@@ -128,6 +129,7 @@ export const envFields = {
         .default(30_000),
     LLM_DAILY_CAP_PER_USER: z.coerce.number().int().min(1).default(200),
     LLM_CACHE_TTL_DAYS: z.coerce.number().int().min(1).max(365).default(7),
+    PLATFORM_ADMINS: platformAdminsField,
     SEED_ADMIN_EMAIL: z.email().optional(),
     SEED_ADMIN_PASSWORD: z.string().min(10).max(72).optional(),
 };

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { LanguageSwitch } from "@/components/layout/LanguageSwitch";
 import { Logo } from "@/components/layout/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
@@ -57,9 +57,10 @@ const COLUMNS = [
     },
 ];
 
-/** Public footer (docs/23): link columns, language and theme, legal links, the prototype disclaimer and the current year via Intl. */
+/** Public footer (docs/23): link columns (the link to the current page carries aria-current), language and theme, legal links, the prototype disclaimer and the current year via Intl. */
 export function MarketingFooter() {
     const { t, i18n } = useTranslation("footer");
+    const { pathname } = useLocation();
     const year = new Intl.DateTimeFormat(resolveLocale(i18n.language), {
         year: "numeric",
         timeZone: DEFAULT_TIME_ZONE,
@@ -91,7 +92,12 @@ export function MarketingFooter() {
                                         <li key={link.key}>
                                             <Link
                                                 to={link.to}
-                                                className="inline-flex min-h-8 items-center rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground"
+                                                aria-current={
+                                                    link.to === pathname
+                                                        ? "page"
+                                                        : undefined
+                                                }
+                                                className="inline-flex min-h-8 items-center rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground aria-[current=page]:font-medium aria-[current=page]:text-foreground aria-[current=page]:underline aria-[current=page]:underline-offset-4"
                                             >
                                                 {t(link.key)}
                                             </Link>

@@ -4,7 +4,7 @@ import { useAppDispatch } from "@/app/hooks";
 import { HistoryIcon, MailLockIcon, VerifiedIcon } from "@/components/icons";
 import { StatePanel } from "@/features/auth/components/StatePanel";
 import { TokenConfirmPanel } from "@/features/auth/components/TokenConfirmPanel";
-import { useAsyncAction } from "@/features/auth/hooks/useAsyncAction";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { LINK_ERROR_CODES } from "@/features/auth/hooks/useAuthFormSubmit";
 import { useFragmentToken } from "@/features/auth/hooks/useFragmentToken";
 import { undoEmailChange } from "@/features/auth/slice/accountSlice";

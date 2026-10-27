@@ -28,6 +28,10 @@ describe("User model indexes (DB-20, DB-22)", () => {
             role: 1,
             status: 1,
         });
+        expect(indexes.users_orgId_createdAt.key).toEqual({
+            orgId: 1,
+            createdAt: -1,
+        });
         expect(indexes.users_status_deletionScheduledAt.key).toEqual({
             status: 1,
             deletionScheduledAt: 1,
