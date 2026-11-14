@@ -22,7 +22,7 @@ Measure the skills. Find the gaps. Build the path. Prove the progress.
 
 ## The problem
 
-India's official statistics depend on people: officers who design surveys, clean data, apply standards and publish numbers the country plans with. Their skills are rarely measured in a consistent way. Training is offered in bulk, so a senior officer and a new joiner often get the same course, and nobody can say which skills actually improved.
+India's official statistics depend on peoples: officers who design surveys, clean data, apply standards and publish numbers the country plans with. Their skills are rarely measured in a consistent way. Training is offered in bulk, so a senior officer and a new joiner often get the same course, and nobody can say which skills actually improved.
 
 The result is a gap that is invisible until a report is late, a method is applied wrongly or a standard is missed.
 
