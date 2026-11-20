@@ -63,7 +63,7 @@ This repository holds **milestone 1**: the foundation every later feature stands
 
 ## Product tour
 
-The hero shows a laptop opening onto a demo **My competency** page and walks through the product in four steps:
+The hero shows a laptop opening onto a demo **My competency** page and walks through the product in four steps
 
 1. **Profile estimated.** From designation, role, experience and past training, the system estimates a starting level (0 to 5) for each competency.
 2. **Gaps found.** Each level is compared with what the role requires. The difference is the gap, ranked by priority.
