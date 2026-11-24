@@ -1,0 +1,67 @@
+[
+  {
+    "_id": "statistical_officer",
+    "title": "Statistical Officer",
+    "department": "National Statistical Office (NSO) / Subordinate Statistical Service (SSS)",
+    "description": "Responsible for conducting sample surveys, processing primary survey schedules, compiling official economic indices, and applying validation rules.",
+    "requiredCompetencies": [
+      { "competencyId": "S01", "minimumLevel": 3, "weight": 1.2 },
+      { "competencyId": "S02", "minimumLevel": 3, "weight": 1.5 },
+      { "competencyId": "S04", "minimumLevel": 2, "weight": 1.0 },
+      { "competencyId": "S05", "minimumLevel": 3, "weight": 1.2 },
+      { "competencyId": "S11", "minimumLevel": 3, "weight": 1.0 },
+      { "competencyId": "T01", "minimumLevel": 2, "weight": 1.0 },
+      { "competencyId": "T03", "minimumLevel": 2, "weight": 0.8 },
+      { "competencyId": "T08", "minimumLevel": 2, "weight": 0.8 },
+      { "competencyId": "D01", "minimumLevel": 3, "weight": 1.0 }
+    ]
+  },
+  {
+    "_id": "data_analyst",
+    "title": "Data Analyst (Official Statistics)",
+    "department": "Data Quality & Analytics Division (DQAD)",
+    "description": "Applies programmatic tools (Python, R, SQL) to clean microdata, automate survey report generation, and engineer statistical data pipelines.",
+    "requiredCompetencies": [
+      { "competencyId": "S02", "minimumLevel": 2, "weight": 1.0 },
+      { "competencyId": "S11", "minimumLevel": 3, "weight": 1.2 },
+      { "competencyId": "S12", "minimumLevel": 3, "weight": 1.0 },
+      { "competencyId": "T01", "minimumLevel": 4, "weight": 1.5 },
+      { "competencyId": "T02", "minimumLevel": 3, "weight": 1.2 },
+      { "competencyId": "T03", "minimumLevel": 4, "weight": 1.5 },
+      { "competencyId": "T08", "minimumLevel": 4, "weight": 1.2 },
+      { "competencyId": "D01", "minimumLevel": 3, "weight": 1.0 }
+    ]
+  },
+  {
+    "_id": "iss_probationer",
+    "title": "Indian Statistical Service (ISS) Officer",
+    "department": "Ministry of Statistics and Programme Implementation (MoSPI)",
+    "description": "Directs statistical divisions, establishes methodological frameworks, coordinates national indicators, and guides evidence-based policy formulation.",
+    "requiredCompetencies": [
+      { "competencyId": "S01", "minimumLevel": 4, "weight": 1.4 },
+      { "competencyId": "S02", "minimumLevel": 4, "weight": 1.5 },
+      { "competencyId": "S03", "minimumLevel": 4, "weight": 1.5 },
+      { "competencyId": "S04", "minimumLevel": 3, "weight": 1.2 },
+      { "competencyId": "S05", "minimumLevel": 4, "weight": 1.3 },
+      { "competencyId": "S11", "minimumLevel": 4, "weight": 1.4 },
+      { "competencyId": "S12", "minimumLevel": 3, "weight": 1.1 },
+      { "competencyId": "T01", "minimumLevel": 3, "weight": 1.0 },
+      { "competencyId": "T02", "minimumLevel": 3, "weight": 1.0 },
+      { "competencyId": "T08", "minimumLevel": 3, "weight": 1.0 },
+      { "competencyId": "D01", "minimumLevel": 4, "weight": 1.5 }
+    ]
+  },
+  {
+    "_id": "field_investigator",
+    "title": "Field Investigator / Senior Field Assistant",
+    "department": "Field Operations Division (FOD)",
+    "description": "Executes household and enterprise survey visits, conducts respondent interviews, verifies geographical boundaries, and records CAPI digital entries.",
+    "requiredCompetencies": [
+      { "competencyId": "S01", "minimumLevel": 2, "weight": 1.5 },
+      { "competencyId": "S02", "minimumLevel": 2, "weight": 1.2 },
+      { "competencyId": "S05", "minimumLevel": 3, "weight": 1.5 },
+      { "competencyId": "T08", "minimumLevel": 1, "weight": 0.8 },
+      { "competencyId": "D01", "minimumLevel": 3, "weight": 1.5 }
+    ]
+  }
+]

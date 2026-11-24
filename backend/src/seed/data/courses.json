@@ -1,0 +1,211 @@
+[
+  {
+    "_id": "igot_stat_01",
+    "title": "Modern Survey Sampling Methods & Weight Calibration",
+    "provider": "iGOT Karmayogi",
+    "domain": "Statistical",
+    "competencyId": "S02",
+    "targetLevel": 3,
+    "durationHours": 14,
+    "rating": 4.8,
+    "url": "https://igotkarmayogi.gov.in/learn/course/sampling-methods",
+    "thumbnail": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80",
+    "description": "Comprehensive course on Stratified Multi-Stage sampling designs, calculating sampling multipliers, handling cluster intraclass correlation, and post-stratification weighting.",
+    "curriculum": [
+      "Probability Sampling Foundations",
+      "Stratification and Allocation Techniques (Neyman & Proportional)",
+      "Multi-stage Cluster Sampling & Design Effects",
+      "Weight Calibration & Non-Response Adjustments"
+    ]
+  },
+  {
+    "_id": "igot_stat_02",
+    "title": "Comprehensive Survey Questionnaire Design & CAPI Automation",
+    "provider": "NSSTA TPAC",
+    "domain": "Statistical",
+    "competencyId": "S01",
+    "targetLevel": 3,
+    "durationHours": 10,
+    "rating": 4.7,
+    "url": "https://igotkarmayogi.gov.in/learn/course/survey-design",
+    "thumbnail": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&auto=format&fit=crop&q=80",
+    "description": "Formulating clear questions, cognitive testing, building validation logic trees for Computer-Assisted Personal Interviewing (CAPI) on mobile tablets.",
+    "curriculum": [
+      "Defining Statistical Concepts & Operational Definitions",
+      "Question Types, Recall Bias and Sensitive Topics",
+      "Logic Rules, Skips and Consistency Validations in CAPI",
+      "Pilot Testing & Field Revisions"
+    ]
+  },
+  {
+    "_id": "igot_stat_03",
+    "title": "Compilation of Consumer Price Index (CPI) & WPI",
+    "provider": "iGOT Karmayogi",
+    "domain": "Statistical",
+    "competencyId": "S04",
+    "targetLevel": 2,
+    "durationHours": 8,
+    "rating": 4.6,
+    "url": "https://igotkarmayogi.gov.in/learn/course/price-indices",
+    "thumbnail": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&auto=format&fit=crop&q=80",
+    "description": "Step-by-step practical training on Laspeyres price index formulation, geometric mean aggregation, seasonal clothing adjustments, and inflation reporting.",
+    "curriculum": [
+      "Index Numbers Principles and Laspeyres/Paasche Formulations",
+      "Item Basket Selection & Weight Allocation",
+      "Weekly Price Collection and Quotation Scrubbing",
+      "Sub-group and Headline Inflation Index Computation"
+    ]
+  },
+  {
+    "_id": "igot_stat_04",
+    "title": "Periodic Labour Force Survey (PLFS) Microdata Analysis",
+    "provider": "NSSTA TPAC",
+    "domain": "Statistical",
+    "competencyId": "S05",
+    "targetLevel": 3,
+    "durationHours": 16,
+    "rating": 4.9,
+    "url": "https://igotkarmayogi.gov.in/learn/course/plfs-analytics",
+    "thumbnail": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=600&auto=format&fit=crop&q=80",
+    "description": "Understanding activity statuses (ps+ss vs CWS), unravelling unit-level record layouts, and computing national employment indicators.",
+    "curriculum": [
+      "PLFS Survey Concept, Sampling and Rotation Panel Scheme",
+      "Record Layouts: Household, Person and Activity Schedules",
+      "Calculating LFPR, WPR, and Unemployment Rate",
+      "Formal vs Informal Sector Disaggregation"
+    ]
+  },
+  {
+    "_id": "igot_stat_05",
+    "title": "System of National Accounts (SNA) & GDP Estimation",
+    "provider": "NSSTA TPAC",
+    "domain": "Statistical",
+    "competencyId": "S03",
+    "targetLevel": 4,
+    "durationHours": 20,
+    "rating": 4.9,
+    "url": "https://igotkarmayogi.gov.in/learn/course/national-accounts",
+    "thumbnail": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&auto=format&fit=crop&q=80",
+    "description": "In-depth course on SNA 2008 principles, production boundaries, double deflation methodologies, financial intermediation services (FISIM), and supply-use balancing.",
+    "curriculum": [
+      "SNA 2008 Framework & Sequence of Accounts",
+      "Gross Value Added (GVA) by Sector (Agriculture, Industry, Services)",
+      "Supply and Use Tables (SUT) Construction",
+      "Constant Price Estimation & Deflator Mechanics"
+    ]
+  },
+  {
+    "_id": "igot_tech_01",
+    "title": "Python for Statistical Officers & Data Wrangling",
+    "provider": "iGOT Karmayogi",
+    "domain": "Technical",
+    "competencyId": "T01",
+    "targetLevel": 2,
+    "durationHours": 18,
+    "rating": 4.9,
+    "url": "https://igotkarmayogi.gov.in/learn/course/python-statistics",
+    "thumbnail": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80",
+    "description": "Hands-on Python training tailored for official statistical offices. Uses Pandas and NumPy to ingest raw ASCII fixed-width survey files and export clean tabular indicators.",
+    "curriculum": [
+      "Python Basics and Environment Setup",
+      "Pandas Series and DataFrames: Filtering, Indexing and Reshaping",
+      "Processing Fixed-Width Survey Raw Files (.txt / .dat)",
+      "Grouping, Aggregation and Exporting Statistical Summaries"
+    ]
+  },
+  {
+    "_id": "igot_tech_02",
+    "title": "Advanced Data Engineering & Pipeline Automation in Python",
+    "provider": "iGOT Karmayogi",
+    "domain": "Technical",
+    "competencyId": "T01",
+    "targetLevel": 4,
+    "durationHours": 24,
+    "rating": 4.8,
+    "url": "https://igotkarmayogi.gov.in/learn/course/python-advanced",
+    "thumbnail": "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=600&auto=format&fit=crop&q=80",
+    "description": "High performance data manipulation with Polars, vectorised data cleaning, automated testing, and CI/CD pipelines for statistical releases.",
+    "curriculum": [
+      "Polars vs Pandas for 10M+ Row Datasets",
+      "Writing Robust Clean Data Transformers",
+      "Automated Quality Check Suites (Great Expectations)",
+      "Orchestration of Monthly Indicator Pipelines"
+    ]
+  },
+  {
+    "_id": "igot_tech_03",
+    "title": "R for Official Survey Data & Complex Design Analysis",
+    "provider": "NSSTA TPAC",
+    "domain": "Technical",
+    "competencyId": "T02",
+    "targetLevel": 3,
+    "durationHours": 15,
+    "rating": 4.8,
+    "url": "https://igotkarmayogi.gov.in/learn/course/r-survey-package",
+    "thumbnail": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&auto=format&fit=crop&q=80",
+    "description": "Mastering the 'survey' library in R: svydesign specification, computing standard errors with design effects, and generating publication-ready tables with Quarto.",
+    "curriculum": [
+      "Tidyverse for Data Cleaning and Transformation",
+      "Specifying Stratified Multi-Stage svydesign in R",
+      "Subpopulation Estimation and Standard Error Computation",
+      "Reproducible Publishing with Quarto"
+    ]
+  },
+  {
+    "_id": "igot_tech_04",
+    "title": "SQL for Large Scale Administrative & Survey Registries",
+    "provider": "iGOT Karmayogi",
+    "domain": "Technical",
+    "competencyId": "T03",
+    "targetLevel": 3,
+    "durationHours": 12,
+    "rating": 4.7,
+    "url": "https://igotkarmayogi.gov.in/learn/course/sql-databases",
+    "thumbnail": "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=600&auto=format&fit=crop&q=80",
+    "description": "Relational data extraction, window functions, linking administrative registers (PAN, GSTN, Udyam) with survey frames, and high-performance querying.",
+    "curriculum": [
+      "Relational Joins, Filtering and Aggregation",
+      "Window Functions (PARTITION BY, RANK, LEAD/LAG)",
+      "Fuzzy Record Linkage & Data Reconciliation",
+      "Query Optimisation and Index Tuning"
+    ]
+  },
+  {
+    "_id": "igot_tech_05",
+    "title": "Statistical Data Visualisation & Dashboard Architecture",
+    "provider": "iGOT Karmayogi",
+    "domain": "Technical",
+    "competencyId": "T08",
+    "targetLevel": 3,
+    "durationHours": 10,
+    "rating": 4.7,
+    "url": "https://igotkarmayogi.gov.in/learn/course/data-visualisation",
+    "thumbnail": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80",
+    "description": "Principles of statistical data presentation, avoiding misleading chart elements, designing accessible public dashboards, and interactive maps.",
+    "curriculum": [
+      "Cognitive Foundations of Visual Perception",
+      "Best Practices in Statistical Chart Selection",
+      "Building Interactive Dashboards (Plotly & Apache Superset)",
+      "Accessibility & Open Dissemination Standards"
+    ]
+  },
+  {
+    "_id": "igot_gov_01",
+    "title": "Data Governance, Confidentiality & DPDP Act Compliance",
+    "provider": "iGOT Karmayogi",
+    "domain": "Digital Governance",
+    "competencyId": "D01",
+    "targetLevel": 3,
+    "durationHours": 8,
+    "rating": 4.9,
+    "url": "https://igotkarmayogi.gov.in/learn/course/data-governance",
+    "thumbnail": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80",
+    "description": "Fundamental Principles of Official Statistics, statistical disclosure control (SDC), k-anonymity, cell suppression in microdata release, and compliance with the DPDP Act.",
+    "curriculum": [
+      "UN Fundamental Principles of Official Statistics",
+      "Digital Personal Data Protection (DPDP) Act Requirements",
+      "Statistical Disclosure Control (SDC) & Microdata Anonymisation",
+      "Ethical Handling of Sovereign Administrative Data"
+    ]
+  }
+]

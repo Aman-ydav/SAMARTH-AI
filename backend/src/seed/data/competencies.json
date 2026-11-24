@@ -1,0 +1,170 @@
+[
+  {
+    "_id": "S01",
+    "name": "Survey Design",
+    "domain": "Statistical",
+    "description": "Formulation of survey objectives, sampling frames, stratification and questionnaire design for national socio-economic surveys.",
+    "levels": [
+      { "level": 0, "name": "None", "description": "No exposure to survey methodology." },
+      { "level": 1, "name": "Awareness", "description": "Familiar with survey stages, standard terminology, and basic questionnaire concepts." },
+      { "level": 2, "name": "Basic", "description": "Can assist in questionnaire drafting and pre-testing under senior guidance." },
+      { "level": 3, "name": "Working", "description": "Independently designs questionnaires, sampling schedules, and field validation rules." },
+      { "level": 4, "name": "Advanced", "description": "Designs large-scale multi-subject survey instruments and complex stratified designs." },
+      { "level": 5, "name": "Expert", "description": "Sets national survey standards, international harmonisation protocols, and innovative frame methods." }
+    ]
+  },
+  {
+    "_id": "S02",
+    "name": "Sampling Methods",
+    "domain": "Statistical",
+    "description": "Theory and application of probability sampling: Simple Random, Stratified, Systematic, Multi-Stage Cluster Sampling and estimation formulas.",
+    "levels": [
+      { "level": 0, "name": "None", "description": "No sampling background." },
+      { "level": 1, "name": "Awareness", "description": "Understands random sampling vs non-probability sampling concepts." },
+      { "level": 2, "name": "Basic", "description": "Can compute basic sample sizes and execute simple random or stratified selection." },
+      { "level": 3, "name": "Working", "description": "Implements multi-stage stratified sampling designs with sampling weights and multiplier calculations." },
+      { "level": 4, "name": "Advanced", "description": "Calibrates sample weights, handles non-response adjustments, and computes complex design effects (DEFF)." },
+      { "level": 5, "name": "Expert", "description": "Designs cutting-edge sampling methodologies for nationwide household and enterprise censuses." }
+    ]
+  },
+  {
+    "_id": "S03",
+    "name": "National Accounts Statistics",
+    "domain": "Statistical",
+    "description": "System of National Accounts (SNA), Gross Domestic Product (GDP), Gross Value Added (GVA), Supply-Use Tables and institutional sector accounts.",
+    "levels": [
+      { "level": 0, "name": "None", "description": "No national accounts exposure." },
+      { "level": 1, "name": "Awareness", "description": "Understands broad macroeconomic aggregates such as GDP, GVA, and base years." },
+      { "level": 2, "name": "Basic", "description": "Can compile routine secondary data series from administrative records for single industries." },
+      { "level": 3, "name": "Working", "description": "Independently computes sectoral GVA using production and income approaches." },
+      { "level": 4, "name": "Advanced", "description": "Constructs Supply and Use Tables, double deflation indices, and sequence of accounts." },
+      { "level": 5, "name": "Expert", "description": "Directs base year revisions and implements international SNA recommendations." }
+    ]
+  },
+  {
+    "_id": "S04",
+    "name": "Price Statistics (CPI / WPI)",
+    "domain": "Statistical",
+    "description": "Compilation of Consumer Price Index (CPI), Wholesale Price Index (WPI), Laspeyres formula, item basket weighting and elementary aggregate index calculation.",
+    "levels": [
+      { "level": 0, "name": "None", "description": "No price index experience." },
+      { "level": 1, "name": "Awareness", "description": "Knows how inflation is reported and what CPI and WPI represent." },
+      { "level": 2, "name": "Basic", "description": "Validates price quotes and detects extreme outliers in market quotations." },
+      { "level": 3, "name": "Working", "description": "Compiles commodity group indices, applies quality adjustments, and calculates headline inflation." },
+      { "level": 4, "name": "Advanced", "description": "Designs weighting diagrams from household expenditure surveys and handles disappearing varieties." },
+      { "level": 5, "name": "Expert", "description": "Leads national price index revisions and international comparison programs (ICP)." }
+    ]
+  },
+  {
+    "_id": "S05",
+    "name": "Labour & Employment Statistics (PLFS)",
+    "domain": "Statistical",
+    "description": "Periodic Labour Force Survey (PLFS) concepts: Usual Status (ps+ss), Current Weekly Status (CWS), Labour Force Participation Rate (LFPR), and Worker Population Ratio (WPR).",
+    "levels": [
+      { "level": 0, "name": "None", "description": "No labour statistics background." },
+      { "level": 1, "name": "Awareness", "description": "Understands definitions of labour force, employment, and unemployment." },
+      { "level": 2, "name": "Basic", "description": "Can verify activity status codes and classify formal vs informal employment." },
+      { "level": 3, "name": "Working", "description": "Derives key employment indicators (LFPR, WPR, UR) from raw unit-level survey data." },
+      { "level": 4, "name": "Advanced", "description": "Conducts longitudinal analyses across quarterly rotation panels and analyzes precarious work." },
+      { "level": 5, "name": "Expert", "description": "Sets national employment statistics framework aligned with ILO standards." }
+    ]
+  },
+  {
+    "_id": "S11",
+    "name": "Statistical Inference & Estimation",
+    "domain": "Statistical",
+    "description": "Hypothesis testing, confidence intervals, regression modelling, maximum likelihood estimation, and non-parametric statistics.",
+    "levels": [
+      { "level": 0, "name": "None", "description": "No statistical inference background." },
+      { "level": 1, "name": "Awareness", "description": "Knows p-values, null hypotheses, and normal distribution basics." },
+      { "level": 2, "name": "Basic", "description": "Performs t-tests, ANOVA, and simple linear regression with interpretation." },
+      { "level": 3, "name": "Working", "description": "Builds multivariate regression models, checks diagnostics, and conducts post-hoc tests." },
+      { "level": 4, "name": "Advanced", "description": "Applies GLMs, panel data models, and small area estimation methods." },
+      { "level": 5, "name": "Expert", "description": "Designs advanced statistical estimation methodologies for official publication." }
+    ]
+  },
+  {
+    "_id": "S12",
+    "name": "Time Series & Seasonal Adjustment",
+    "domain": "Statistical",
+    "description": "Trend, seasonality, cyclical and irregular decomposition (X-13ARIMA-SEATS), ARIMA modelling and macro forecasting.",
+    "levels": [
+      { "level": 0, "name": "None", "description": "No time series experience." },
+      { "level": 1, "name": "Awareness", "description": "Understands trend, seasonality, and stationarity concepts." },
+      { "level": 2, "name": "Basic", "description": "Performs moving average smoothing and computes growth rates." },
+      { "level": 3, "name": "Working", "description": "Runs automated seasonal adjustment pipelines and estimates ARIMA models." },
+      { "level": 4, "name": "Advanced", "description": "Handles trading day / calendar effects and builds multi-step vector autoregression (VAR) models." },
+      { "level": 5, "name": "Expert", "description": "Develops official nowcasting algorithms for high-frequency economic monitors." }
+    ]
+  },
+  {
+    "_id": "T01",
+    "name": "Python for Data Analysis",
+    "domain": "Technical",
+    "description": "Data wrangling, cleaning, automation and analytics using Pandas, NumPy, Scipy and Jupyter for official statistical pipelines.",
+    "levels": [
+      { "level": 0, "name": "None", "description": "No programming knowledge." },
+      { "level": 1, "name": "Awareness", "description": "Can read simple scripts and run Python interpreter commands." },
+      { "level": 2, "name": "Basic", "description": "Writes scripts using Pandas to filter, group, and merge tabular survey files." },
+      { "level": 3, "name": "Working", "description": "Builds robust end-to-end data transformation pipelines and writes reusable functions." },
+      { "level": 4, "name": "Advanced", "description": "Optimises memory for large microdata sets (Polars/Dask), writes tests, and builds internal modules." },
+      { "level": 5, "name": "Expert", "description": "Architects enterprise data processing systems and sets organisation-wide coding standards." }
+    ]
+  },
+  {
+    "_id": "T02",
+    "name": "R Statistical Computing",
+    "domain": "Technical",
+    "description": "Statistical modeling, survey analysis using the 'survey' package, tidyverse workflows, and R Markdown reporting.",
+    "levels": [
+      { "level": 0, "name": "None", "description": "No R experience." },
+      { "level": 1, "name": "Awareness", "description": "Familiar with RStudio and basic vector arithmetic." },
+      { "level": 2, "name": "Basic", "description": "Uses tidyverse (dplyr, ggplot2) for data preparation and exploratory summaries." },
+      { "level": 3, "name": "Working", "description": "Uses the 'survey' package (svydesign, svymean) for official survey weighting and error estimation." },
+      { "level": 4, "name": "Advanced", "description": "Creates automated reproducible reports using Quarto/RMarkdown and develops custom R packages." },
+      { "level": 5, "name": "Expert", "description": "Leads institutional adoption of open-source statistical software and reproducible pipelines." }
+    ]
+  },
+  {
+    "_id": "T03",
+    "name": "SQL & Relational Databases",
+    "domain": "Technical",
+    "description": "Relational querying, multi-table joins, subqueries, indexing, window functions, and schema design for statistical data warehouses.",
+    "levels": [
+      { "level": 0, "name": "None", "description": "No database knowledge." },
+      { "level": 1, "name": "Awareness", "description": "Understands tables, rows, primary keys, and basic SELECT queries." },
+      { "level": 2, "name": "Basic", "description": "Writes SELECT with WHERE, GROUP BY, and simple INNER/LEFT JOIN statements." },
+      { "level": 3, "name": "Working", "description": "Writes complex multi-table queries, window functions (ROW_NUMBER, LAG), and CTEs." },
+      { "level": 4, "name": "Advanced", "description": "Designs normalised schemas, creates indexed views, and optimizes query execution plans." },
+      { "level": 5, "name": "Expert", "description": "Designs large-scale distributed database architectures for administrative registry integration." }
+    ]
+  },
+  {
+    "_id": "T08",
+    "name": "Data Visualisation & Dashboards",
+    "domain": "Technical",
+    "description": "Visual storytelling, chart design principles, interactive dashboards (PowerBI / Tableau / Apache Superset / Plotly) for statistical dissemination.",
+    "levels": [
+      { "level": 0, "name": "None", "description": "No data visualisation skills." },
+      { "level": 1, "name": "Awareness", "description": "Creates basic bar charts and line graphs in spreadsheets." },
+      { "level": 2, "name": "Basic", "description": "Selects appropriate chart types for categorical vs continuous variables without misleading axes." },
+      { "level": 3, "name": "Working", "description": "Builds interactive multi-page dashboards with drilldowns, filters, and clear annotations." },
+      { "level": 4, "name": "Advanced", "description": "Designs responsive, accessible visualisations compliant with government web design standards." },
+      { "level": 5, "name": "Expert", "description": "Leads national statistical portal visualisation strategy and public data transparency initiatives." }
+    ]
+  },
+  {
+    "_id": "D01",
+    "name": "Data Governance & Ethics",
+    "domain": "Digital Governance",
+    "description": "Principles of Official Statistics (UN-FPOS), data anonymisation, privacy regulations (DPDP Act), confidentiality and metadata standards.",
+    "levels": [
+      { "level": 0, "name": "None", "description": "No governance awareness." },
+      { "level": 1, "name": "Awareness", "description": "Understands respondent confidentiality and basic data privacy expectations." },
+      { "level": 2, "name": "Basic", "description": "Applies standard anonymisation rules (k-anonymity, suppression of cell counts under threshold)." },
+      { "level": 3, "name": "Working", "description": "Ensures full compliance with the Digital Personal Data Protection Act and statistical disclosure control protocols." },
+      { "level": 4, "name": "Advanced", "description": "Formulates institutional data sharing agreements, microdata release policies, and differential privacy protocols." },
+      { "level": 5, "name": "Expert", "description": "Shapes national data governance legislation and international ethics councils for statistical authorities." }
+    ]
+  }
+]
