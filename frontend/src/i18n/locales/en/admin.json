@@ -21,6 +21,9 @@
             "role": "Role",
             "rolePlaceholder": "Choose a role",
             "roleRequired": "Choose a role for the invitation.",
+            "organisation": "Organisation",
+            "organisationPlaceholder": "Choose an organisation",
+            "organisationRequired": "Choose the organisation for this invitation.",
             "submit": "Send invitation",
             "sent": "Invitation sent to {{email}}.",
             "conflict": "This email address already has an account or an open invitation.",
@@ -94,6 +97,8 @@
             "allRoles": "All roles",
             "status": "Status",
             "allStatuses": "All statuses",
+            "organisation": "Organisation",
+            "allOrganisations": "All organisations",
             "clear": "Clear filters"
         },
         "status": {
@@ -122,7 +127,8 @@
             "open": "Actions for {{name}}",
             "suspend": "Suspend",
             "reactivate": "Reactivate",
-            "changeRole": "Change role…"
+            "changeRole": "Change role…",
+            "changeOrganisation": "Change organisation…"
         },
         "suspend": {
             "title": "Suspend {{name}}?",
@@ -146,6 +152,14 @@
             "roleRequired": "Choose a new role.",
             "done": "{{name}} is now {{role}}."
         },
+        "organisationDialog": {
+            "title": "Move {{name}} to another organisation",
+            "description": "This signs the user out on every device. Their old sessions will not return if you move them back.",
+            "label": "New organisation",
+            "placeholder": "Choose an organisation",
+            "submit": "Move user",
+            "done": "{{name}} was moved to {{organisation}}."
+        },
         "errors": {
             "conflict": "This account changed in the meantime, or the change is not possible. The list was refreshed.",
             "notFound": "This account no longer exists or is not available to you. The list was refreshed.",
@@ -158,5 +172,37 @@
             "filteredBody": "Try a shorter start of the email address or other filters.",
             "clear": "Clear filters"
         }
+    },
+    "organisations": {
+        "title": "Organisations",
+        "subtitle": "Create and maintain the organisations that use SAMARTH AI. Deactivating one blocks access and signs out all its users.",
+        "createTitle": "Add an organisation",
+        "editTitle": "Edit organisation",
+        "listTitle": "Organisation directory",
+        "name": "Organisation name",
+        "code": "Registration code",
+        "domains": "Allowed email domains",
+        "domainsHint": "Comma-separated. Leave blank to allow any domain.",
+        "selfRegistration": "Allow self-registration",
+        "emailVerification": "Require email verification",
+        "google": "Allow Google sign-in",
+        "save": "Save organisation",
+        "saveError": "The organisation could not be saved. Check the name, code, domains, and whether another organisation already uses them.",
+        "created": "{{name}} was created.",
+        "updated": "{{name}} was updated.",
+        "deactivated": "{{name}} was deactivated and its users were signed out.",
+        "restored": "{{name}} was restored. Previous sessions remain signed out.",
+        "loadError": "Organisations could not be loaded.",
+        "statusLabel": "Show organisations",
+        "active": "Active",
+        "inactive": "Inactive",
+        "empty": "No organisations in this list.",
+        "codeValue": "Registration code: {{code}}",
+        "allDomains": "All email domains allowed",
+        "edit": "Edit",
+        "deactivate": "Deactivate",
+        "restore": "Restore",
+        "deactivateTitle": "Deactivate {{name}}?",
+        "deactivateBody": "All users in this organisation will be signed out immediately and cannot access the platform until it is restored. Restoring will not restore old sessions."
     }
 }

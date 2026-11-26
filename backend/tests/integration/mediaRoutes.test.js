@@ -10,6 +10,7 @@ import {
     vi,
 } from "vitest";
 import { cloudinaryFake } from "#integrations/cloudinary/cloudinary.mock.js";
+import { DEFAULT_ORG_ID } from "#constants/org.js";
 import { mediaRouter } from "#modules/media/index.js";
 import { usersPort } from "#modules/media/mediaAvatar.service.js";
 import { Media } from "#modules/media/media.model.js";
@@ -32,7 +33,7 @@ const { app } = buildApp({ mountRoutes: (api) => api.use("/", mediaRouter) });
 
 /** Creates an active user with a live session and returns a request helper that sends its real cookies. */
 async function signIn(role) {
-    const orgId = new mongoose.Types.ObjectId();
+    const orgId = new mongoose.Types.ObjectId(DEFAULT_ORG_ID);
     const user = await mongoose.model("User").create({
         orgId,
         email: `${randomBytes(4).toString("hex")}@example.test`,

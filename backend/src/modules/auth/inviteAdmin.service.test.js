@@ -12,6 +12,7 @@ import { tokenOf } from "#integrations/email/memory.adapter.js";
 import { AuditLog } from "#modules/audit/auditLog.model.js";
 import { Invite } from "#modules/users/invite.model.js";
 import { User } from "#modules/users/user.model.js";
+import { createOrganisation } from "#modules/organisations/index.js";
 import { createUser, newObjectId } from "#tests/factories/user.factory.js";
 import { makeAuthCtx } from "#tests/helpers/authCtx.js";
 import { resetAuthDb, startAuthDb, stopTestDb } from "#tests/helpers/authDb.js";
@@ -69,6 +70,7 @@ describe("toInviteView", () => {
             "expiresAt",
             "id",
             "invitedBy",
+            "organisationId",
             "resentCount",
             "role",
             "status",
@@ -112,7 +114,7 @@ describe("listInvites", () => {
         expect(own.meta.total).toBe(1);
     });
 
-    it("is scoped to the actor's org", async () => {
+    it("lets platform admins see invites across organisation affiliations", async () => {
         const { platform, ctx } = await setup();
         await inviteAs(platform, ctx, "t@example.test");
         const other = await createUser({
@@ -120,8 +122,10 @@ describe("listInvites", () => {
             orgId: newObjectId(),
         });
         const result = await listInvites(asActor(other));
-        expect(result.items).toEqual([]);
-        expect(result.meta.total).toBe(0);
+        expect(result.items.map((item) => item.email)).toEqual([
+            "t@example.test",
+        ]);
+        expect(result.meta.total).toBe(1);
     });
 
     it("paginates with a stable order and clamps bad page numbers", async () => {
@@ -266,9 +270,13 @@ describe("revokeInvite", () => {
         await expect(
             revokeInvite(asActor(admin), adminInvite.invite._id)
         ).rejects.toMatchObject({ statusCode: 404, code: "NOT_FOUND" });
+        const foreignOrg = await createOrganisation(
+            { name: "Foreign Office", code: "foreign-office" },
+            asActor(platform)
+        );
         const foreign = await createUser({
-            role: "superadmin",
-            orgId: newObjectId(),
+            role: "admin",
+            orgId: foreignOrg.id,
         });
         await expect(
             revokeInvite(asActor(foreign), adminInvite.invite._id)

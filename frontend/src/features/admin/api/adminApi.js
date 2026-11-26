@@ -47,6 +47,7 @@ export function readInvite(raw) {
         id: raw.id,
         email: text(raw.email),
         role: text(raw.role),
+        organisationId: text(raw.organisationId),
         status: INVITE_STATUSES.includes(raw.status) ? raw.status : "unknown",
         resentCount: Number.isInteger(raw.resentCount) ? raw.resentCount : 0,
         expiresAt: isoOrNull(raw.expiresAt),
@@ -61,6 +62,7 @@ export function readAdminUser(raw) {
         return null;
     return {
         id: raw.id,
+        orgId: text(raw.orgId),
         email: text(raw.email),
         name: text(raw.name),
         role: text(raw.role),
@@ -69,6 +71,36 @@ export function readAdminUser(raw) {
         mustChangePassword: raw.mustChangePassword === true,
         lastLoginAt: isoOrNull(raw.lastLoginAt),
         createdAt: isoOrNull(raw.createdAt),
+    };
+}
+
+/** Defensive read of one tenant returned by the platform organisation endpoints. */
+export function readOrganisation(raw) {
+    if (!raw || typeof raw !== "object" || typeof raw.id !== "string")
+        return null;
+    const settings = raw.settings ?? {};
+    return {
+        id: raw.id,
+        name: text(raw.name),
+        code: text(raw.code),
+        active: raw.active === true,
+        version:
+            Number.isInteger(raw.version) && raw.version >= 0
+                ? raw.version
+                : 0,
+        createdAt: isoOrNull(raw.createdAt),
+        updatedAt: isoOrNull(raw.updatedAt),
+        settings: {
+            allowSelfRegistration: settings.allowSelfRegistration === true,
+            allowedEmailDomains: Array.isArray(settings.allowedEmailDomains)
+                ? settings.allowedEmailDomains.filter(
+                      (domain) => typeof domain === "string"
+                  )
+                : [],
+            requireEmailVerification:
+                settings.requireEmailVerification === true,
+            allowGoogleLogin: settings.allowGoogleLogin === true,
+        },
     };
 }
 
@@ -100,10 +132,13 @@ export async function listInvites(query, { signal } = {}) {
     };
 }
 
-export async function createInvite({ email, role }, { signal } = {}) {
+export async function createInvite(
+    { email, role, organisationId },
+    { signal } = {}
+) {
     const { data } = await apiClient.post(
         "/admin/invites",
-        { email, role },
+        { email, role, ...(organisationId ? { organisationId } : {}) },
         withSignal(signal)
     );
     return readInvite(data?.invite);
@@ -153,6 +188,67 @@ export async function changeUserRole({ id, role }, { signal } = {}) {
         withSignal(signal)
     );
     return readAdminUser(data?.user);
+}
+
+export async function changeUserOrganisation(
+    { id, organisationId },
+    { signal } = {}
+) {
+    const { data } = await apiClient.patch(
+        `/admin/users/${encodeURIComponent(id)}/organisation`,
+        { organisationId },
+        withSignal(signal)
+    );
+    return readAdminUser(data?.user);
+}
+
+export async function listOrganisations(query = {}, { signal } = {}) {
+    const { data, meta } = await apiClient.get(
+        "/organisations",
+        withSignal(signal, { params: cleanParams(query) })
+    );
+    return {
+        items: readList(data?.organisations, readOrganisation),
+        meta: readMeta(meta),
+    };
+}
+
+export async function createOrganisation(body, { signal } = {}) {
+    const { data } = await apiClient.post(
+        "/organisations",
+        body,
+        withSignal(signal)
+    );
+    return readOrganisation(data?.organisation);
+}
+
+export async function updateOrganisation(
+    { id, ...body },
+    { signal } = {}
+) {
+    const { data } = await apiClient.patch(
+        `/organisations/${encodeURIComponent(id)}`,
+        body,
+        withSignal(signal)
+    );
+    return readOrganisation(data?.organisation);
+}
+
+export async function deactivateOrganisation({ id }, { signal } = {}) {
+    const { data } = await apiClient.delete(
+        `/organisations/${encodeURIComponent(id)}`,
+        withSignal(signal)
+    );
+    return readOrganisation(data?.organisation);
+}
+
+export async function restoreOrganisation({ id }, { signal } = {}) {
+    const { data } = await apiClient.post(
+        `/organisations/${encodeURIComponent(id)}/restore`,
+        null,
+        withSignal(signal)
+    );
+    return readOrganisation(data?.organisation);
 }
 
 /** Rejection payload for a 2xx response that lacks the expected record (FE-37). */

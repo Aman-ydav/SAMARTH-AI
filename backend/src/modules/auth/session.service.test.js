@@ -125,7 +125,11 @@ describe("listSessions and toSessionView", () => {
             ctx: fromOtherDevice(ctx, "curl/8.4.0"),
             now: new Date("2026-10-26T09:00:00Z"),
         });
-        const items = await listSessions(user._id, second.familyId);
+        const items = await listSessions(
+            user._id,
+            second.familyId,
+            new Date("2026-10-26T10:00:00Z")
+        );
         expect(items.map((item) => item.id)).toEqual([
             second.familyId,
             first.familyId,

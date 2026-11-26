@@ -1,11 +1,15 @@
 import { AUDIT_ACTIONS } from "#constants/auditActions.js";
 import { EMAIL_TEMPLATES } from "#constants/emailTemplates.js";
 import { ERROR_CODES } from "#constants/errorCodes.js";
-import { DEFAULT_ORG_ID } from "#constants/org.js";
 import { ROLES } from "#constants/roles.js";
 import { AUTH_PROVIDERS, USER_STATUSES } from "#constants/statuses.js";
 import { AUTH_TOKEN_TYPES } from "#constants/tokenTypes.js";
 import { appendAudit } from "#modules/audit/index.js";
+import {
+    assertGoogleLoginAllowed,
+    assertOrganisationEmailAllowed,
+    resolveOrganisationForSignup,
+} from "#modules/organisations/index.js";
 import { toAuthUser, User } from "#modules/users/index.js";
 import { ApiError } from "#utils/apiError.js";
 import { FRONTEND_PATHS, POLICY_VERSION } from "./auth.constants.js";
@@ -78,10 +82,24 @@ async function replaceUnverifiedAccount({ user, profile, now }) {
     );
 }
 
-async function createGoogleUser({ profile, ctx, now }) {
+async function createGoogleUser({
+    profile,
+    organisationCode,
+    ctx,
+    now,
+}) {
     assertEmailDomainAllowed(profile.email, ctx.config);
+    if (!ctx.config.auth.allowSelfRegistration) {
+        throw ApiError.forbidden(ERROR_CODES.FORBIDDEN);
+    }
+    const organisation = await resolveOrganisationForSignup({
+        organisationCode,
+        email: profile.email,
+    });
+    assertOrganisationEmailAllowed(profile.email, organisation);
+    await assertGoogleLoginAllowed(organisation._id);
     const user = await User.create({
-        orgId: DEFAULT_ORG_ID,
+        orgId: organisation._id,
         email: profile.email,
         name: profile.name,
         googleSub: profile.sub,
@@ -115,16 +133,31 @@ async function createGoogleUser({ profile, ctx, now }) {
     return user;
 }
 
+async function assertExistingGoogleAccountAllowed(user) {
+    await assertGoogleLoginAllowed(user.orgId);
+}
+
 // Finds the account for a verified Google profile: by `sub` first (emails change), then by email (AUTH-42, AUTH-43).
-async function resolveAccount({ profile, ctx, now }) {
+async function resolveAccount({
+    profile,
+    organisationCode,
+    ctx,
+    now,
+}) {
     const bySub = await User.findOne({ googleSub: profile.sub });
     if (bySub) return { user: bySub, created: false };
     const byEmail = await User.findOne({ email: profile.email });
     if (!byEmail)
         return {
-            user: await createGoogleUser({ profile, ctx, now }),
+            user: await createGoogleUser({
+                profile,
+                organisationCode,
+                ctx,
+                now,
+            }),
             created: true,
         };
+    await assertExistingGoogleAccountAllowed(byEmail);
     if (byEmail.emailVerified) {
         await linkToVerifiedAccount({ user: byEmail, profile, ctx, now });
         return { user: byEmail, created: false };
@@ -138,11 +171,11 @@ async function resolveAccount({ profile, ctx, now }) {
  * (`ctx.verifyGoogleCredential`); only its `sub`, verified `email` and `name` are used. Then the same status gate,
  * session and new-device logic as password login applies.
  *
- * @param {{ credential: string, nonce?: string, reactivate?: boolean }} input
+ * @param {{ credential: string, nonce?: string, reactivate?: boolean, organisationCode?: string }} input
  * @param {object} ctx request context
  */
 export async function googleSignIn(
-    { credential, nonce, reactivate = false },
+    { credential, nonce, reactivate = false, organisationCode },
     ctx,
     now = new Date()
 ) {
@@ -152,7 +185,13 @@ export async function googleSignIn(
         });
     }
     const profile = await ctx.verifyGoogleCredential(credential, { nonce });
-    const { user, created } = await resolveAccount({ profile, ctx, now });
+    const { user, created } = await resolveAccount({
+        profile,
+        organisationCode,
+        ctx,
+        now,
+    });
+    await assertGoogleLoginAllowed(user.orgId);
     const change = await checkStatus({ user, reactivate, now });
     if (change) await applyReactivation({ user, change });
     return signInUser({

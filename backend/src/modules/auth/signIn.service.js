@@ -1,5 +1,6 @@
 import { AUDIT_ACTIONS } from "#constants/auditActions.js";
 import { appendAudit } from "#modules/audit/index.js";
+import { assertOrganisationActive } from "#modules/organisations/index.js";
 import { needsOnboarding, toAuthUser, User } from "#modules/users/index.js";
 import { handleDevice } from "./device.service.js";
 import { createSession } from "./session.service.js";
@@ -32,6 +33,7 @@ export async function signInUser({
     reactivate = false,
     now = new Date(),
 }) {
+    await assertOrganisationActive(user.orgId);
     const limited = Boolean(user.mustChangePassword);
     let session;
     if (limited) {

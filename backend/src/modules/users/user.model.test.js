@@ -151,12 +151,13 @@ describe("User model fields", () => {
         expect(user.avatar.publicId).toBe("samarth-ai/test/avatars/a");
     });
 
-    it("makes orgId immutable", async () => {
+    it("allows orgId to change when a user is reassigned", async () => {
         const user = await User.create(makeUser());
-        user.orgId = "000000000000000000000002";
+        const destinationOrgId = "000000000000000000000002";
+        user.orgId = destinationOrgId;
         await user.save();
         expect(String((await User.findById(user._id).lean()).orgId)).toBe(
-            String(makeUser().orgId)
+            destinationOrgId
         );
     });
 

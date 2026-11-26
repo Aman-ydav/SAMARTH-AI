@@ -11,6 +11,7 @@ import { readReturnTo } from "@/lib/safeRedirect";
 
 const MAX_EMAIL = 254;
 const MAX_NAME = 80;
+const MAX_ORGANISATION_CODE = 20;
 const FIRST_PRINTABLE = 32;
 const DELETE_CHAR = 127;
 
@@ -33,6 +34,10 @@ export default function SignupPage() {
     const defaultValues = {
         name: cleanPrefill(params.get("name"), MAX_NAME),
         email: cleanPrefill(params.get("email"), MAX_EMAIL),
+        organisationCode: cleanPrefill(
+            params.get("organisationCode"),
+            MAX_ORGANISATION_CODE
+        ),
     };
     const carried = readReturnTo(location, null);
 

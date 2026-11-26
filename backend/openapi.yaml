@@ -127,6 +127,12 @@ paths:
                                     description: "Policy (server-enforced, PASSWORD_POLICY): at least 10 characters and at most 72 UTF-8 bytes, not on the common-password denylist, must not contain the email name or the display name. Never trimmed or echoed."
                                 acceptTerms:
                                     const: true
+                                organisationCode:
+                                    type: string
+                                    minLength: 2
+                                    maxLength: 20
+                                    pattern: ^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$
+                                    description: Optional active organisation code. Omitted selects the default organisation.
                             required:
                                 - name
                                 - email
@@ -147,8 +153,14 @@ paths:
                                       properties:
                                           statusCode:
                                               const: 202
-                                          data: &a3
-                                              type: "null"
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              required:
+                                                  - verificationRequired
+                                              properties:
+                                                  verificationRequired:
+                                                      type: boolean
                 "400":
                     $ref: "#/components/responses/Error400"
                     description: "Codes: VALIDATION_ERROR, PASSWORD_POLICY, INVALID_JSON."
@@ -252,7 +264,8 @@ paths:
                                       properties:
                                           statusCode:
                                               const: 200
-                                          data: *a3
+                                          data: &a3
+                                              type: "null"
                 "400":
                     $ref: "#/components/responses/Error400"
                     description: "Codes: VALIDATION_ERROR."
@@ -353,6 +366,11 @@ paths:
                                     maxLength: 256
                                 reactivate:
                                     type: boolean
+                                organisationCode:
+                                    type: string
+                                    minLength: 2
+                                    maxLength: 20
+                                    pattern: ^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$
                             required:
                                 - credential
             responses:
@@ -1749,6 +1767,9 @@ paths:
                                 departmentId:
                                     type: string
                                     pattern: ^[a-f0-9]{24}$
+                                organisationId:
+                                    type: string
+                                    pattern: ^[a-f0-9]{24}$
             responses:
                 "201":
                     description: Invitation created and mailed
@@ -1981,8 +2002,8 @@ paths:
             tags:
                 - Admin
             operationId: listUsers
-            summary: List the users of the org (paged, filtered)
-            description: "Filters role, status and q (an escaped, case-insensitive email prefix of 1 to 64 characters). Platform admins are not listed for an admin. Never returns hashes, token versions or devices. 300 per 15 minutes per user. Guard order: authenticate, authorize (admin or platform admin), per-user rate limit, validation, service. Learners and trainers get 403 FORBIDDEN. Scoped to the caller's org; a missing, foreign or out-of-grant id is 404."
+            summary: List users in the caller's org or across the platform
+            description: "Filters role, status, q (escaped email prefix) and, for platform admins, organisationId. Platform admins are not listed for an admin. Never returns hashes, token versions or devices. 300 per 15 minutes per user. Guard order: authenticate, authorize, per-user rate limit, validation, service. Learners and trainers get 403 FORBIDDEN. Admins are scoped to their org; platform admins may list across organisations."
             security: *a8
             parameters:
                 - name: page
@@ -2034,6 +2055,12 @@ paths:
                       type: string
                       minLength: 1
                       maxLength: 64
+                - name: organisationId
+                  in: query
+                  description: Platform admins only; filters users to an active or inactive tenant id.
+                  schema:
+                      type: string
+                      pattern: ^[a-f0-9]{24}$
             responses:
                 "200":
                     description: A page of users
@@ -2212,6 +2239,338 @@ paths:
                 "429":
                     $ref: "#/components/responses/Error429"
                     description: "Codes: RATE_LIMITED."
+    /admin/users/{id}/organisation:
+        patch:
+            tags:
+                - Admin
+            operationId: changeUserOrganisation
+            summary: Move a user to an organisation (platform admin only)
+            description: Moves a non-platform-admin user into an active organisation. Blocks self-moves and moving the last active admin. Increments tokenVersion, revokes all sessions and writes the audit record in one transaction.
+            security: *a8
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      pattern: ^[a-f0-9]{24}$
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            required:
+                                - organisationId
+                            properties:
+                                organisationId:
+                                    type: string
+                                    pattern: ^[a-f0-9]{24}$
+            responses:
+                "200":
+                    description: User organisation updated
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  user:
+                                                      $ref: "#/components/schemas/AdminUser"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                "401":
+                    $ref: "#/components/responses/Error401"
+                "403":
+                    $ref: "#/components/responses/Error403"
+                "404":
+                    $ref: "#/components/responses/Error404"
+                "409":
+                    $ref: "#/components/responses/Error409"
+                "429":
+                    $ref: "#/components/responses/Error429"
+    /organisations:
+        get:
+            tags:
+                - Organisations
+            operationId: listOrganisations
+            summary: List organisations (platform admin only)
+            security: *a8
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                      type: integer
+                      minimum: 1
+                - name: limit
+                  in: query
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                - name: sort
+                  in: query
+                  schema:
+                      enum: [name, code, createdAt]
+                - name: order
+                  in: query
+                  schema:
+                      enum: [asc, desc]
+                - name: status
+                  in: query
+                  schema:
+                      enum: [active, inactive]
+                - name: q
+                  in: query
+                  schema:
+                      type: string
+                      minLength: 1
+                      maxLength: 64
+            responses:
+                "200":
+                    description: A page of organisations
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  organisations:
+                                                      type: array
+                                                      items:
+                                                          $ref: "#/components/schemas/Organisation"
+                                          meta:
+                                              $ref: "#/components/schemas/PageMeta"
+                "401":
+                    $ref: "#/components/responses/Error401"
+                "403":
+                    $ref: "#/components/responses/Error403"
+                "429":
+                    $ref: "#/components/responses/Error429"
+        post:
+            tags:
+                - Organisations
+            operationId: createOrganisation
+            summary: Create an organisation (platform admin only)
+            security: *a8
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            required: [name, code]
+                            properties:
+                                name:
+                                    type: string
+                                    minLength: 2
+                                    maxLength: 120
+                                code:
+                                    type: string
+                                    minLength: 2
+                                    maxLength: 20
+                                    pattern: ^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$
+                                settings:
+                                    $ref: "#/components/schemas/OrganisationSettings"
+            responses:
+                "201":
+                    description: Organisation created
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  organisation:
+                                                      $ref: "#/components/schemas/Organisation"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                "401":
+                    $ref: "#/components/responses/Error401"
+                "403":
+                    $ref: "#/components/responses/Error403"
+                "409":
+                    $ref: "#/components/responses/Error409"
+                "429":
+                    $ref: "#/components/responses/Error429"
+    /organisations/{id}:
+        patch:
+            tags:
+                - Organisations
+            operationId: updateOrganisation
+            summary: Update an organisation (platform admin only)
+            description: Requires expectedVersion to prevent overwriting a concurrent edit.
+            security: *a8
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      pattern: ^[a-f0-9]{24}$
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            required: [expectedVersion]
+                            properties:
+                                name:
+                                    type: string
+                                    minLength: 2
+                                    maxLength: 120
+                                code:
+                                    type: string
+                                    minLength: 2
+                                    maxLength: 20
+                                settings:
+                                    type: object
+                                    additionalProperties: false
+                                    properties:
+                                        allowSelfRegistration:
+                                            type: boolean
+                                        allowedEmailDomains:
+                                            type: array
+                                            maxItems: 20
+                                            items:
+                                                type: string
+                                                maxLength: 100
+                                        requireEmailVerification:
+                                            type: boolean
+                                        allowGoogleLogin:
+                                            type: boolean
+                                expectedVersion:
+                                    type: integer
+                                    minimum: 0
+            responses:
+                "200":
+                    description: Organisation updated
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  organisation:
+                                                      $ref: "#/components/schemas/Organisation"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                "401":
+                    $ref: "#/components/responses/Error401"
+                "403":
+                    $ref: "#/components/responses/Error403"
+                "404":
+                    $ref: "#/components/responses/Error404"
+                "409":
+                    $ref: "#/components/responses/Error409"
+                "429":
+                    $ref: "#/components/responses/Error429"
+        delete:
+            tags:
+                - Organisations
+            operationId: deactivateOrganisation
+            summary: Deactivate an organisation (platform admin only)
+            description: Soft-deactivates the organisation and revokes member sessions transactionally. The default organisation is protected.
+            security: *a8
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      pattern: ^[a-f0-9]{24}$
+                - *a1
+            responses:
+                "200":
+                    description: Organisation deactivated
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  organisation:
+                                                      $ref: "#/components/schemas/Organisation"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                "401":
+                    $ref: "#/components/responses/Error401"
+                "403":
+                    $ref: "#/components/responses/Error403"
+                "404":
+                    $ref: "#/components/responses/Error404"
+                "409":
+                    $ref: "#/components/responses/Error409"
+                "429":
+                    $ref: "#/components/responses/Error429"
+    /organisations/{id}/restore:
+        post:
+            tags:
+                - Organisations
+            operationId: restoreOrganisation
+            summary: Restore an organisation (platform admin only)
+            security: *a8
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      pattern: ^[a-f0-9]{24}$
+                - *a1
+            responses:
+                "200":
+                    description: Organisation restored; previous sessions remain revoked
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  organisation:
+                                                      $ref: "#/components/schemas/Organisation"
+                "401":
+                    $ref: "#/components/responses/Error401"
+                "403":
+                    $ref: "#/components/responses/Error403"
+                "404":
+                    $ref: "#/components/responses/Error404"
+                "409":
+                    $ref: "#/components/responses/Error409"
+                "429":
+                    $ref: "#/components/responses/Error429"
 components:
     securitySchemes:
         accessCookie:
@@ -2808,6 +3167,58 @@ components:
                     type: integer
                 hasNext:
                     type: boolean
+        OrganisationSettings:
+            type: object
+            additionalProperties: false
+            required:
+                - allowSelfRegistration
+                - allowedEmailDomains
+                - requireEmailVerification
+                - allowGoogleLogin
+            properties:
+                allowSelfRegistration:
+                    type: boolean
+                allowedEmailDomains:
+                    type: array
+                    maxItems: 20
+                    items:
+                        type: string
+                        maxLength: 100
+                requireEmailVerification:
+                    type: boolean
+                allowGoogleLogin:
+                    type: boolean
+        Organisation:
+            type: object
+            additionalProperties: false
+            required:
+                - id
+                - name
+                - code
+                - settings
+                - active
+                - version
+                - createdAt
+                - updatedAt
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                code:
+                    type: string
+                settings:
+                    $ref: "#/components/schemas/OrganisationSettings"
+                active:
+                    type: boolean
+                version:
+                    type: integer
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
         AdminInvite:
             type: object
             additionalProperties: false
@@ -2816,6 +3227,7 @@ components:
                 - id
                 - email
                 - role
+                - organisationId
                 - status
                 - invitedBy
                 - resentCount
@@ -2831,6 +3243,8 @@ components:
                         - learner
                         - trainer
                         - admin
+                organisationId:
+                    type: string
                 status:
                     enum:
                         - sent
@@ -2863,6 +3277,7 @@ components:
             description: The admin view of an account. Never a hash, token version, device list or lock counters.
             required:
                 - id
+                - orgId
                 - email
                 - name
                 - role
@@ -2873,6 +3288,8 @@ components:
                 - createdAt
             properties:
                 id:
+                    type: string
+                orgId:
                     type: string
                 email:
                     type: string

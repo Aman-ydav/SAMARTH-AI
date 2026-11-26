@@ -92,3 +92,5 @@ export const lazyAdminInvites = () =>
     import("@/features/admin/pages/AdminInvitesPage.jsx").then(toRoute);
 export const lazyAdminUsers = () =>
     import("@/features/admin/pages/AdminUsersPage.jsx").then(toRoute);
+export const lazyOrganisations = () =>
+    import("@/features/admin/pages/OrganisationsPage.jsx").then(toRoute);

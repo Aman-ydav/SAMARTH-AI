@@ -58,7 +58,7 @@ describe("POST /auth/register", () => {
         }
         expect(bodies[0]).toEqual(bodies[1]);
         expect(bodies[0]).toEqual(bodies[2]);
-        expect(bodies[0].data).toBeNull();
+        expect(bodies[0].data).toEqual({ verificationRequired: true });
     });
 
     it("sends the verification mail after the response with the token in the URL fragment", async () => {

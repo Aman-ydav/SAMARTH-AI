@@ -5,6 +5,7 @@ import { SESSION_REVOKED_REASONS, USER_STATUSES } from "#constants/statuses.js";
 import { withTransaction } from "#db/transaction.js";
 import { appendAudit } from "#modules/audit/index.js";
 import { revokeAllSessions } from "#modules/auth/index.js";
+import { getActiveOrganisationById } from "#modules/organisations/index.js";
 import { assertNotLastAdmin, User } from "#modules/users/index.js";
 import { ApiError } from "#utils/apiError.js";
 import { escapeRegex, toObjectId } from "#utils/mongo.js";
@@ -19,13 +20,14 @@ import {
 
 // Only these fields leave the service (BE-47). Secret fields are `select: false` as well, so they can never be loaded here.
 const LIST_FIELDS =
-    "email name role status emailVerified authProviders mustChangePassword lastLoginAt createdAt";
+    "orgId email name role status emailVerified authProviders mustChangePassword lastLoginAt createdAt";
 
 /** The user as the admin API shows it: an allow-list, never a hash, token version, device list or lock counters. */
 export function toAdminUser(user) {
     const plain = typeof user.toObject === "function" ? user.toObject() : user;
     return {
         id: String(plain._id ?? plain.id),
+        orgId: String(plain.orgId),
         email: plain.email,
         name: plain.name,
         role: plain.role,
@@ -50,9 +52,8 @@ function assertAdminArea(actor) {
 }
 
 /**
- * Lists the users of the actor's org (page, limit, sort, order; filters `role`, `status`; `q` = anchored, escaped,
- * lower-cased email prefix). A plain bounded query on `{ orgId, ... }` with the `users_*` indexes: one collection, no
- * joins, so no aggregation is needed yet (DB-51). Platform admins are left out for everyone but a platform admin.
+ * Lists users in the actor's org, or across orgs for a platform admin (optionally filtered by organisationId). The
+ * bounded query uses the org or createdAt index and does not join collections (DB-51).
  * @returns {Promise<{ items: object[], meta: object }>}
  */
 export async function listUsers(actor, query = {}) {
@@ -72,8 +73,14 @@ export async function listUsers(actor, query = {}) {
             }),
         };
     }
+    if (!isPlatformAdmin(actor) && query.organisationId)
+        throw ApiError.forbidden(ERROR_CODES.FORBIDDEN);
     const filter = {
-        orgId: actor.orgId,
+        ...(isPlatformAdmin(actor)
+            ? query.organisationId
+                ? { orgId: toObjectId(query.organisationId) }
+                : {}
+            : { orgId: actor.orgId }),
         ...hiddenFromActor(actor),
         ...(query.role ? { role: query.role } : {}),
         ...(query.status ? { status: query.status } : {}),
@@ -101,7 +108,7 @@ export async function listUsers(actor, query = {}) {
 async function loadTarget(actor, id, session) {
     const target = await User.findOne({
         _id: toObjectId(id),
-        orgId: actor.orgId,
+        ...(isPlatformAdmin(actor) ? {} : { orgId: actor.orgId }),
         ...hiddenFromActor(actor),
     }).session(session ?? null);
     if (!target) throw ApiError.notFound(ERROR_CODES.NOT_FOUND);
@@ -149,7 +156,7 @@ export async function setUserStatus(actor, id, status, now = new Date()) {
             throw ApiError.conflict(ERROR_CODES.CONFLICT);
         if (suspending) await assertNotLastAdmin(target, { session });
         const updated = await User.findOneAndUpdate(
-            { _id: target._id, orgId: actor.orgId, status: from },
+            { _id: target._id, orgId: target.orgId, status: from },
             {
                 $set: {
                     status,
@@ -212,7 +219,7 @@ export async function changeUserRole(actor, id, role, now = new Date()) {
         if (target.role === ROLES.ADMIN)
             await assertNotLastAdmin(target, { session });
         const updated = await User.findOneAndUpdate(
-            { _id: target._id, orgId: actor.orgId, role: target.role },
+            { _id: target._id, orgId: target.orgId, role: target.role },
             { $set: { role }, $inc: { tokenVersion: 1 } },
             { session, returnDocument: "after", runValidators: true }
         );
@@ -226,6 +233,61 @@ export async function changeUserRole(actor, id, role, now = new Date()) {
             target,
             AUDIT_ACTIONS.ROLE_CHANGED,
             { from: target.role, to: role },
+            session,
+            now
+        );
+        return toAdminUser(updated);
+    });
+}
+
+export async function changeUserOrganisation(
+    actor,
+    id,
+    organisationId,
+    now = new Date()
+) {
+    if (!isPlatformAdmin(actor))
+        throw ApiError.forbidden(ERROR_CODES.FORBIDDEN);
+    const targetOrganisation = await getActiveOrganisationById(
+        organisationId
+    );
+    if (!targetOrganisation)
+        throw ApiError.notFound(ERROR_CODES.NOT_FOUND);
+    return withTransaction(async (session) => {
+        const target = await loadTarget(actor, id, session);
+        assertNotSelf(actor, target);
+        if (target.role === ROLES.SUPERADMIN)
+            throw ApiError.forbidden(ERROR_CODES.FORBIDDEN);
+        if (String(target.orgId) === String(targetOrganisation._id))
+            throw ApiError.conflict(ERROR_CODES.CONFLICT);
+        if (
+            target.role === ROLES.ADMIN &&
+            target.status === USER_STATUSES.ACTIVE
+        ) {
+            await assertNotLastAdmin(target, { session });
+        }
+        const previousOrgId = String(target.orgId);
+        const updated = await User.findOneAndUpdate(
+            { _id: target._id, orgId: target.orgId },
+            {
+                $set: { orgId: targetOrganisation._id },
+                $inc: { tokenVersion: 1 },
+            },
+            { session, returnDocument: "after", runValidators: true }
+        );
+        if (!updated) throw ApiError.conflict(ERROR_CODES.CONFLICT);
+        await revokeAllSessions(target._id, SESSION_REVOKED_REASONS.ADMIN, {
+            session,
+            now,
+        });
+        await audit(
+            actor,
+            target,
+            AUDIT_ACTIONS.USER_ORGANISATION_CHANGED,
+            {
+                previousOrganisationId: previousOrgId,
+                organisationId: String(targetOrganisation._id),
+            },
             session,
             now
         );

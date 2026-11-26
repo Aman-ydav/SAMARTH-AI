@@ -8,8 +8,10 @@ import { ListEmptyState } from "@/features/admin/components/ListEmptyState";
 import { ListPagination } from "@/features/admin/components/ListPagination";
 import { ListSkeleton } from "@/features/admin/components/ListSkeleton";
 import { RoleChangeDialog } from "@/features/admin/components/RoleChangeDialog";
+import { OrganisationChangeDialog } from "@/features/admin/components/OrganisationChangeDialog";
 import { UserFilters } from "@/features/admin/components/UserFilters";
 import { UsersTable } from "@/features/admin/components/UsersTable";
+import * as adminApi from "@/features/admin/api/adminApi";
 import { useAdminErrorText } from "@/features/admin/hooks/useAdminErrorText";
 import { useRowAction } from "@/features/admin/hooks/useRowAction";
 import { queryKeyOf } from "@/features/admin/schemas/adminSchemas";
@@ -40,12 +42,32 @@ export function UsersList({ actor, query, setQuery, onRefresh }) {
     const loadedKey = useAppSelector(selectAdminUsersLoadedKey);
     const [statusTarget, setStatusTarget] = useState(null);
     const [roleTarget, setRoleTarget] = useState(null);
+    const [organisationTarget, setOrganisationTarget] = useState(null);
+    const [organisations, setOrganisations] = useState([]);
+    const [organisationError, setOrganisationError] = useState(null);
     const errorText = useAdminErrorText("users");
     const { busyId, run } = useRowAction({ errorText, onRefresh });
 
     useEffect(() => {
         dispatch(fetchAdminUsers(query));
     }, [dispatch, query]);
+
+    useEffect(() => {
+        if (actor?.role !== ROLES.SUPERADMIN) return undefined;
+        const controller = new AbortController();
+        adminApi
+            .listOrganisations({ status: "active", limit: 100 }, {
+                signal: controller.signal,
+            })
+            .then(({ items }) => {
+                setOrganisations(items);
+                setOrganisationError(null);
+            })
+            .catch((error) => {
+                if (!controller.signal.aborted) setOrganisationError(error);
+            });
+        return () => controller.abort();
+    }, [actor?.role]);
 
     const hasData = loadedKey === queryKeyOf(query);
     const { page } = query;
@@ -120,6 +142,7 @@ export function UsersList({ actor, query, setQuery, onRefresh }) {
                         setStatusTarget({ user, action })
                     }
                     onChangeRole={setRoleTarget}
+                    onChangeOrganisation={setOrganisationTarget}
                 />
             </>
         );
@@ -131,9 +154,25 @@ export function UsersList({ actor, query, setQuery, onRefresh }) {
                 query={query}
                 setQuery={setQuery}
                 canSeePlatformAdmins={actor?.role === ROLES.SUPERADMIN}
+                organisations={organisations}
                 loading={status === STATUS.LOADING}
                 onRefresh={onRefresh}
             />
+            {organisationError && (
+                <LoadErrorAlert
+                    error={organisationError}
+                    onRetry={() => {
+                        setOrganisationError(null);
+                        adminApi
+                            .listOrganisations({
+                                status: "active",
+                                limit: 100,
+                            })
+                            .then(({ items }) => setOrganisations(items))
+                            .catch(setOrganisationError);
+                    }}
+                />
+            )}
             {body}
             {hasData && (
                 <ListPagination
@@ -168,6 +207,11 @@ export function UsersList({ actor, query, setQuery, onRefresh }) {
             <RoleChangeDialog
                 target={roleTarget}
                 onClose={() => setRoleTarget(null)}
+                onRefresh={onRefresh}
+            />
+            <OrganisationChangeDialog
+                target={organisationTarget}
+                onClose={() => setOrganisationTarget(null)}
                 onRefresh={onRefresh}
             />
         </section>

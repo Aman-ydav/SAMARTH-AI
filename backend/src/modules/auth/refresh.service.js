@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { AUDIT_ACTIONS } from "#constants/auditActions.js";
 import { EMAIL_TEMPLATES } from "#constants/emailTemplates.js";
 import { ERROR_CODES } from "#constants/errorCodes.js";
@@ -181,7 +182,18 @@ export async function rotateRefreshToken({
     const { current, outcome } = await resolveOutcome({ row, ctx, now });
 
     const user = await User.findById(current.userId).lean();
-    if (!user || user.status !== USER_STATUSES.ACTIVE) {
+    const organisation = user
+        ? await mongoose
+              .model("Organisation")
+              .findById(user.orgId)
+              .select("_id")
+              .lean()
+        : null;
+    if (
+        !user ||
+        user.status !== USER_STATUSES.ACTIVE ||
+        !organisation
+    ) {
         // The account can no longer have a session: do not leave the freshly rotated row alive.
         await revokeFamily(current.familyId, SESSION_REVOKED_REASONS.ADMIN, {
             now,

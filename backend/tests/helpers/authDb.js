@@ -4,8 +4,10 @@ import "#modules/audit/counter.model.js";
 import "#modules/auth/authToken.model.js";
 import "#modules/auth/loginAttempt.model.js";
 import "#modules/auth/refreshSession.model.js";
+import "#modules/organisations/organisation.model.js";
 import "#modules/users/invite.model.js";
 import "#modules/users/user.model.js";
+import { ensureDefaultOrganisation } from "#modules/organisations/index.js";
 import { startTestDb, stopTestDb } from "./testDb.js";
 
 /**
@@ -17,6 +19,7 @@ export async function startAuthDb() {
     await Promise.all(
         mongoose.modelNames().map((name) => mongoose.model(name).init())
     );
+    await ensureDefaultOrganisation();
     return info;
 }
 
@@ -28,4 +31,5 @@ export async function resetAuthDb() {
     await Promise.all(
         collections.map((collection) => collection.deleteMany({}))
     );
+    await ensureDefaultOrganisation();
 }

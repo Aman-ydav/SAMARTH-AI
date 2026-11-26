@@ -19,7 +19,14 @@ import { formatDateTime } from "@/lib/format";
  * Accounts as a table. Names and emails are server text rendered as plain text (FE-97) and wrap instead of overflowing.
  * Your own row carries a "You" badge. `busyId` marks the row with a running action and disables every row menu.
  */
-export function UsersTable({ actor, users, busyId, onStatus, onChangeRole }) {
+export function UsersTable({
+    actor,
+    users,
+    busyId,
+    onStatus,
+    onChangeRole,
+    onChangeOrganisation,
+}) {
     const { t, i18n } = useTranslation("admin");
     const language = i18n.language;
 
@@ -82,6 +89,7 @@ export function UsersTable({ actor, users, busyId, onStatus, onChangeRole }) {
                                     disabled={busyId !== null}
                                     onStatus={onStatus}
                                     onChangeRole={onChangeRole}
+                                    onChangeOrganisation={onChangeOrganisation}
                                 />
                             )}
                         </TableCell>
