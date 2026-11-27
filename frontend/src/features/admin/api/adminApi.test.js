@@ -9,6 +9,7 @@ import {
     pageMeta,
 } from "@/mocks/fixtures/envelope";
 import { makeInvite } from "@/mocks/fixtures/invite";
+import { makeOrganisation } from "@/mocks/fixtures/organisation";
 import { setupMockServer } from "@/test/mockServerLifecycle";
 
 const server = setupMockServer();
@@ -24,6 +25,7 @@ describe("readInvite", () => {
             id: "64b7f0c2a1b2c3d4e5f60201",
             email: "meera.nair@example.test",
             role: "trainer",
+            organisationId: "000000000000000000000001",
             status: "sent",
             resentCount: 0,
             expiresAt: "2026-11-03T09:00:00.000Z",
@@ -61,6 +63,7 @@ describe("readAdminUser", () => {
         });
         expect(user).toEqual({
             id: "64b7f0c2a1b2c3d4e5f60301",
+            orgId: "000000000000000000000001",
             email: "ravi.kumar@example.test",
             name: "Ravi Kumar",
             role: "learner",
@@ -69,6 +72,33 @@ describe("readAdminUser", () => {
             mustChangePassword: false,
             lastLoginAt: "2026-10-26T09:00:00.000Z",
             createdAt: "2026-10-01T09:00:00.000Z",
+        });
+    });
+
+    describe("readOrganisation", () => {
+        it("reads tenant policy fields without trusting invalid values", () => {
+            expect(
+                adminApi.readOrganisation({
+                    ...makeOrganisation(),
+                    secret: "not exposed",
+                })
+            ).toEqual(makeOrganisation());
+            expect(
+                adminApi.readOrganisation({
+                    id: "org",
+                    settings: { allowedEmailDomains: ["example.test", 1] },
+                })
+            ).toMatchObject({
+                active: false,
+                version: 0,
+                settings: {
+                    allowSelfRegistration: false,
+                    allowedEmailDomains: ["example.test"],
+                    requireEmailVerification: false,
+                    allowGoogleLogin: false,
+                },
+            });
+            expect(adminApi.readOrganisation({})).toBeNull();
         });
     });
 
@@ -184,6 +214,30 @@ describe("invite requests", () => {
         );
         expect(await adminApi.revokeInvite({ id: "i1" })).toBeNull();
     });
+
+    it("sends a platform invite to the explicitly selected organisation", async () => {
+        let body = null;
+        server.use(
+            http.post(apiUrl("/admin/invites"), async ({ request }) => {
+                body = await request.json();
+                return okResponse({
+                    invite: makeInvite({
+                        organisationId: body.organisationId,
+                    }),
+                });
+            })
+        );
+        await adminApi.createInvite({
+            email: "a@example.test",
+            role: "trainer",
+            organisationId: "64b7f0c2a1b2c3d4e5f60309",
+        });
+        expect(body).toEqual({
+            email: "a@example.test",
+            role: "trainer",
+            organisationId: "64b7f0c2a1b2c3d4e5f60309",
+        });
+    });
 });
 
 describe("user requests", () => {
@@ -260,6 +314,78 @@ describe("invalidResponse", () => {
     it("is an INVALID_RESPONSE error payload", () => {
         expect(adminApi.invalidResponse()).toMatchObject({
             code: "INVALID_RESPONSE",
+        });
+    });
+
+    describe("organisation requests", () => {
+        it("changes a user's organisation with only the destination id", async () => {
+            let body = null;
+            let path = "";
+            server.use(
+                http.patch(
+                    apiUrl("/admin/users/:id/organisation"),
+                    async ({ request }) => {
+                        path = new URL(request.url).pathname;
+                        body = await request.json();
+                        return okResponse({
+                            user: makeAdminUser({ orgId: body.organisationId }),
+                        });
+                    }
+                )
+            );
+            const user = await adminApi.changeUserOrganisation({
+                id: "user id",
+                organisationId: "64b7f0c2a1b2c3d4e5f60309",
+            });
+            expect(path).toBe("/api/v1/admin/users/user%20id/organisation");
+            expect(body).toEqual({
+                organisationId: "64b7f0c2a1b2c3d4e5f60309",
+            });
+            expect(user.orgId).toBe(body.organisationId);
+        });
+
+        it("lists and creates organisations through the tenant API", async () => {
+            let query = null;
+            let body = null;
+            server.use(
+                http.get(apiUrl("/organisations"), ({ request }) => {
+                    query = new URL(request.url).searchParams;
+                    return okResponse(
+                        { organisations: [makeOrganisation()] },
+                        { meta: pageMeta({ total: 1 }) }
+                    );
+                }),
+                http.post(apiUrl("/organisations"), async ({ request }) => {
+                    body = await request.json();
+                    return okResponse(
+                        {
+                            organisation: makeOrganisation({
+                                name: body.name,
+                                code: body.code,
+                            }),
+                        },
+                        { status: 201 }
+                    );
+                })
+            );
+            const list = await adminApi.listOrganisations({
+                status: "active",
+                limit: 100,
+            });
+            expect(list.items[0].name).toBe("SAMARTH AI");
+            expect(Object.fromEntries(query)).toEqual({
+                status: "active",
+                limit: "100",
+            });
+            const created = await adminApi.createOrganisation({
+                name: "Regional Statistics",
+                code: "regional",
+            });
+            expect(body).toEqual({
+                name: "Regional Statistics",
+                code: "regional",
+            });
+            expect(created.code).toBe("regional");
         });
     });
 });

@@ -4,6 +4,7 @@ import {
     MoreHorizontalIcon,
     UserForbidIcon,
     UserSettingsIcon,
+    BuildingIcon,
 } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +13,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { rolesChangeableTo, statusActionFor } from "@/lib/permissions";
+import { ROLES, rolesChangeableTo, statusActionFor } from "@/lib/permissions";
 
 /**
  * The row menu of the users table. It offers only what the API would accept for this actor and account: suspend or
@@ -26,11 +27,16 @@ export function UserActionsMenu({
     disabled,
     onStatus,
     onChangeRole,
+    onChangeOrganisation,
 }) {
     const { t } = useTranslation("admin");
     const statusAction = statusActionFor(actor, user);
     const canChangeRole = rolesChangeableTo(actor, user).length > 0;
-    if (!statusAction && !canChangeRole) return null;
+    const canChangeOrganisation =
+        actor?.role === ROLES.SUPERADMIN &&
+        actor.id !== user.id &&
+        user.role !== ROLES.SUPERADMIN;
+    if (!statusAction && !canChangeRole && !canChangeOrganisation) return null;
 
     return (
         <DropdownMenu>
@@ -66,6 +72,14 @@ export function UserActionsMenu({
                     <DropdownMenuItem onSelect={() => onChangeRole(user)}>
                         <UserSettingsIcon aria-hidden="true" />
                         {t("users.actions.changeRole")}
+                    </DropdownMenuItem>
+                )}
+                {canChangeOrganisation && (
+                    <DropdownMenuItem
+                        onSelect={() => onChangeOrganisation(user)}
+                    >
+                        <BuildingIcon aria-hidden="true" />
+                        {t("users.actions.changeOrganisation")}
                     </DropdownMenuItem>
                 )}
             </DropdownMenuContent>

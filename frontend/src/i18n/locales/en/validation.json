@@ -28,6 +28,9 @@
         "required": "Confirm your password.",
         "mismatch": "The passwords do not match."
     },
+    "organisationCode": {
+        "invalid": "Use 2–20 lowercase letters, numbers or hyphens, with no hyphen at either end."
+    },
     "terms": {
         "required": "You must agree to the Terms of Use and Privacy Policy to continue."
     },

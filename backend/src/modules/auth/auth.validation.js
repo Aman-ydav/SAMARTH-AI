@@ -35,6 +35,13 @@ export const registerBody = z.object({
     name,
     email,
     password,
+    organisationCode: z
+        .string()
+        .trim()
+        .min(2)
+        .max(20)
+        .regex(/^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$/)
+        .optional(),
     acceptTerms: z.literal(true, {
         error: "You must accept the terms and privacy policy",
     }),
@@ -53,6 +60,13 @@ export const loginBody = z.object({
 export const googleBody = z.object({
     credential,
     nonce: z.string().min(1).max(256).optional(),
+    organisationCode: z
+        .string()
+        .trim()
+        .min(2)
+        .max(20)
+        .regex(/^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$/)
+        .optional(),
     reactivate: optionalFlag,
 });
 

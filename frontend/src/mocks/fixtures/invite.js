@@ -2,6 +2,7 @@
 export function makeInvite(overrides = {}) {
     return {
         id: "64b7f0c2a1b2c3d4e5f60201",
+        organisationId: "000000000000000000000001",
         email: "meera.nair@example.test",
         role: "trainer",
         status: "sent",

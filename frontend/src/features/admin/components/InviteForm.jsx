@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -28,14 +29,16 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { inviteSchemaFor } from "@/features/admin/schemas/adminSchemas";
+import * as adminApi from "@/features/admin/api/adminApi";
 import { createInvite } from "@/features/admin/slice/invitesSlice";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { notify } from "@/hooks/useNotify";
 import { API_ERROR_CODES, errorMessageKey } from "@/lib/apiError";
 import { applyServerErrors } from "@/lib/forms";
 import { roleLabelKey } from "@/lib/roleLabels";
+import { ROLES } from "@/lib/permissions";
 
-const FIELDS = ["email", "role"];
+const FIELDS = ["email", "role", "organisationId"];
 
 /**
  * Invite one person by email (R68, doc 20 section 1a). The role list is what the signed-in role may grant: an admin sees
@@ -47,9 +50,15 @@ export function InviteForm({ role: actorRole, roles, onInvited }) {
     const { t } = useTranslation(["admin", "validation", "errors", "common"]);
     const dispatch = useAppDispatch();
     const action = useAsyncAction();
+    const [organisations, setOrganisations] = useState([]);
+    const [organisationError, setOrganisationError] = useState(false);
     const form = useForm({
         resolver: zodResolver(inviteSchemaFor(actorRole)),
-        defaultValues: { email: "", role: roles.length === 1 ? roles[0] : "" },
+        defaultValues: {
+            email: "",
+            role: roles.length === 1 ? roles[0] : "",
+            organisationId: "",
+        },
     });
     const { errors } = form.formState;
     const text = (message) =>
@@ -57,13 +66,41 @@ export function InviteForm({ role: actorRole, roles, onInvited }) {
             ? t(message, { defaultValue: message })
             : "";
 
+    useEffect(() => {
+        if (actorRole !== ROLES.SUPERADMIN) return undefined;
+        const controller = new AbortController();
+        adminApi
+            .listOrganisations(
+                { status: "active", limit: 100 },
+                { signal: controller.signal }
+            )
+            .then(({ items }) => {
+                setOrganisations(items);
+                setOrganisationError(false);
+            })
+            .catch(() => {
+                if (!controller.signal.aborted) setOrganisationError(true);
+            });
+        return () => controller.abort();
+    }, [actorRole]);
+
     const onSubmit = form.handleSubmit((values) =>
         action.run(
             async () => {
                 const invite = await dispatch(
-                    createInvite({ email: values.email, role: values.role })
+                    createInvite({
+                        email: values.email,
+                        role: values.role,
+                        ...(values.organisationId
+                            ? { organisationId: values.organisationId }
+                            : {}),
+                    })
                 ).unwrap();
-                form.reset({ email: "", role: values.role });
+                form.reset({
+                    email: "",
+                    role: values.role,
+                    organisationId: values.organisationId,
+                });
                 await notify(
                     "success",
                     t("admin:invites.form.sent", { email: invite.email }),
@@ -211,6 +248,90 @@ export function InviteForm({ role: actorRole, roles, onInvited }) {
                                     {text(errors.role?.message)}
                                 </FieldError>
                             </Field>
+                            {actorRole === ROLES.SUPERADMIN && (
+                                <Field
+                                    data-invalid={Boolean(
+                                        errors.organisationId
+                                    )}
+                                >
+                                    <FieldLabel htmlFor="invite-organisation">
+                                        {t(
+                                            "admin:invites.form.organisation"
+                                        )}
+                                    </FieldLabel>
+                                    <Controller
+                                        control={form.control}
+                                        name="organisationId"
+                                        render={({ field }) => (
+                                            <Select
+                                                value={field.value}
+                                                onValueChange={field.onChange}
+                                                disabled={
+                                                    action.pending ||
+                                                    organisationError ||
+                                                    organisations.length === 0
+                                                }
+                                            >
+                                                <SelectTrigger
+                                                    id="invite-organisation"
+                                                    ref={field.ref}
+                                                    onBlur={field.onBlur}
+                                                    className="w-full"
+                                                    aria-invalid={
+                                                        errors.organisationId
+                                                            ? true
+                                                            : undefined
+                                                    }
+                                                    aria-describedby={
+                                                        errors.organisationId
+                                                            ? "invite-organisation-error"
+                                                            : undefined
+                                                    }
+                                                >
+                                                    <SelectValue
+                                                        placeholder={t(
+                                                            "admin:invites.form.organisationPlaceholder"
+                                                        )}
+                                                    />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {organisations.map(
+                                                        (organisation) => (
+                                                            <SelectItem
+                                                                key={
+                                                                    organisation.id
+                                                                }
+                                                                value={
+                                                                    organisation.id
+                                                                }
+                                                            >
+                                                                {
+                                                                    organisation.name
+                                                                }
+                                                            </SelectItem>
+                                                        )
+                                                    )}
+                                                </SelectContent>
+                                            </Select>
+                                        )}
+                                    />
+                                    <FieldError id="invite-organisation-error">
+                                        {text(
+                                            errors.organisationId?.message
+                                        )}
+                                    </FieldError>
+                                    {organisationError && (
+                                        <p
+                                            role="alert"
+                                            className="text-sm text-destructive"
+                                        >
+                                            {t(
+                                                "admin:organisations.loadError"
+                                            )}
+                                        </p>
+                                    )}
+                                </Field>
+                            )}
                         </FieldGroup>
                     </fieldset>
                     <FormFailureAlert
@@ -219,7 +340,12 @@ export function InviteForm({ role: actorRole, roles, onInvited }) {
                     />
                     <SubmitButton
                         pending={action.pending}
-                        disabled={action.cooldownSec > 0}
+                        disabled={
+                            action.cooldownSec > 0 ||
+                            (actorRole === ROLES.SUPERADMIN &&
+                                (organisationError ||
+                                    organisations.length === 0))
+                        }
                         className="w-full sm:w-auto sm:self-start"
                     >
                         {t("admin:invites.form.submit")}

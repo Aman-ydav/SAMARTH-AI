@@ -1,16 +1,21 @@
 import { AUDIT_ACTIONS } from "#constants/auditActions.js";
 import { EMAIL_TEMPLATES } from "#constants/emailTemplates.js";
 import { ERROR_CODES } from "#constants/errorCodes.js";
-import { INVITE_GRANTS } from "#constants/roles.js";
+import { INVITE_GRANTS, ROLES } from "#constants/roles.js";
 import {
     AUTH_PROVIDERS,
     INVITE_STATUSES,
     USER_STATUSES,
 } from "#constants/statuses.js";
 import { AUTH_TOKEN_TYPES } from "#constants/tokenTypes.js";
+import { DEFAULT_ORG_NAME } from "#constants/org.js";
 import { withTransaction } from "#db/transaction.js";
 import { buildFrontendLink } from "#integrations/email/emailLinks.mapper.js";
 import { appendAudit } from "#modules/audit/index.js";
+import {
+    assertOrganisationEmailAllowed,
+    getActiveOrganisationById,
+} from "#modules/organisations/index.js";
 import { Invite, User } from "#modules/users/index.js";
 import { ApiError } from "#utils/apiError.js";
 import { gt, lte } from "#utils/mongoOps.js";
@@ -27,7 +32,6 @@ import {
 } from "./tokens.service.js";
 
 const TYPE = AUTH_TOKEN_TYPES.INVITE;
-const ORG_LABEL = "SAMARTH AI";
 const invalidInvite = () => ApiError.badRequest(ERROR_CODES.INVITE_INVALID);
 
 /**
@@ -36,11 +40,11 @@ const invalidInvite = () => ApiError.badRequest(ERROR_CODES.INVITE_INVALID);
  * trainers only, learners and trainers invite nobody, and `superadmin` is never invitable. An invite that lapsed
  * (still `sent` after its 7 days) no longer blocks a new one for the same address; it is closed as `expired`.
  *
- * @param {{ email: string, role: string, departmentId?: string }} input
+ * @param {{ email: string, role: string, departmentId?: string, organisationId?: string }} input
  * @param {{ userId: string, role: string, orgId: string }} actor the signed-in inviter (from `req.auth`)
  */
 export async function createInvite(
-    { email, role, departmentId },
+    { email, role, departmentId, organisationId },
     actor,
     ctx,
     now = new Date()
@@ -54,10 +58,18 @@ export async function createInvite(
     }
     const address = normalizeEmail(email);
     assertEmailDomainAllowed(address, ctx.config);
+    if (organisationId && actor.role !== ROLES.SUPERADMIN)
+        throw ApiError.forbidden(ERROR_CODES.FORBIDDEN);
+    const organisation = await getActiveOrganisationById(
+        organisationId ?? actor.orgId
+    );
+    if (!organisation) throw ApiError.notFound(ERROR_CODES.NOT_FOUND);
+    assertOrganisationEmailAllowed(address, organisation);
+    const targetOrgId = organisation._id;
     const clash = await Promise.all([
         User.exists({ email: address }),
         Invite.exists({
-            orgId: actor.orgId,
+            orgId: targetOrgId,
             email: address,
             status: INVITE_STATUSES.SENT,
             expiresAt: gt(now),
@@ -71,7 +83,7 @@ export async function createInvite(
     const { invite, token } = await withTransaction(async (session) => {
         await Invite.updateMany(
             {
-                orgId: actor.orgId,
+                orgId: targetOrgId,
                 email: address,
                 status: INVITE_STATUSES.SENT,
                 expiresAt: lte(now),
@@ -83,8 +95,8 @@ export async function createInvite(
             {
                 type: TYPE,
                 email: address,
-                orgId: actor.orgId,
-                meta: { role, orgId: actor.orgId },
+                orgId: targetOrgId,
+                meta: { role, orgId: String(targetOrgId) },
                 ctx,
                 supersede: false,
             },
@@ -93,7 +105,7 @@ export async function createInvite(
         const [created] = await Invite.create(
             [
                 {
-                    orgId: actor.orgId,
+                    orgId: targetOrgId,
                     email: address,
                     role,
                     departmentId,
@@ -111,7 +123,10 @@ export async function createInvite(
                 action: AUDIT_ACTIONS.INVITE_SENT,
                 entityType: "invite",
                 entityId: created._id,
-                meta: { role },
+                meta: {
+                    role,
+                    organisationId: String(targetOrgId),
+                },
             },
             { session, now }
         );
@@ -121,8 +136,8 @@ export async function createInvite(
         to: address,
         templateKey: EMAIL_TEMPLATES.INVITE,
         data: {
-            inviterName: inviter?.name ?? ORG_LABEL,
-            orgName: ORG_LABEL,
+            inviterName: inviter?.name ?? DEFAULT_ORG_NAME,
+            orgName: organisation.name,
             role,
             link: buildFrontendLink(
                 FRONTEND_PATHS.ACCEPT_INVITE,
@@ -148,6 +163,9 @@ export async function acceptInvite(
     const peeked = await peekEmailToken({ token, type: TYPE }, { now });
     if (!peeked) throw invalidInvite();
     assertEmailDomainAllowed(peeked.email, ctx.config);
+    const organisation = await getActiveOrganisationById(peeked.orgId);
+    if (!organisation) throw invalidInvite();
+    assertOrganisationEmailAllowed(peeked.email, organisation);
     assertPasswordPolicy(password, { email: peeked.email, name });
     const passwordHash = await hashPassword(password);
 

@@ -50,6 +50,13 @@ export function createAuthenticate({
                 ? ApiError.forbidden(code)
                 : ApiError.unauthorized(ERROR_CODES.SESSION_REVOKED);
         }
+        const organisation = await mongoose
+            .model("Organisation")
+            .findById(user.orgId)
+            .select("_id")
+            .lean();
+        if (!organisation)
+            throw ApiError.forbidden(ERROR_CODES.ORGANISATION_INACTIVE);
         if (user.tokenVersion !== claims.tokenVersion) {
             throw ApiError.unauthorized(ERROR_CODES.TOKEN_INVALID);
         }

@@ -78,6 +78,20 @@ export const updateUserRole = createAsyncThunk(
     }
 );
 
+export const updateUserOrganisation = createAsyncThunk(
+    "adminUsers/updateUserOrganisation",
+    async (args, { signal, rejectWithValue }) => {
+        try {
+            const user = await adminApi.changeUserOrganisation(args, {
+                signal,
+            });
+            return user ?? rejectWithValue(adminApi.invalidResponse());
+        } catch (error) {
+            return rejectWithValue(toApiError(error));
+        }
+    }
+);
+
 export const adminUsersInitialState = usersAdapter.getInitialState({
     ...asyncInitial,
     queryKey: null,
@@ -130,8 +144,18 @@ const adminUsersSlice = createSlice({
             })
             .addCase(updateUserRole.fulfilled, (state, { payload }) => {
                 usersAdapter.upsertOne(state, payload);
-            });
-        addOpMatchers(builder, [updateUserStatus, updateUserRole]);
+            })
+            .addCase(
+                updateUserOrganisation.fulfilled,
+                (state, { payload }) => {
+                    usersAdapter.upsertOne(state, payload);
+                }
+            );
+        addOpMatchers(builder, [
+            updateUserStatus,
+            updateUserRole,
+            updateUserOrganisation,
+        ]);
     },
 });
 

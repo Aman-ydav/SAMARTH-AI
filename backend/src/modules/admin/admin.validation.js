@@ -31,6 +31,10 @@ export const createInviteBody = z.object({
         .string()
         .regex(OBJECT_ID_PATTERN, "Invalid identifier")
         .optional(),
+    organisationId: z
+        .string()
+        .regex(OBJECT_ID_PATTERN, "Invalid identifier")
+        .optional(),
 });
 
 export const listInvitesQuery = z.object({
@@ -49,6 +53,11 @@ export const listUsersQuery = z.object({
         .max(SEARCH_MAX_LENGTH)
         .refine((value) => !hasControlCharacters(value), "Invalid characters")
         .optional(),
+    organisationId: z.string().regex(OBJECT_ID_PATTERN).optional(),
+});
+
+export const changeOrganisationBody = z.object({
+    organisationId: z.string().regex(OBJECT_ID_PATTERN),
 });
 
 export const setStatusBody = z.object({

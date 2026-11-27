@@ -25,7 +25,13 @@ function randomNonce() {
     );
 }
 
-function GoogleSection({ onSession, onFailure, reactivate, withDivider }) {
+function GoogleSection({
+    onSession,
+    onFailure,
+    reactivate,
+    withDivider,
+    organisationCode,
+}) {
     const { t, i18n } = useTranslation(["auth", "common"]);
     const dispatch = useAppDispatch();
     const isMobile = useIsMobile();
@@ -48,6 +54,9 @@ function GoogleSection({ onSession, onFailure, reactivate, withDivider }) {
                     loginWithGoogle({
                         credential,
                         nonce,
+                        ...(organisationCode
+                            ? { organisationCode: organisationCode.trim() }
+                            : {}),
                         ...(reactivate ? { reactivate: true } : {}),
                     })
                 ).unwrap();
@@ -133,6 +142,7 @@ export function GoogleButton({
     onFailure,
     reactivate = false,
     withDivider = true,
+    organisationCode,
 }) {
     if (!env.googleEnabled) return null;
     return (
@@ -141,6 +151,7 @@ export function GoogleButton({
             onFailure={onFailure}
             reactivate={reactivate}
             withDivider={withDivider}
+            organisationCode={organisationCode}
         />
     );
 }

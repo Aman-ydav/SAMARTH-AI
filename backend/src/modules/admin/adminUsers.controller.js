@@ -27,3 +27,12 @@ export const changeRoleHandler = asyncHandler(async (req, res) => {
     );
     return ApiResponse.ok({ user }, "Role updated").send(res);
 });
+
+export const changeOrganisationHandler = asyncHandler(async (req, res) => {
+    const user = await adminUsers.changeUserOrganisation(
+        req.auth,
+        req.validated.params.id,
+        req.validated.body.organisationId
+    );
+    return ApiResponse.ok({ user }, "User organisation updated").send(res);
+});

@@ -49,7 +49,7 @@ function FilterSelect({ id, label, value, allLabel, options, onChange }) {
                     <SelectItem value={ALL}>{allLabel}</SelectItem>
                     {options.map(([option, optionLabel]) => (
                         <SelectItem key={option} value={option}>
-                            {t(optionLabel)}
+                            {t(optionLabel, { defaultValue: optionLabel })}
                         </SelectItem>
                     ))}
                 </SelectContent>
@@ -67,6 +67,7 @@ export function UserFilters({
     query,
     setQuery,
     canSeePlatformAdmins,
+    organisations = [],
     loading,
     onRefresh,
 }) {
@@ -81,11 +82,18 @@ export function UserFilters({
         setQuery({ q: debounced.trim() || undefined });
     }, [debounced, setQuery]);
 
-    const active = Boolean(query.q || query.role || query.status);
+    const active = Boolean(
+        query.q || query.role || query.status || query.organisationId
+    );
     const clear = () => {
         sent.current = "";
         setSearch("");
-        setQuery({ q: undefined, role: undefined, status: undefined });
+        setQuery({
+            q: undefined,
+            role: undefined,
+            status: undefined,
+            organisationId: undefined,
+        });
     };
     const roleOptions = canSeePlatformAdmins
         ? [...ROLE_OPTIONS, PLATFORM_OPTION]
@@ -129,6 +137,18 @@ export function UserFilters({
                 options={STATUS_OPTIONS}
                 onChange={(status) => setQuery({ status })}
             />
+            {canSeePlatformAdmins && (
+                <FilterSelect
+                    id="users-organisation-filter"
+                    label={t("users.filters.organisation")}
+                    allLabel={t("users.filters.allOrganisations")}
+                    value={query.organisationId}
+                    options={organisations.map(({ id, name }) => [id, name])}
+                    onChange={(organisationId) =>
+                        setQuery({ organisationId })
+                    }
+                />
+            )}
             {active && (
                 <Button type="button" variant="ghost" onClick={clear}>
                     {t("users.filters.clear")}

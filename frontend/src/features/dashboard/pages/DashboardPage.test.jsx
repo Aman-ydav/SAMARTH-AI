@@ -105,7 +105,12 @@ describe("DashboardPage", () => {
             expect(within(users).queryByText("Coming soon")).toBeNull();
             expect(within(invites).queryByText("Coming soon")).toBeNull();
             expect(
-                screen.getByText(/Invite trainers/, { selector: "p" })
+                screen.getByText(
+                    role === "admin"
+                        ? /Invite trainers/
+                        : /Manage organisations, invite teams/,
+                    { selector: "p" }
+                )
             ).toBeInTheDocument();
         }
     );

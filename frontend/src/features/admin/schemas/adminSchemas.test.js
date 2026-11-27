@@ -24,6 +24,7 @@ describe("inviteSchemaFor", () => {
         expect(result.data).toEqual({
             email: "meera.nair@example.test",
             role: "trainer",
+            organisationId: "",
         });
     });
 
@@ -32,6 +33,7 @@ describe("inviteSchemaFor", () => {
             inviteSchemaFor("superadmin").safeParse({
                 email: "a@example.test",
                 role: "admin",
+                organisationId: "64b7f0c2a1b2c3d4e5f60309",
             }).success
         ).toBe(true);
         const refused = inviteSchemaFor("admin").safeParse({

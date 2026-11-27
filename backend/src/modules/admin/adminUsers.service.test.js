@@ -72,6 +72,7 @@ describe("toAdminUser", () => {
             "lastLoginAt",
             "mustChangePassword",
             "name",
+            "orgId",
             "role",
             "status",
         ]);
@@ -160,7 +161,7 @@ describe("listUsers", () => {
         expect(await find("$ne")).toEqual([]);
     });
 
-    it("never lists another org or a soft-deleted user, and rejects unknown sort fields", async () => {
+    it("lists across organisations for platform admins, hides soft-deleted users, and rejects unknown sort fields", async () => {
         const { platform } = await cast();
         await createUser({
             orgId: newObjectId(),
@@ -170,7 +171,7 @@ describe("listUsers", () => {
         const emails = (await listUsers(asActor(platform))).items.map(
             (u) => u.email
         );
-        expect(emails).not.toContain("foreign@example.test");
+        expect(emails).toContain("foreign@example.test");
         expect(emails).not.toContain("gone@example.test");
         await expect(
             listUsers(asActor(platform), { sort: "passwordHash" })
@@ -416,7 +417,7 @@ describe("changeUserRole", () => {
         const foreign = await createUser({ orgId: newObjectId() });
         await expect(
             changeUserRole(asActor(platform), foreign._id, "trainer")
-        ).rejects.toMatchObject({ statusCode: 404 });
+        ).resolves.toMatchObject({ id: String(foreign._id), role: "trainer" });
         await expect(
             changeUserRole(asActor(platform), "xyz", "trainer")
         ).rejects.toMatchObject({ statusCode: 400, code: "INVALID_ID" });

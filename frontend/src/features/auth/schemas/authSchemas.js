@@ -55,6 +55,7 @@ const MESSAGES = {
     confirmMismatch: "validation:confirmPassword.mismatch",
     terms: "validation:terms.required",
     token: "validation:token.required",
+    organisationCode: "validation:organisationCode.invalid",
 };
 
 export const normalizeEmail = (value) =>
@@ -197,6 +198,18 @@ export const registerSchema = z
     .object({
         name: nameField,
         email: emailField,
+        organisationCode: z
+            .string()
+            .trim()
+            .toLowerCase()
+            .max(20, MESSAGES.organisationCode)
+            .refine(
+                (value) =>
+                    value === "" ||
+                    /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(value),
+                MESSAGES.organisationCode
+            )
+            .default(""),
         password: newPasswordField,
         confirmPassword: confirmField,
         acceptTerms: z.literal(true, MESSAGES.terms),
@@ -253,11 +266,18 @@ export const deleteAccountSchema = z.object({
 export const oneTimeTokenSchema = z.object({ token: tokenField });
 
 /** Strips UI-only fields before a body goes to the API. */
-export const toRegisterBody = ({ name, email, password, acceptTerms }) => ({
+export const toRegisterBody = ({
     name,
     email,
     password,
     acceptTerms,
+    organisationCode,
+}) => ({
+    name,
+    email,
+    password,
+    acceptTerms,
+    ...(organisationCode ? { organisationCode } : {}),
 });
 export const toLoginBody = ({ email, password, rememberMe, reactivate }) => ({
     email,

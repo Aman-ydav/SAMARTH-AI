@@ -6,12 +6,14 @@ import { validate } from "#middlewares/validate.js";
 import { ADMIN_AREA_ROLES } from "./admin.constants.js";
 import {
     changeRoleBody,
+    changeOrganisationBody,
     idParams,
     listUsersQuery,
     setStatusBody,
 } from "./admin.validation.js";
 import {
     changeRoleHandler,
+    changeOrganisationHandler,
     listUsersHandler,
     setStatusHandler,
 } from "./adminUsers.controller.js";
@@ -48,6 +50,17 @@ export function createUserRoutes({ config, limiters }) {
         limiters.usersWrite,
         validate({ params: idParams, body: changeRoleBody }),
         changeRoleHandler
+    );
+    router.patch(
+        "/users/:id/organisation",
+        authenticate,
+        authorize(ROLES.SUPERADMIN),
+        limiters.usersWrite,
+        validate({
+            params: idParams,
+            body: changeOrganisationBody,
+        }),
+        changeOrganisationHandler
     );
     return router;
 }

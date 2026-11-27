@@ -47,6 +47,14 @@ const CATALOG = {
     ACCOUNT_DEACTIVATED: [403, "The account is deactivated."],
     ACCOUNT_PENDING_DELETION: [403, "The account is scheduled for deletion."],
     MUST_CHANGE_PASSWORD: [403, "The password must be changed first."],
+    ORGANISATION_UNAVAILABLE: [
+        403,
+        "This organisation is not available for registration.",
+    ],
+    ORGANISATION_INACTIVE: [
+        403,
+        "The organisation associated with this account is inactive.",
+    ],
     // 404
     NOT_FOUND: [404, "The resource was not found."],
     MEDIA_NOT_FOUND: [404, "The media item was not found."],
