@@ -46,3 +46,12 @@ export const MEDIA_STATUSES = Object.freeze({
     DELETED: "deleted",
 });
 export const MEDIA_STATUS_LIST = Object.freeze(Object.values(MEDIA_STATUSES));
+
+/** Background job lifecycle (DB-49): `queued` to `running` to `done` or `failed`; a retry goes `running` back to `queued`. */
+export const JOB_STATUSES = Object.freeze({
+    QUEUED: "queued",
+    RUNNING: "running",
+    DONE: "done",
+    FAILED: "failed",
+});
+export const JOB_STATUS_LIST = Object.freeze(Object.values(JOB_STATUSES));
