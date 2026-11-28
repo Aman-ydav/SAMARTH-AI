@@ -22,6 +22,7 @@ tags:
     - name: Media
     - name: Admin
     - name: Jobs
+    - name: Notifications
 security: []
 paths:
     /health:
@@ -2687,6 +2688,189 @@ paths:
                     $ref: "#/components/responses/Error404"
                 "429":
                     $ref: "#/components/responses/Error429"
+    /me/notifications:
+        get:
+            tags:
+                - Notifications
+            operationId: listNotifications
+            summary: List my in-app notifications, newest first
+            description: Any signed-in role. Scoped to the caller; another user's notifications are never visible. The client renders the text from type and subject (en and hi), so no title or body is returned.
+            security: *a8
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                      type: integer
+                      minimum: 1
+                - name: limit
+                  in: query
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                - name: unread
+                  in: query
+                  description: "true returns unread only, false returns read only, absent returns all."
+                  schema:
+                      enum: ["true", "false"]
+            responses:
+                "200":
+                    description: A page of notifications
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  notifications:
+                                                      type: array
+                                                      items:
+                                                          $ref: "#/components/schemas/Notification"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                "401":
+                    $ref: "#/components/responses/Error401"
+                "403":
+                    $ref: "#/components/responses/Error403"
+                "429":
+                    $ref: "#/components/responses/Error429"
+    /me/notifications/unread-count:
+        get:
+            tags:
+                - Notifications
+            operationId: getUnreadNotificationCount
+            summary: Number of unread notifications (the bell badge)
+            security: *a8
+            responses:
+                "200":
+                    description: The unread count
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  unreadCount:
+                                                      type: integer
+                                                      minimum: 0
+                "400":
+                    $ref: "#/components/responses/Error400"
+                "401":
+                    $ref: "#/components/responses/Error401"
+                "403":
+                    $ref: "#/components/responses/Error403"
+                "429":
+                    $ref: "#/components/responses/Error429"
+    /me/notifications/read-all:
+        post:
+            tags:
+                - Notifications
+            operationId: markAllNotificationsRead
+            summary: Mark every unread notification as read
+            security: *a8
+            parameters:
+                - *a1
+            responses:
+                "200":
+                    description: How many notifications changed
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  updated:
+                                                      type: integer
+                                                      minimum: 0
+                "400":
+                    $ref: "#/components/responses/Error400"
+                "401":
+                    $ref: "#/components/responses/Error401"
+                "403":
+                    $ref: "#/components/responses/Error403"
+                "429":
+                    $ref: "#/components/responses/Error429"
+    /me/notifications/{id}/read:
+        post:
+            tags:
+                - Notifications
+            operationId: markNotificationRead
+            summary: Mark one notification as read
+            description: Repeating the call returns the same notification (idempotent). Another user's or an unknown id answers 404 NOTIFICATION_NOT_FOUND.
+            security: *a8
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      pattern: ^[a-f0-9]{24}$
+                - *a1
+            responses:
+                "200":
+                    description: The notification, now read
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  notification:
+                                                      $ref: "#/components/schemas/Notification"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                "401":
+                    $ref: "#/components/responses/Error401"
+                "403":
+                    $ref: "#/components/responses/Error403"
+                "404":
+                    $ref: "#/components/responses/Error404"
+                "429":
+                    $ref: "#/components/responses/Error429"
+    /me/notifications/{id}:
+        delete:
+            tags:
+                - Notifications
+            operationId: dismissNotification
+            summary: Dismiss (delete) one notification
+            security: *a8
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      pattern: ^[a-f0-9]{24}$
+                - *a1
+            responses:
+                "204":
+                    description: Dismissed; no body
+                "400":
+                    $ref: "#/components/responses/Error400"
+                "401":
+                    $ref: "#/components/responses/Error401"
+                "403":
+                    $ref: "#/components/responses/Error403"
+                "404":
+                    $ref: "#/components/responses/Error404"
+                "429":
+                    $ref: "#/components/responses/Error429"
 components:
     securitySchemes:
         accessCookie:
@@ -3325,6 +3509,46 @@ components:
                     type: boolean
                 allowGoogleLogin:
                     type: boolean
+        Notification:
+            type: object
+            additionalProperties: false
+            required:
+                - id
+                - type
+                - subject
+                - refId
+                - link
+                - read
+                - readAt
+                - createdAt
+            properties:
+                id:
+                    type: string
+                    pattern: ^[a-f0-9]{24}$
+                type:
+                    type: string
+                    enum: [job.completed, job.failed]
+                    description: Lowercase dotted code. The client builds the localized text from it (notifications:types.<type>).
+                subject:
+                    type: [string, "null"]
+                    maxLength: 120
+                    description: Short non-personal label the client interpolates, for example the job type.
+                refId:
+                    type: [string, "null"]
+                    maxLength: 64
+                    description: Id of the thing it refers to, for example a job id.
+                link:
+                    type: [string, "null"]
+                    maxLength: 200
+                    description: In-app path to open on click, never a full URL.
+                read:
+                    type: boolean
+                readAt:
+                    type: [string, "null"]
+                    format: date-time
+                createdAt:
+                    type: string
+                    format: date-time
         Job:
             type: object
             additionalProperties: false
@@ -3551,6 +3775,7 @@ x-error-statuses:
     NOT_FOUND: 404
     MEDIA_NOT_FOUND: 404
     JOB_NOT_FOUND: 404
+    NOTIFICATION_NOT_FOUND: 404
     CONFLICT: 409
     LAST_ADMIN: 409
     AUTH_METHOD_REQUIRED: 409
