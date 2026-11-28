@@ -1,6 +1,7 @@
 import { screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import DashboardPage from "@/features/dashboard/pages/DashboardPage";
+import { dashboardInitialState } from "@/features/dashboard/slice/dashboardSlice";
 import { i18n } from "@/i18n";
 import { signedInAuth } from "@/test/authState";
 import { expectAccessible } from "@/test/axeCheck";
@@ -8,7 +9,15 @@ import { renderWithProviders } from "@/test/renderWithProviders";
 
 const render = (userOverrides = {}) =>
     renderWithProviders(<DashboardPage />, {
-        preloadedState: { auth: signedInAuth(userOverrides) },
+        preloadedState: {
+            auth: signedInAuth(userOverrides),
+            // A fresh, empty analysis: the learner overview shows its empty state and makes no request.
+            dashboard: {
+                ...dashboardInitialState,
+                status: "succeeded",
+                lastFetchedAt: Date.now(),
+            },
+        },
     });
 
 describe("DashboardPage", () => {
