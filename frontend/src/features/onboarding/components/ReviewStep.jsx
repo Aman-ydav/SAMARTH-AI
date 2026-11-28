@@ -55,7 +55,9 @@ export function ReviewStep({
                         >
                             <span>{competency.name}</span>
                             <span className="font-medium">
-                                {ratings[competency.id]} / 5
+                                {t("common:onboarding.review.outOf", {
+                                    level: ratings[competency.id],
+                                })}
                             </span>
                         </li>
                     ))}
