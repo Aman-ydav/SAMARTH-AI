@@ -19,7 +19,10 @@ import {
     testOutboxRouter,
 } from "#middlewares/testOutbox.js";
 import { createAdminRouter } from "#modules/admin/index.js";
+import { createAssessmentRouter } from "#modules/assessment/index.js";
 import { createAuthRouter } from "#modules/auth/index.js";
+import { createCompetencyRouter } from "#modules/competency/index.js";
+import { createLearningRouter } from "#modules/learning/index.js";
 import { mediaRouter } from "#modules/media/index.js";
 import { createOrganisationRouter } from "#modules/organisations/index.js";
 import { createUsersRouter } from "#modules/users/index.js";
@@ -38,6 +41,9 @@ function mountModules(api, deps) {
     api.use("/auth", createAuthRouter(deps));
     api.use("/profile", createUsersRouter(deps));
     api.use("/admin", createAdminRouter(deps));
+    api.use("/competencies", createCompetencyRouter(deps));
+    api.use("/learning", createLearningRouter(deps));
+    api.use("/assessment", createAssessmentRouter(deps));
     api.use("/organisations", createOrganisationRouter(deps));
     // Serves /media/* and /me/avatar, so it is mounted at "/" and declares absolute paths (see media.routes.js).
     api.use("/", mediaRouter);

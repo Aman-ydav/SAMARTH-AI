@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: A4; margin: 20mm 18mm; }
+  body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.45; color: #111; margin: 0; padding: 0; }
+  .univ-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #ea580c; padding-bottom: 12px; }
+  .univ-name { font-size: 18pt; font-weight: bold; color: #ea580c; letter-spacing: 0.5px; }
+  .univ-sub { font-size: 10pt; color: #444; }
+  h1.title { font-size: 15pt; text-align: center; font-weight: bold; margin: 15px 0 10px 0; }
+  .meta { text-align: center; font-size: 10pt; margin-bottom: 15px; }
+  .meta p { margin: 2px 0; }
+  .disclaimer { font-style: italic; font-size: 9pt; color: #555; text-align: center; margin-bottom: 18px; }
+  .abstract { font-size: 10pt; margin-bottom: 16px; background: #fdfaf6; border-left: 3px solid #ea580c; padding: 10px 14px; }
+  .abstract b { color: #111; }
+  h2 { font-size: 12pt; font-weight: bold; margin-top: 18px; margin-bottom: 6px; border-bottom: 1px solid #ccc; padding-bottom: 3px; }
+  h3 { font-size: 11pt; font-weight: bold; margin-top: 12px; margin-bottom: 4px; }
+  p, li { text-align: justify; margin: 6px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 9.5pt; }
+  th, td { border: 1px solid #999; padding: 6px 8px; text-align: left; }
+  th { background-color: #f2f2f2; font-weight: bold; }
+  .references { font-size: 9pt; }
+  .references p { margin: 4px 0; text-align: left; }
+</style>
+</head>
+<body>
+  <div class="univ-header">
+    <div class="univ-name">LOVELY PROFESSIONAL UNIVERSITY</div>
+    <div class="univ-sub">Punjab, India &bull; School of Computer Science & Engineering</div>
+  </div>
+
+  <h1 class="title">SAMARTH AI: A Smart Competency Intelligence System for Skill Gap Analysis & Learning Recommendations in Official Statistics</h1>
+
+  <div class="meta">
+    <p><b>Authors:</b> Aman, Cancy, Manveer, Parul, Vansh, Vaibhav</p>
+    <p><b>Institution:</b> Lovely Professional University, Punjab, India</p>
+    <p><b>Project Reference:</b> Smart India Hackathon, Problem Statement SIH26101 | Ministry of Statistics and Programme Implementation (MoSPI) | Theme: Blockchain and Cybersecurity</p>
+  </div>
+
+  <p class="disclaimer"><b>Note:</b> SAMARTH AI is an academic prototype developed for SIH26101. It is not an official Government of India website and implies no official endorsement by MoSPI, NSSTA, or iGOT.</p>
+
+  <div class="abstract">
+    <b>Abstract</b>&mdash;Modern public administration requires data professionals in official statistics to continually align with advancing methodologies in survey sampling, national accounts, and programmatic analytics. Traditional civil service training often implements static curricula without individualised diagnostic mapping. This paper presents <b>SAMARTH AI</b>, an integrated competency intelligence and skill gap analysis platform designed for official statistics personnel under MoSPI. The system features: (1) a multi-dimensional competency framework spanning Statistical, Technical, and Digital Governance domains (proficiency levels 0 to 5); (2) an automated skill gap analysis engine computing weighted role-readiness metrics; (3) an AI recommendation pipeline mapping deficits to certified courses on iGOT Karmayogi and NSSTA; and (4) diagnostic quiz assessments providing loop-closure competency validation. Development has advanced from foundational authentication into the core intelligence engine.
+    <br><br>
+    <b>Keywords:</b> Competency Intelligence, Skill Gap Analysis, Official Statistics, MoSPI, iGOT Karmayogi, Machine Learning, MERN Stack.
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p>Official statistics form the empirical bedrock of evidence-based policymaking, national resource planning, and economic stewardship. Compiling macroeconomic indices like CPI, GDP, and conducting nationwide surveys (such as the Periodic Labour Force Survey) necessitates rigorous statistical and technological proficiency. However, public statistical officers often operate across disparate skill baselines with minimal continuous feedback on emerging requirements such as Python/R wrangling, digital data governance, and automated survey pipelines.</p>
+
+  <h2>2. Problem Statement</h2>
+  <p>The system addresses four key challenges in capacity building: (a) absence of granular competency mapping linking job roles (e.g., Statistical Officer, ISS Officer) to standardized proficiency descriptors; (b) lack of automated gap identification quantifying skill deficits; (c) disconnected training discovery across platforms like iGOT Karmayogi; and (d) lack of verified assessment records closing the learning evaluation loop.</p>
+
+  <h2>3. Proposed Methodology & Architecture</h2>
+  <p>SAMARTH AI implements a 4-tier modular architecture built upon Node.js/Express, MongoDB Atlas, and React 19:
+  <ul>
+    <li><b>Competency Taxonomy:</b> Encodes standard domains (Statistical S01-S14, Technical T01-T14, Governance D01-D06) across 6 proficiency levels (0-None to 5-Expert).</li>
+    <li><b>Skill Gap Analysis Engine:</b> Calculates gap delta &Delta; = max(0, L_req - L_curr) and evaluates role readiness as the weighted ratio of attained to required proficiency scores. Gaps are categorized into Critical (&Delta; &ge; 2), Moderate (&Delta; = 1), and Met.</li>
+    <li><b>Learning Recommendation Engine:</b> Ranks catalogued modules from iGOT Karmayogi and NSSTA based on gap closure priority, generating contextual explanations for each recommendation.</li>
+    <li><b>Assessment & Loop Closure:</b> Delivers diagnostic evaluations that dynamically certify and update the learner's competency profile upon passing.</li>
+  </ul>
+  </p>
+
+  <h2>4. Current Implementation Status (Milestones 1 & 2)</h2>
+  <table>
+    <tr><th>Module</th><th>Features Implemented</th><th>Status</th></tr>
+    <tr><td>Identity & Security</td><td>JWT session rotation, CSRF protection, RBAC, audit logs</td><td>Complete</td></tr>
+    <tr><td>Competency Framework</td><td>30+ official statistics competencies, 6-level rubric, role profiles</td><td>Complete</td></tr>
+    <tr><td>Skill Gap Engine</td><td>Automated deficit calculation, severity tagging, role readiness score</td><td>Complete</td></tr>
+    <tr><td>Recommender System</td><td>iGOT Karmayogi course catalog integration, AI justification generator</td><td>Complete</td></tr>
+    <tr><td>Diagnostic Assessments</td><td>Item evaluation, scoring, competency level auto-upgrade</td><td>Complete</td></tr>
+  </table>
+
+  <h2>5. Conclusion & Future Work</h2>
+  <p>SAMARTH AI bridges the gap between public sector capability requirements and targeted learning discovery. By standardizing official statistics competencies and providing automated gap analysis linked to iGOT Karmayogi, the platform accelerates civil service capacity building. Future milestones will incorporate blockchain credential anchoring and LLM-driven generative assessments.</p>
+
+  <h2>6. References</h2>
+  <div class="references">
+    <p>[1] D. M. Popa, S.-V. Oprea, and A. Bâra, 'Generative-AI and the transformation of workforce: A job postings-driven analysis,' arXiv:2605.00843, 2026.</p>
+    <p>[2] M. C. Urdaneta-Ponte et al., 'Recommendation systems for education: Systematic review,' Electronics, vol. 10, no. 14, 2021.</p>
+    <p>[3] P. Lewis et al., 'Retrieval-augmented generation for knowledge-intensive NLP tasks,' in Proc. NeurIPS, 2020.</p>
+    <p>[4] S. A. Crosby and D. S. Wallach, 'Efficient data structures for tamper-evident logging,' in Proc. 18th USENIX Security Symposium, 2009.</p>
+  </div>
+</body>
+</html>

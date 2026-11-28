@@ -1,0 +1,194 @@
+[
+  {
+    "_id": "quiz_s02_level3",
+    "title": "Sampling Methods & Weight Calibration Diagnostic",
+    "domain": "Statistical",
+    "competencyId": "S02",
+    "level": 3,
+    "timeLimitMinutes": 15,
+    "passingScorePercent": 70,
+    "description": "Assess proficiency in multi-stage cluster sampling, multiplier calculation, stratification, and sample weighting.",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "In a two-stage stratified sampling design, what is the base sampling weight (multiplier) of a selected household?",
+        "options": [
+          "The product of the probabilities of selection at both stages",
+          "The inverse of the joint inclusion probability of the primary and secondary stage units",
+          "The total population divided by the total number of primary sampling units",
+          "The ratio of the sample mean to the population mean"
+        ],
+        "correctOptionIndex": 1,
+        "explanation": "The base sampling weight (multiplier) is the inverse of the inclusion probability (Horvitz-Thompson estimator): w_ij = 1 / (P(PSU_i) * P(SSU_ij | PSU_i))."
+      },
+      {
+        "id": "q2",
+        "question": "What is the primary objective of Neyman (optimum) allocation in stratified random sampling?",
+        "options": [
+          "To ensure an equal number of sample units are chosen from every stratum",
+          "To minimise the variance of the estimated mean for a fixed overall sample size when stratum variances differ",
+          "To maximise the response rate in difficult geographic strata",
+          "To eliminate non-sampling errors across field investigators"
+        ],
+        "correctOptionIndex": 1,
+        "explanation": "Neyman allocation allocates sample sizes proportionally to N_h * S_h (stratum size multiplied by stratum standard deviation), which mathematically minimises the variance of the estimator under a fixed total sample size."
+      },
+      {
+        "id": "q3",
+        "question": "What is the Design Effect (DEFF) of a cluster sampling design when the intraclass correlation coefficient (rho) is positive?",
+        "options": [
+          "DEFF is strictly equal to 1",
+          "DEFF is less than 1, indicating higher precision than simple random sampling",
+          "DEFF is greater than 1, indicating lower precision than simple random sampling of the same size",
+          "DEFF cannot be computed when clusters have unequal sizes"
+        ],
+        "correctOptionIndex": 2,
+        "explanation": "DEFF = 1 + (m - 1)*rho. When rho > 0 and cluster size m > 1, DEFF > 1. This means cluster sampling has a larger variance (standard error) than an SRS of the same total sample size."
+      },
+      {
+        "id": "q4",
+        "question": "When non-response occurs in household surveys, which technique is standardly applied to prevent non-response bias?",
+        "options": [
+          "Arbitrarily substituting the non-responding household with their next-door neighbour",
+          "Deleting the entire primary sampling unit from the analysis",
+          "Re-weighting responding households using response propensity or weighting classes within strata",
+          "Assigning a zero value to all missing household variables"
+        ],
+        "correctOptionIndex": 2,
+        "explanation": "Standard official statistical practice uses weighting class adjustments or response propensity re-weighting. Arbitrary substitution in the field introduces severe selection bias and violates probability sampling."
+      }
+    ]
+  },
+  {
+    "_id": "quiz_s05_level3",
+    "title": "Periodic Labour Force Survey (PLFS) Concepts & Indicator Derivation",
+    "domain": "Statistical",
+    "competencyId": "S05",
+    "level": 3,
+    "timeLimitMinutes": 15,
+    "passingScorePercent": 70,
+    "description": "Evaluate knowledge of activity status codes, reference periods (ps+ss vs CWS), and labour market ratios.",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Under the Usual Principal Status (UPS) approach in PLFS, what reference period is considered to determine a person's principal activity?",
+        "options": [
+          "The preceding 7 days prior to the date of survey",
+          "The major time criterion (183 days or more) during the 365 days preceding the date of survey",
+          "The exact day prior to the interview",
+          "The last completed financial quarter"
+        ],
+        "correctOptionIndex": 1,
+        "explanation": "The Usual Principal Status classifies an individual based on the activity on which they spent a relatively long time (major time criterion) during the 365 days preceding the date of survey."
+      },
+      {
+        "id": "q2",
+        "question": "How is the Worker Population Ratio (WPR) mathematically defined in official reports?",
+        "options": [
+          "(Total employed persons / Total labour force) * 100",
+          "(Total unemployed persons / Total population) * 100",
+          "(Total employed persons / Total population) * 100",
+          "(Total labour force / Total working-age population) * 100"
+        ],
+        "correctOptionIndex": 2,
+        "explanation": "Worker Population Ratio (WPR) is defined as the percentage of employed persons in the total population: (Employed / Total Population) * 100."
+      },
+      {
+        "id": "q3",
+        "question": "In the Current Weekly Status (CWS) approach, what is the minimum duration of work in the reference week required to be classified as employed?",
+        "options": [
+          "At least 40 hours during the 7 days",
+          "At least 1 hour on at least one day during the 7 days",
+          "At least 4 hours on any single day",
+          "At least half a day on every working day"
+        ],
+        "correctOptionIndex": 1,
+        "explanation": "Following ILO standards, in the Current Weekly Status (CWS), a person is considered employed if they worked for at least 1 hour on at least 1 day during the 7-day reference period."
+      }
+    ]
+  },
+  {
+    "_id": "quiz_t01_level3",
+    "title": "Python for Statistical Wrangling & Pipeline Verification",
+    "domain": "Technical",
+    "competencyId": "T01",
+    "level": 3,
+    "timeLimitMinutes": 15,
+    "passingScorePercent": 70,
+    "description": "Assess proficiency in Pandas DataFrame transformations, memory optimisation, and microdata processing.",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Which Pandas operation is the most efficient and idiomatically correct way to calculate weighted averages across survey strata?",
+        "options": [
+          "A Python for-loop iterating over df.iterrows() and appending to a list",
+          "df.groupby('stratum').apply(lambda g: (g['value'] * g['weight']).sum() / g['weight'].sum())",
+          "Using eval() in a recursive function",
+          "Converting the entire DataFrame into a nested Python dictionary first"
+        ],
+        "correctOptionIndex": 1,
+        "explanation": "Using groupby with a vectorised weighted calculation avoids slow row-by-row iteration (iterrows is notoriously slow on large microdata)."
+      },
+      {
+        "id": "q2",
+        "question": "When parsing a fixed-width text file (.dat / .txt) from an official statistical agency, which Pandas function should be used?",
+        "options": [
+          "pd.read_csv() with delimiter='\t'",
+          "pd.read_fwf() specifying colspecs or widths",
+          "pd.read_table() with regex split",
+          "pd.read_excel()"
+        ],
+        "correctOptionIndex": 1,
+        "explanation": "pd.read_fwf() (read fixed-width formatted lines) is built specifically for positional columns with fixed character widths, which is the standard format for legacy census and NSS survey releases."
+      },
+      {
+        "id": "q3",
+        "question": "How can memory footprint be drastically reduced when loading large survey datasets with millions of rows and categorical responses?",
+        "options": [
+          "Converting repetitive string columns (e.g., state codes, gender, sector) to the 'category' dtype",
+          "Increasing the pagefile size in Windows",
+          "Reading each column as an object dtype",
+          "Splitting the data into 100 individual CSV files"
+        ],
+        "correctOptionIndex": 0,
+        "explanation": "Converting low-cardinality string columns to category dtype replaces large string pointers with integer codes internally, often reducing memory usage by 70-80%."
+      }
+    ]
+  },
+  {
+    "_id": "quiz_d01_level3",
+    "title": "Data Governance, Anonymisation & DPDP Act Compliance",
+    "domain": "Digital Governance",
+    "competencyId": "D01",
+    "level": 3,
+    "timeLimitMinutes": 15,
+    "passingScorePercent": 70,
+    "description": "Assess comprehension of statistical disclosure control, respondent confidentiality, and data ethics.",
+    "questions": [
+      {
+        "id": "q1",
+        "question": "What is the primary rule of k-anonymity when preparing public-use microdata files?",
+        "options": [
+          "Every dataset must contain at least k variables",
+          "Each combination of quasi-identifiers (e.g. age, gender, postal code) must match at least k individuals in the dataset",
+          "No respondent may be surveyed more than k times in a decade",
+          "The sample size must be a multiple of k"
+        ],
+        "correctOptionIndex": 1,
+        "explanation": "k-anonymity guarantees that each record cannot be distinguished from at least k - 1 other individuals sharing the same quasi-identifiers, making individual re-identification improbable."
+      },
+      {
+        "id": "q2",
+        "question": "Under the UN Fundamental Principles of Official Statistics, what must be done with data collected for statistical compilation?",
+        "options": [
+          "It can be shared with law enforcement and tax authorities for prosecution",
+          "It must be sold to commercial entities to recoup survey costs",
+          "It is strictly confidential and used exclusively for statistical purposes",
+          "It must include respondent names and contact numbers in open datasets"
+        ],
+        "correctOptionIndex": 2,
+        "explanation": "Principle 6 of UN-FPOS mandates that individual data collected by statistical agencies for compilation, whether referring to natural or legal persons, are strictly confidential and used exclusively for statistical purposes."
+      }
+    ]
+  }
+]
