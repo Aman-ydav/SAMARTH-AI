@@ -26,10 +26,13 @@ export const roleStepSchema = z.object({
 /** Step 2: ratings keyed by competency id, each an integer 0 to 5, at least one, at most 12. */
 export const ratingsSchema = z
     .record(z.string(), z.number().int().min(0).max(MAX_LEVEL))
-    .refine((value) => Object.keys(value).length >= 1, "no-ratings")
+    .refine(
+        (value) => Object.keys(value).length >= 1,
+        "validation:onboarding.noRatings"
+    )
     .refine(
         (value) => Object.keys(value).length <= MAX_RATED_COMPETENCIES,
-        "too-many"
+        "validation:onboarding.tooManyRatings"
     );
 
 export const toRatingsPayload = (ratings) =>

@@ -1,4 +1,4 @@
-import { getMyGaps } from "@/features/competencies/api/competenciesApi";
+import { getMyGaps } from "@/features/competencies";
 import { apiClient } from "@/lib/apiClient";
 
 /** `GET /competencies/me/gaps` answers `data.gapAnalysis` (readinessScore plus a gaps list); null when absent. */

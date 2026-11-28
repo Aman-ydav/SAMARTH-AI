@@ -1,7 +1,8 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { Competency, RoleProfile } from "#modules/competency/competency.model.js";
+import { Competency } from "#modules/competency/competency.model.js";
+import { RoleProfile } from "#modules/competency/roleProfile.model.js";
 import { Course } from "#modules/learning/course.model.js";
 import { Quiz } from "#modules/assessment/quiz.model.js";
 

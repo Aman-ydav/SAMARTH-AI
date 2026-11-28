@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { userPatched } from "@/features/auth";
-import * as competenciesApi from "@/features/competencies/api/competenciesApi";
+import * as competenciesApi from "@/features/competencies";
 import * as onboardingApi from "@/features/onboarding/api/onboardingApi";
 import {
     toProfilePayload,
@@ -45,7 +45,7 @@ export const fetchRoles = createAsyncThunk(
 
 /** Saves the profile, then the self-assessment. Single-flight: a second dispatch while one runs is dropped. */
 export const submitOnboarding = createAsyncThunk(
-    "onboarding/submit",
+    "onboarding/submitOnboarding",
     async (_arg, { getState, dispatch, signal, rejectWithValue }) => {
         const { profile, ratings } = getState().onboarding;
         try {

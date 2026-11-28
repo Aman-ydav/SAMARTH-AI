@@ -1,49 +1,50 @@
 import mongoose from "mongoose";
 import { toJsonPlugin } from "#db/toJsonPlugin.js";
 
+const MAX_CURRICULUM_ITEMS = 30;
+
 const courseSchema = new mongoose.Schema(
     {
-        _id: { type: String, required: true, trim: true },
-        title: { type: String, required: true, trim: true },
+        _id: { type: String, required: true, trim: true, maxlength: 64 },
+        title: { type: String, required: true, trim: true, maxlength: 200 },
         provider: {
             type: String,
             required: true,
             enum: ["iGOT Karmayogi", "NSSTA TPAC", "MoSPI Portal"],
             default: "iGOT Karmayogi",
         },
-        domain: { type: String, required: true, trim: true },
-        competencyId: { type: String, required: true, ref: "Competency", index: true },
+        domain: { type: String, required: true, trim: true, maxlength: 80 },
+        competencyId: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: 64,
+            ref: "Competency",
+        },
         targetLevel: { type: Number, required: true, min: 1, max: 5 },
         durationHours: { type: Number, required: true, min: 1 },
         rating: { type: Number, min: 1, max: 5, default: 4.5 },
-        url: { type: String, required: true, trim: true },
-        thumbnail: { type: String, trim: true },
-        description: { type: String, required: true, trim: true },
-        curriculum: [{ type: String, trim: true }],
+        url: { type: String, required: true, trim: true, maxlength: 500 },
+        thumbnail: { type: String, trim: true, maxlength: 500 },
+        description: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: 1000,
+        },
+        curriculum: {
+            type: [{ type: String, trim: true, maxlength: 200 }],
+            validate: {
+                validator: (items) => items.length <= MAX_CURRICULUM_ITEMS,
+                message: "A course lists at most 30 curriculum items.",
+            },
+        },
     },
-    { timestamps: true }
+    { timestamps: true, collection: "courses" }
 );
 
+// serves: the catalogue filtered by competency
+courseSchema.index({ competencyId: 1 }, { name: "courses_competencyId" });
 courseSchema.plugin(toJsonPlugin);
 
-const enrolmentSchema = new mongoose.Schema(
-    {
-        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
-        courseId: { type: String, ref: "Course", required: true },
-        status: {
-            type: String,
-            enum: ["enrolled", "in_progress", "completed"],
-            default: "enrolled",
-        },
-        progressPercent: { type: Number, min: 0, max: 100, default: 0 },
-        enrolledAt: { type: Date, default: Date.now },
-        completedAt: { type: Date },
-    },
-    { timestamps: true }
-);
-
-enrolmentSchema.index({ userId: 1, courseId: 1 }, { unique: true });
-enrolmentSchema.plugin(toJsonPlugin);
-
 export const Course = mongoose.model("Course", courseSchema);
-export const Enrolment = mongoose.model("Enrolment", enrolmentSchema);

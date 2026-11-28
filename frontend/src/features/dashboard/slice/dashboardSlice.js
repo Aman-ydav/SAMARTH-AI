@@ -8,13 +8,20 @@ export const fetchDashboard = createAsyncThunk(
     "dashboard/fetchDashboard",
     async (_arg, { signal, rejectWithValue }) => {
         try {
-            const [analysis, hours] = await Promise.all([
+            const [analysisResult, hoursResult] = await Promise.allSettled([
                 dashboardApi.getGapAnalysis(undefined, { signal }),
-                dashboardApi
-                    .getPlannedHours({ signal })
-                    .catch(() => null),
+                dashboardApi.getPlannedHours({ signal }),
             ]);
-            return { analysis, hours, fetchedAt: Date.now() };
+            // The gap analysis is required: its failure fails the dashboard. The hours are optional: without them the card says "none".
+            if (analysisResult.status === "rejected")
+                return rejectWithValue(toApiError(analysisResult.reason));
+            const hours =
+                hoursResult.status === "fulfilled" ? hoursResult.value : null;
+            return {
+                analysis: analysisResult.value,
+                hours,
+                fetchedAt: Date.now(),
+            };
         } catch (error) {
             return rejectWithValue(toApiError(error));
         }

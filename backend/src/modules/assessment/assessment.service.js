@@ -2,9 +2,18 @@ import mongoose from "mongoose";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { Quiz, QuizAttempt } from "./quiz.model.js";
-import { UserCompetency } from "../competency/competency.model.js";
-import { ApiError } from "#utils/ApiError.js";
+import { ERROR_CODES } from "#constants/errorCodes.js";
+import { ApiError } from "#utils/apiError.js";
+import {
+    MAX_EVIDENCE_ENTRIES,
+    UserCompetency,
+} from "../competency/userCompetency.model.js";
+import {
+    ASSESSMENT_LIMITS,
+    QUIZ_ATTEMPT_LIMIT,
+} from "./assessment.constants.js";
+import { Quiz } from "./quiz.model.js";
+import { QuizAttempt } from "./quizAttempt.model.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SEED_DATA_DIR = path.resolve(__dirname, "../../seed/data");
@@ -25,7 +34,7 @@ export async function getQuizzes({ competencyId, domain } = {}) {
     let list = [];
     if (isDbConnected()) {
         try {
-            list = await Quiz.find().lean();
+            list = await Quiz.find().limit(ASSESSMENT_LIMITS.listMax).lean();
         } catch {
             list = [];
         }
@@ -47,10 +56,14 @@ export async function getQuizzes({ competencyId, domain } = {}) {
     }));
 
     if (competencyId) {
-        results = results.filter((q) => q.competencyId.toLowerCase() === competencyId.toLowerCase());
+        results = results.filter(
+            (q) => q.competencyId.toLowerCase() === competencyId.toLowerCase()
+        );
     }
     if (domain) {
-        results = results.filter((q) => q.domain.toLowerCase() === domain.toLowerCase());
+        results = results.filter(
+            (q) => q.domain.toLowerCase() === domain.toLowerCase()
+        );
     }
 
     return results;
@@ -70,7 +83,7 @@ export async function getQuizForAttempt(quizId) {
         quiz = fallbacks.find((q) => (q._id || q.id) === quizId);
     }
     if (!quiz) {
-        throw ApiError.notFound("QUIZ_NOT_FOUND", `Quiz '${quizId}' not found`);
+        throw ApiError.notFound(ERROR_CODES.QUIZ_NOT_FOUND);
     }
 
     // Return sanitized questions WITHOUT correctOptionIndex or explanation
@@ -93,60 +106,103 @@ export async function getQuizForAttempt(quizId) {
     };
 }
 
-export async function submitQuizAttempt(userId, quizId, userAnswers) {
-    if (!Array.isArray(userAnswers)) {
-        throw ApiError.badRequest("INVALID_ANSWERS", "Answers must be an array of { questionId, selectedOptionIndex }");
+/** The quiz with its answer key, for scoring only. The key never goes back to the client before the attempt is saved. */
+async function loadQuizWithAnswers(quizId) {
+    let quiz = null;
+    if (isDbConnected()) {
+        quiz = await Quiz.findById(quizId)
+            .select("+questions.correctOptionIndex +questions.explanation")
+            .lean();
     }
-
-    // Load full quiz with answers
-    let fullQuiz = await Quiz.findById(quizId).select("+questions.correctOptionIndex +questions.explanation").lean();
-    if (!fullQuiz) {
+    if (!quiz) {
         const fallbacks = await loadFallbackQuizzes();
-        fullQuiz = fallbacks.find((q) => (q._id || q.id) === quizId);
+        quiz = fallbacks.find((q) => (q._id || q.id) === quizId);
     }
-    if (!fullQuiz) {
-        throw ApiError.notFound("QUIZ_NOT_FOUND", `Quiz '${quizId}' not found`);
+    if (!quiz) {
+        throw ApiError.notFound(ERROR_CODES.QUIZ_NOT_FOUND);
     }
+    return quiz;
+}
 
-    const questionMap = new Map();
-    for (const q of fullQuiz.questions) {
-        questionMap.set(q.id, q);
+const invalidAnswers = (message) =>
+    ApiError.badRequest(ERROR_CODES.INVALID_ANSWERS, {
+        errors: [{ field: "answers", message }],
+    });
+
+/**
+ * One answer per question, only for questions of this quiz, each option inside the question's own options. Counting the same
+ * question twice would let a learner reach a pass by repeating one right answer, so a repeat is refused, not ignored.
+ */
+function checkAnswers(questionMap, userAnswers) {
+    const seen = new Set();
+    for (const answer of userAnswers) {
+        const question = questionMap.get(answer.questionId);
+        if (!question) throw invalidAnswers("Unknown question");
+        if (seen.has(answer.questionId))
+            throw invalidAnswers("Each question can be answered once");
+        if (answer.selectedOptionIndex >= question.options.length)
+            throw invalidAnswers("Option is out of range");
+        seen.add(answer.questionId);
     }
+}
+
+/** At most `maxAttempts` attempts per quiz in any rolling window; the oldest one in the window decides when a slot frees. */
+async function assertWithinAttemptLimit(userId, quizId) {
+    const { maxAttempts, windowMs } = QUIZ_ATTEMPT_LIMIT;
+    const now = Date.now();
+    const recent = await QuizAttempt.find({
+        userId,
+        quizId,
+        submittedAt: { $gte: new Date(now - windowMs) },
+    })
+        .sort({ submittedAt: 1 })
+        .limit(maxAttempts)
+        .select("submittedAt")
+        .lean();
+    if (recent.length < maxAttempts) return;
+    const frees = recent[0].submittedAt.getTime() + windowMs;
+    throw ApiError.tooManyRequests(ERROR_CODES.QUIZ_ATTEMPT_LIMIT, {
+        retryAfterSec: Math.max(1, Math.ceil((frees - now) / 1000)),
+    });
+}
+
+export async function submitQuizAttempt(userId, quizId, userAnswers) {
+    const fullQuiz = await loadQuizWithAnswers(quizId);
+    const savedQuizId = fullQuiz._id || fullQuiz.id;
+
+    const questionMap = new Map(fullQuiz.questions.map((q) => [q.id, q]));
+    checkAnswers(questionMap, userAnswers);
+    await assertWithinAttemptLimit(userId, savedQuizId);
 
     let correctCount = 0;
-    const answerRecords = [];
-
-    for (const ans of userAnswers) {
-        const q = questionMap.get(ans.questionId);
-        if (!q) continue;
-
-        const isCorrect = Number(ans.selectedOptionIndex) === Number(q.correctOptionIndex);
+    const answerRecords = userAnswers.map((answer) => {
+        const q = questionMap.get(answer.questionId);
+        const isCorrect = answer.selectedOptionIndex === q.correctOptionIndex;
         if (isCorrect) correctCount++;
-
-        answerRecords.push({
+        return {
             questionId: q.id,
             questionText: q.question,
-            selectedOptionIndex: Number(ans.selectedOptionIndex),
+            selectedOptionIndex: answer.selectedOptionIndex,
             correctOptionIndex: q.correctOptionIndex,
             isCorrect,
             explanation: q.explanation,
-        });
-    }
+        };
+    });
 
     const totalQuestions = fullQuiz.questions.length;
-    const scorePercent = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+    const scorePercent =
+        totalQuestions > 0
+            ? Math.round((correctCount / totalQuestions) * 100)
+            : 0;
     const passed = scorePercent >= fullQuiz.passingScorePercent;
 
-    let feedback = "";
-    if (passed) {
-        feedback = `Outstanding performance! You scored ${scorePercent}%, exceeding the ${fullQuiz.passingScorePercent}% threshold for Level ${fullQuiz.level} proficiency in ${fullQuiz.competencyId}.`;
-    } else {
-        feedback = `You scored ${scorePercent}% (required: ${fullQuiz.passingScorePercent}%). Review the questions and recommendations below to strengthen your conceptual understanding before re-attempting.`;
-    }
+    const feedback = passed
+        ? `Outstanding performance! You scored ${scorePercent}%, exceeding the ${fullQuiz.passingScorePercent}% threshold for Level ${fullQuiz.level} proficiency in ${fullQuiz.competencyId}.`
+        : `You scored ${scorePercent}% (required: ${fullQuiz.passingScorePercent}%). Review the questions and recommendations below to strengthen your conceptual understanding before re-attempting.`;
 
     const attempt = await QuizAttempt.create({
         userId,
-        quizId: fullQuiz._id || fullQuiz.id,
+        quizId: savedQuizId,
         answers: answerRecords,
         scorePercent,
         passed,
@@ -156,37 +212,38 @@ export async function submitQuizAttempt(userId, quizId, userAnswers) {
     let competencyUpdated = false;
     let newLevel = 0;
 
-    // Competency Loop Closure: If passed, upgrade user's competency level
+    // Competency loop closure: a pass raises the level, never lowers it. `$max` makes that one atomic step, so two attempts
+    // finishing together cannot overwrite a higher level with a lower one.
     if (passed) {
-        const existing = await UserCompetency.findOne({ userId, competencyId: fullQuiz.competencyId });
-        newLevel = Math.max(existing ? existing.currentLevel : 0, fullQuiz.level);
-
-        await UserCompetency.findOneAndUpdate(
+        const updated = await UserCompetency.findOneAndUpdate(
             { userId, competencyId: fullQuiz.competencyId },
             {
-                $set: {
-                    currentLevel: newLevel,
-                    lastAssessedAt: new Date(),
-                    confidenceScore: 0.9,
-                },
+                $max: { currentLevel: fullQuiz.level },
+                $set: { lastAssessedAt: new Date(), confidenceScore: 0.9 },
                 $push: {
                     evidence: {
-                        type: "quiz_attempt",
-                        sourceId: String(attempt._id),
-                        score: scorePercent,
-                        notes: `Certified Level ${newLevel} via Diagnostic Assessment (${scorePercent}%)`,
-                        earnedAt: new Date(),
+                        $each: [
+                            {
+                                type: "quiz_attempt",
+                                sourceId: String(attempt._id),
+                                score: scorePercent,
+                                notes: `Passed the Level ${fullQuiz.level} quiz (${scorePercent}%)`,
+                                earnedAt: new Date(),
+                            },
+                        ],
+                        $slice: -MAX_EVIDENCE_ENTRIES,
                     },
                 },
             },
-            { upsert: true, new: true }
+            { upsert: true, returnDocument: "after" }
         );
+        newLevel = updated.currentLevel;
         competencyUpdated = true;
     }
 
     return {
         id: String(attempt._id),
-        quizId: fullQuiz._id || fullQuiz.id,
+        quizId: savedQuizId,
         quizTitle: fullQuiz.title,
         competencyId: fullQuiz.competencyId,
         scorePercent,
@@ -203,7 +260,11 @@ export async function submitQuizAttempt(userId, quizId, userAnswers) {
 }
 
 export async function getUserAttempts(userId) {
-    const attempts = await QuizAttempt.find({ userId }).sort({ submittedAt: -1 }).lean();
+    const attempts = await QuizAttempt.find({ userId })
+        .select("quizId scorePercent passed feedback submittedAt")
+        .sort({ submittedAt: -1 })
+        .limit(ASSESSMENT_LIMITS.listMax)
+        .lean();
     return attempts.map((a) => ({
         id: a._id || a.id,
         quizId: a.quizId,
@@ -215,9 +276,12 @@ export async function getUserAttempts(userId) {
 }
 
 export async function getAttemptById(userId, attemptId) {
-    const attempt = await QuizAttempt.findOne({ _id: attemptId, userId }).lean();
+    // Scoped by owner: someone else's attempt answers 404, exactly like a missing one (AUTH-62).
+    const attempt = await QuizAttempt.findOne({ _id: attemptId, userId })
+        .select("+answers.explanation")
+        .lean();
     if (!attempt) {
-        throw ApiError.notFound("ATTEMPT_NOT_FOUND", `Attempt '${attemptId}' not found`);
+        throw ApiError.notFound(ERROR_CODES.ATTEMPT_NOT_FOUND);
     }
     return attempt;
 }

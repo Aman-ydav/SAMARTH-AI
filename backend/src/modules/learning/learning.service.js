@@ -2,9 +2,12 @@ import mongoose from "mongoose";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { Course, Enrolment } from "./course.model.js";
+import { ERROR_CODES } from "#constants/errorCodes.js";
+import { ApiError } from "#utils/apiError.js";
 import { calculateGapAnalysis } from "../competency/competency.service.js";
-import { ApiError } from "#utils/ApiError.js";
+import { Course } from "./course.model.js";
+import { Enrolment } from "./enrolment.model.js";
+import { DEFAULT_TARGET_ROLE, LEARNING_LIMITS } from "./learning.constants.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SEED_DATA_DIR = path.resolve(__dirname, "../../seed/data");
@@ -21,11 +24,18 @@ async function loadFallbackCourses() {
     }
 }
 
-export async function getCourses({ domain, competencyId, provider, search } = {}) {
+export async function getCourses({
+    domain,
+    competencyId,
+    provider,
+    search,
+} = {}) {
     let courses = [];
     if (isDbConnected()) {
         try {
-            courses = await Course.find().lean();
+            courses = await Course.find()
+                .limit(LEARNING_LIMITS.catalogueMax)
+                .lean();
         } catch {
             courses = [];
         }
@@ -50,13 +60,19 @@ export async function getCourses({ domain, competencyId, provider, search } = {}
     }));
 
     if (domain) {
-        filtered = filtered.filter((c) => c.domain.toLowerCase() === domain.toLowerCase());
+        filtered = filtered.filter(
+            (c) => c.domain.toLowerCase() === domain.toLowerCase()
+        );
     }
     if (competencyId) {
-        filtered = filtered.filter((c) => c.competencyId.toLowerCase() === competencyId.toLowerCase());
+        filtered = filtered.filter(
+            (c) => c.competencyId.toLowerCase() === competencyId.toLowerCase()
+        );
     }
     if (provider) {
-        filtered = filtered.filter((c) => c.provider.toLowerCase().includes(provider.toLowerCase()));
+        filtered = filtered.filter((c) =>
+            c.provider.toLowerCase().includes(provider.toLowerCase())
+        );
     }
     if (search) {
         const q = search.toLowerCase();
@@ -69,6 +85,12 @@ export async function getCourses({ domain, competencyId, provider, search } = {}
     }
 
     return filtered;
+}
+
+/** One page of the filtered catalogue plus the total, for the paged `GET /learning/courses`. */
+export async function listCourses(filters, { skip, limit }) {
+    const all = await getCourses(filters);
+    return { items: all.slice(skip, skip + limit), total: all.length };
 }
 
 export async function getCourseById(courseId) {
@@ -85,7 +107,7 @@ export async function getCourseById(courseId) {
         course = fallbacks.find((c) => (c._id || c.id) === courseId);
     }
     if (!course) {
-        throw ApiError.notFound("COURSE_NOT_FOUND", `Course '${courseId}' not found`);
+        throw ApiError.notFound(ERROR_CODES.COURSE_NOT_FOUND);
     }
     return {
         id: course._id || course.id,
@@ -103,7 +125,10 @@ export async function getCourseById(courseId) {
     };
 }
 
-export async function getRecommendationsForUser(userId, targetRoleId = "statistical_officer") {
+export async function getRecommendationsForUser(
+    userId,
+    targetRoleId = DEFAULT_TARGET_ROLE
+) {
     const gapAnalysis = await calculateGapAnalysis(userId, targetRoleId);
     const allCourses = await getCourses();
     const enrolments = await getUserEnrolments(userId);
@@ -161,47 +186,76 @@ export async function getRecommendationsForUser(userId, targetRoleId = "statisti
     return {
         targetRole: gapAnalysis.targetRole,
         readinessScore: gapAnalysis.readinessScore,
-        recommendations,
+        // The best matches only: the list is ranked, and a response never grows with the catalogue (BE-25).
+        recommendations: recommendations.slice(
+            0,
+            LEARNING_LIMITS.recommendationsMax
+        ),
     };
 }
 
-export async function getLearningPath(userId, targetRoleId = "statistical_officer") {
+export async function getLearningPath(
+    userId,
+    targetRoleId = DEFAULT_TARGET_ROLE
+) {
     const recResult = await getRecommendationsForUser(userId, targetRoleId);
     const courses = recResult.recommendations;
 
-    const stage1Courses = courses.filter(
-        (c) => c.matchedGap?.severity === "critical" || c.targetLevel <= 2
-    ).slice(0, 3);
+    const stage1Courses = courses
+        .filter(
+            (c) => c.matchedGap?.severity === "critical" || c.targetLevel <= 2
+        )
+        .slice(0, 3);
 
-    const stage2Courses = courses.filter(
-        (c) => c.matchedGap?.severity === "moderate" || (c.targetLevel === 3 && !stage1Courses.includes(c))
-    ).slice(0, 3);
+    const stage2Courses = courses
+        .filter(
+            (c) =>
+                c.matchedGap?.severity === "moderate" ||
+                (c.targetLevel === 3 && !stage1Courses.includes(c))
+        )
+        .slice(0, 3);
 
-    const stage3Courses = courses.filter(
-        (c) => c.targetLevel >= 4 || (!stage1Courses.includes(c) && !stage2Courses.includes(c))
-    ).slice(0, 3);
+    const stage3Courses = courses
+        .filter(
+            (c) =>
+                c.targetLevel >= 4 ||
+                (!stage1Courses.includes(c) && !stage2Courses.includes(c))
+        )
+        .slice(0, 3);
 
     const stages = [
         {
             stage: 1,
             name: "Phase 1: Foundational Skill Recovery",
-            description: "Eliminate high-risk critical gaps in fundamental survey and statistical methodology.",
+            description:
+                "Eliminate high-risk critical gaps in fundamental survey and statistical methodology.",
             courses: stage1Courses,
-            estimatedHours: stage1Courses.reduce((sum, c) => sum + c.durationHours, 0),
+            estimatedHours: stage1Courses.reduce(
+                (sum, c) => sum + c.durationHours,
+                0
+            ),
         },
         {
             stage: 2,
             name: "Phase 2: Core Official Statistics Domain Proficiency",
-            description: "Master primary data collection, index compilation, and regulatory standards.",
+            description:
+                "Master primary data collection, index compilation, and regulatory standards.",
             courses: stage2Courses,
-            estimatedHours: stage2Courses.reduce((sum, c) => sum + c.durationHours, 0),
+            estimatedHours: stage2Courses.reduce(
+                (sum, c) => sum + c.durationHours,
+                0
+            ),
         },
         {
             stage: 3,
             name: "Phase 3: Advanced Analytics, Inference & Modernization",
-            description: "Adopt programmatic tooling, automation pipelines, and advanced predictive methods.",
+            description:
+                "Adopt programmatic tooling, automation pipelines, and advanced predictive methods.",
             courses: stage3Courses,
-            estimatedHours: stage3Courses.reduce((sum, c) => sum + c.durationHours, 0),
+            estimatedHours: stage3Courses.reduce(
+                (sum, c) => sum + c.durationHours,
+                0
+            ),
         },
     ];
 
@@ -227,7 +281,7 @@ export async function enrollInCourse(userId, courseId) {
                 enrolledAt: new Date(),
             },
         },
-        { upsert: true, new: true }
+        { upsert: true, returnDocument: "after" }
     );
 
     return enrolment;
@@ -237,7 +291,10 @@ export async function getUserEnrolments(userId) {
     let enrolments = [];
     if (isDbConnected()) {
         try {
-            enrolments = await Enrolment.find({ userId }).sort({ enrolledAt: -1 }).lean();
+            enrolments = await Enrolment.find({ userId })
+                .sort({ enrolledAt: -1 })
+                .limit(LEARNING_LIMITS.listMax)
+                .lean();
         } catch {
             enrolments = [];
         }
@@ -252,25 +309,34 @@ export async function getUserEnrolments(userId) {
     }));
 }
 
-export async function updateEnrolmentProgress(userId, courseId, progressPercent) {
-    const safeProgress = Math.max(0, Math.min(100, Number(progressPercent) || 0));
-    const status = safeProgress >= 100 ? "completed" : safeProgress > 0 ? "in_progress" : "enrolled";
-    const completedAt = safeProgress >= 100 ? new Date() : null;
+export async function updateEnrolmentProgress(
+    userId,
+    courseId,
+    progressPercent
+) {
+    // `progressPercent` is an integer 0 to 100 by the time it gets here (strict body validation).
+    const status =
+        progressPercent >= 100
+            ? "completed"
+            : progressPercent > 0
+              ? "in_progress"
+              : "enrolled";
+    const completedAt = progressPercent >= 100 ? new Date() : null;
 
     const enrolment = await Enrolment.findOneAndUpdate(
         { userId, courseId },
         {
             $set: {
-                progressPercent: safeProgress,
+                progressPercent,
                 status,
                 ...(completedAt ? { completedAt } : {}),
             },
         },
-        { new: true }
+        { returnDocument: "after" }
     );
 
     if (!enrolment) {
-        throw ApiError.notFound("ENROLMENT_NOT_FOUND", `Enrolment for course '${courseId}' not found`);
+        throw ApiError.notFound(ERROR_CODES.ENROLMENT_NOT_FOUND);
     }
 
     return enrolment;
