@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { LoadErrorAlert } from "@/components/common/LoadErrorAlert";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CompetencyCard } from "@/features/competencies/components/CompetencyCard";
 import {
     domainsOf,
@@ -87,7 +87,7 @@ export default function CompetenciesPage() {
                     {t("competencies.intro")}
                 </p>
             </header>
-            {items.length > 0 && (
+            {items.length > 0 ? (
                 <Tabs value={domain} onValueChange={setDomain}>
                     <TabsList
                         aria-label={t("competencies.filter")}
@@ -102,9 +102,13 @@ export default function CompetenciesPage() {
                             </TabsTrigger>
                         ))}
                     </TabsList>
+                    <TabsContent value={domain} className="mt-4">
+                        {body}
+                    </TabsContent>
                 </Tabs>
+            ) : (
+                body
             )}
-            {body}
         </main>
     );
 }
