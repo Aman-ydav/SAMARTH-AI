@@ -128,27 +128,45 @@ export async function appendAudit(
 }
 
 /**
+ * The single integrity check of the chain, with no database access: walks `rows` in order from the state the previous
+ * segment ended in and stops at the first entry whose sequence, previous hash or own hash does not match. Real
+ * verification (`verifyAuditChain`) and the tamper demo both run exactly this, so a demo "detected" is the real check.
+ * Returns `{ valid: false, brokenAtSeq }` or `{ valid: true, nextSeq, nextPrev }` for the next segment.
+ */
+export function checkChainSegment(
+    rows,
+    { expectedSeq = 1, expectedPrev = AUDIT_GENESIS_HASH } = {}
+) {
+    let seq = expectedSeq;
+    let prev = expectedPrev;
+    for (const row of rows) {
+        const intact =
+            row.seq === seq &&
+            row.prevHash === prev &&
+            row.hash === computeAuditHash(row);
+        if (!intact) return { valid: false, brokenAtSeq: row.seq };
+        prev = row.hash;
+        seq += 1;
+    }
+    return { valid: true, nextSeq: seq, nextPrev: prev };
+}
+
+/**
  * Recomputes the whole chain in order. Returns `{ valid: true, count }`, or `{ valid: false, brokenAtSeq }` at the
  * first entry whose sequence, previous hash or own hash does not match.
  */
 export async function verifyAuditChain({ batchSize = VERIFY_BATCH_SIZE } = {}) {
-    let expectedSeq = 1;
-    let expectedPrev = AUDIT_GENESIS_HASH;
+    let state = { expectedSeq: 1, expectedPrev: AUDIT_GENESIS_HASH };
     for (;;) {
-        const batch = await AuditLog.find({ seq: gte(expectedSeq) })
+        const batch = await AuditLog.find({ seq: gte(state.expectedSeq) })
             .sort({ seq: 1 })
             .limit(batchSize)
             .lean();
         if (batch.length === 0) break;
-        for (const row of batch) {
-            const intact =
-                row.seq === expectedSeq &&
-                row.prevHash === expectedPrev &&
-                row.hash === computeAuditHash(row);
-            if (!intact) return { valid: false, brokenAtSeq: row.seq };
-            expectedPrev = row.hash;
-            expectedSeq += 1;
-        }
+        const result = checkChainSegment(batch, state);
+        if (!result.valid)
+            return { valid: false, brokenAtSeq: result.brokenAtSeq };
+        state = { expectedSeq: result.nextSeq, expectedPrev: result.nextPrev };
     }
-    return { valid: true, count: expectedSeq - 1 };
+    return { valid: true, count: state.expectedSeq - 1 };
 }

@@ -60,6 +60,7 @@ export function shapeConfig(v) {
             dailyCapPerUser: v.LLM_DAILY_CAP_PER_USER,
             cacheTtlDays: v.LLM_CACHE_TTL_DAYS,
         },
+        audit: { tamperDemo: v.AUDIT_TAMPER_DEMO },
         // Platform admins (R68): PLATFORM_ADMINS plus the legacy seed pair, synced on every server start.
         platformAdmins: Object.freeze(
             mergePlatformAdmins(v.PLATFORM_ADMINS, {

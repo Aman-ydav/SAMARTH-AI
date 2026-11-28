@@ -129,6 +129,8 @@ export const envFields = {
         .default(30_000),
     LLM_DAILY_CAP_PER_USER: z.coerce.number().int().min(1).default(200),
     LLM_CACHE_TTL_DAYS: z.coerce.number().int().min(1).max(365).default(7),
+    // Turns on POST /admin/audit/demo/tamper (doc 10 section 5): a read-only simulation, so it is safe in any environment.
+    AUDIT_TAMPER_DEMO: flag(false),
     PLATFORM_ADMINS: platformAdminsField,
     SEED_ADMIN_EMAIL: z.email().optional(),
     SEED_ADMIN_PASSWORD: z.string().min(10).max(72).optional(),
