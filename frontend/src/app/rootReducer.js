@@ -13,9 +13,12 @@ import {
     auditReducer,
     invitesReducer,
 } from "@/features/admin";
+import { adminUsersReducer, invitesReducer } from "@/features/admin";
+import { competencyProfileReducer } from "@/features/competencies/slice/competencyProfileSlice";
 import { dashboardReducer } from "@/features/dashboard/slice/dashboardSlice";
 import { notificationsReducer } from "@/features/notifications";
 import { onboardingReducer } from "@/features/onboarding";
+import { quizReducer } from "@/features/quiz/slice/quizSlice";
 import { uiReducer } from "@/features/preferences";
 
 const appReducer = combineReducers({
@@ -27,9 +30,11 @@ const appReducer = combineReducers({
     invites: invitesReducer,
     adminUsers: adminUsersReducer,
     audit: auditReducer,
+    competencyProfile: competencyProfileReducer,
     dashboard: dashboardReducer,
     notifications: notificationsReducer,
     onboarding: onboardingReducer,
+    quiz: quizReducer,
     ui: uiReducer,
 });
 

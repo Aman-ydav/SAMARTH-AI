@@ -87,6 +87,16 @@ export const lazyDashboard = () =>
     import("@/features/dashboard/pages/DashboardPage.jsx").then(toRoute);
 export const lazyGaps = () =>
     import("@/features/competencies/pages/GapsPage.jsx").then(toRoute);
+export const lazyCompetencies = () =>
+    import("@/features/competencies/pages/CompetenciesPage.jsx").then(toRoute);
+export const lazyQuizzes = () =>
+    import("@/features/quiz/pages/QuizzesPage.jsx").then(toRoute);
+export const lazyQuizDetail = () =>
+    import("@/features/quiz/pages/QuizDetailPage.jsx").then(toRoute);
+export const lazyQuizAttempt = () =>
+    import("@/features/quiz/pages/QuizAttemptPage.jsx").then(toRoute);
+export const lazyQuizResult = () =>
+    import("@/features/quiz/pages/QuizResultPage.jsx").then(toRoute);
 export const lazyRecommendations = () =>
     import("@/features/learning/pages/RecommendationsPage.jsx").then(toRoute);
 export const lazyHelp = () =>
