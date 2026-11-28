@@ -1,0 +1,50 @@
+{
+    "page": {
+        "title": "Notifications",
+        "subtitle": "Updates about the tasks you started and your activity.",
+        "filterLabel": "Filter notifications",
+        "all": "All",
+        "unread": "Unread",
+        "markAllRead": "Mark all as read"
+    },
+    "empty": {
+        "allTitle": "You are all caught up",
+        "allBody": "New notifications will appear here.",
+        "unreadTitle": "No unread notifications",
+        "unreadBody": "You have read everything. Choose All to see older notifications.",
+        "showAll": "Show all"
+    },
+    "row": {
+        "unread": "Unread",
+        "markRead": "Mark as read",
+        "dismiss": "Dismiss"
+    },
+    "menu": {
+        "listLabel": "Recent notifications",
+        "markAllRead": "Mark all as read"
+    },
+    "types": {
+        "jobCompleted": {
+            "title": "Task finished",
+            "body": "A background task you started has finished."
+        },
+        "jobFailed": {
+            "title": "Task could not be completed",
+            "body": "A background task you started could not be completed. Please try again."
+        },
+        "unknown": {
+            "title": "New notification",
+            "body": "There is a new update for you."
+        }
+    },
+    "errors": {
+        "notFound": "This notification no longer exists."
+    },
+    "pagination": {
+        "total_one": "{{count}} notification",
+        "total_other": "{{count}} notifications",
+        "previous": "Previous",
+        "next": "Next",
+        "label": "Page {{page}} of {{pages}}"
+    }
+}

@@ -18,6 +18,7 @@ export const NAMESPACES = Object.freeze([
     "footer",
     "validation",
     "admin",
+    "notifications",
 ]);
 export const DEFAULT_NAMESPACE = "common";
 const BUNDLED_NAMESPACES = [

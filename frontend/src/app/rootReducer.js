@@ -9,6 +9,7 @@ import {
     sessionsReducer,
 } from "@/features/auth";
 import { adminUsersReducer, invitesReducer } from "@/features/admin";
+import { notificationsReducer } from "@/features/notifications";
 import { onboardingReducer } from "@/features/onboarding";
 import { uiReducer } from "@/features/preferences";
 
@@ -20,6 +21,7 @@ const appReducer = combineReducers({
     sessions: sessionsReducer,
     invites: invitesReducer,
     adminUsers: adminUsersReducer,
+    notifications: notificationsReducer,
     onboarding: onboardingReducer,
     ui: uiReducer,
 });

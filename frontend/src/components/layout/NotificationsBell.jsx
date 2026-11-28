@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { BellIcon } from "@/components/icons";
@@ -16,11 +17,19 @@ import { PATHS } from "@/lib/paths";
 const MAX_BADGE = 99;
 
 /**
- * Bell with an unread-count badge (capped at 99+) opening a popover list (UI-61). There is no notifications source
- * yet, so the list is the empty state; `unreadCount` is the seam for the future notifications slice.
+ * Bell with an unread-count badge (capped at 99+) opening a popover list (UI-61). It stays presentational: the live
+ * count and the list come from `features/notifications` (`NotificationsMenu`), which passes `unreadCount`, an
+ * `onOpenChange` callback and the list as `children` (a node, or a function that receives `{ close }` so the list can
+ * close the popover when a notification is opened). Without `children` it shows the empty state.
  */
-export function NotificationsBell({ unreadCount = 0 }) {
+export function NotificationsBell({ unreadCount = 0, onOpenChange, children }) {
     const { t, i18n } = useTranslation("nav");
+    const [open, setOpen] = useState(false);
+    const close = () => setOpen(false);
+    const handleOpenChange = (next) => {
+        setOpen(next);
+        onOpenChange?.(next);
+    };
     const count =
         Number.isFinite(unreadCount) && unreadCount > 0
             ? Math.floor(unreadCount)
@@ -31,7 +40,7 @@ export function NotificationsBell({ unreadCount = 0 }) {
             : formatNumber(count, i18n.language);
 
     return (
-        <Popover>
+        <Popover open={open} onOpenChange={handleOpenChange}>
             <PopoverTrigger asChild>
                 <Button
                     variant="ghost"
@@ -62,20 +71,28 @@ export function NotificationsBell({ unreadCount = 0 }) {
                 <PopoverHeader>
                     <PopoverTitle>{t("notifications.title")}</PopoverTitle>
                 </PopoverHeader>
-                <div className="flex flex-col items-center gap-2 py-4 text-center">
-                    <BellIcon
-                        className="size-6 text-muted-foreground"
-                        aria-hidden="true"
-                    />
-                    <p className="font-medium text-foreground">
-                        {t("notifications.emptyTitle")}
-                    </p>
-                    <p className="text-muted-foreground">
-                        {t("notifications.emptyBody")}
-                    </p>
-                </div>
+                {children ? (
+                    typeof children === "function" ? (
+                        children({ close })
+                    ) : (
+                        children
+                    )
+                ) : (
+                    <div className="flex flex-col items-center gap-2 py-4 text-center">
+                        <BellIcon
+                            className="size-6 text-muted-foreground"
+                            aria-hidden="true"
+                        />
+                        <p className="font-medium text-foreground">
+                            {t("notifications.emptyTitle")}
+                        </p>
+                        <p className="text-muted-foreground">
+                            {t("notifications.emptyBody")}
+                        </p>
+                    </div>
+                )}
                 <Button variant="outline" asChild>
-                    <Link to={PATHS.notifications}>
+                    <Link to={PATHS.notifications} onClick={close}>
                         {t("notifications.viewAll")}
                     </Link>
                 </Button>
