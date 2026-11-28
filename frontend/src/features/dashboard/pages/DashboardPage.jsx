@@ -4,6 +4,7 @@ import { RadarIcon } from "@/components/icons";
 import { RoleBadge } from "@/components/layout/RoleBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { LearnerOverview } from "@/features/dashboard/components/LearnerOverview";
 import { NextStepCard } from "@/features/dashboard/components/NextStepCard";
 import { useAuth } from "@/features/auth";
 import { getDisplayName, getNextSteps } from "@/lib/navigation";
@@ -79,25 +80,29 @@ export default function DashboardPage() {
                 <h2 id="dashboard-overview" className="type-h3 text-foreground">
                     {t("dashboard.overview.title")}
                 </h2>
-                <Card>
-                    <CardContent className="flex flex-col items-center gap-3 py-6 text-center">
-                        <RadarIcon
-                            className="size-6 text-muted-foreground"
-                            aria-hidden="true"
-                        />
-                        <p className="font-medium text-card-foreground">
-                            {t("dashboard.overview.emptyTitle")}
-                        </p>
-                        <p className="max-w-prose text-muted-foreground">
-                            {t("dashboard.overview.emptyBody")}
-                        </p>
-                        <Button asChild>
-                            <Link to={PATHS.settingsProfile}>
-                                {t("dashboard.overview.action")}
-                            </Link>
-                        </Button>
-                    </CardContent>
-                </Card>
+                {user?.role === "learner" || !user?.role ? (
+                    <LearnerOverview />
+                ) : (
+                    <Card>
+                        <CardContent className="flex flex-col items-center gap-3 py-6 text-center">
+                            <RadarIcon
+                                className="size-6 text-muted-foreground"
+                                aria-hidden="true"
+                            />
+                            <p className="font-medium text-card-foreground">
+                                {t("dashboard.overview.emptyTitle")}
+                            </p>
+                            <p className="max-w-prose text-muted-foreground">
+                                {t("dashboard.overview.emptyBody")}
+                            </p>
+                            <Button asChild>
+                                <Link to={PATHS.settingsProfile}>
+                                    {t("dashboard.overview.action")}
+                                </Link>
+                            </Button>
+                        </CardContent>
+                    </Card>
+                )}
             </section>
         </main>
     );

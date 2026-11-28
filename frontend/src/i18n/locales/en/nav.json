@@ -95,6 +95,27 @@
             "admin": "This is your administration home. Invite trainers and manage accounts from here; workforce views will appear as those parts of the prototype are built.",
             "superadmin": "This is your platform home. Manage organisations, invite teams and oversee accounts and roles from here; framework and system tools are planned for later."
         },
+        "readiness": "Role readiness: {{score}}%",
+        "severity": {
+            "critical": "Critical",
+            "high": "High",
+            "moderate": "Moderate",
+            "medium": "Medium",
+            "low": "Low",
+            "met": "Met"
+        },
+        "gaps": {
+            "title": "Top skill gaps",
+            "hint": "The competencies furthest below what your role requires.",
+            "none": "No open gaps. You meet every requirement of your role.",
+            "levels": "Level {{current}} of {{required}} required"
+        },
+        "hours": {
+            "label": "Planned learning hours",
+            "none": "No learning plan yet",
+            "value_one": "{{count}} hour",
+            "value_other": "{{count}} hours"
+        },
         "roleLabel": "Your role",
         "nextSteps": "What comes next",
         "nextStepsHint": "Some of these areas are ready to use; the rest are planned for later milestones of the prototype.",

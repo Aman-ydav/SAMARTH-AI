@@ -26,6 +26,17 @@
     "goBack": "Go back",
     "goToDashboard": "Go to dashboard",
     "or": "or",
+    "charts": {
+        "radar": {
+            "title": "Skills against role requirements",
+            "current": "Current level",
+            "required": "Required level",
+            "axis": "Competency",
+            "aria": "Radar chart comparing current and required level for {{count}} competencies, scale 0 to 5",
+            "empty": "No competency data to chart yet.",
+            "error": "The chart could not be shown."
+        }
+    },
     "onboarding": {
         "title": "Welcome to SAMARTH AI",
         "progress": "Step {{step}} of {{total}}",
