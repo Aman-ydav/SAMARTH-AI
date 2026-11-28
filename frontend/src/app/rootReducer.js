@@ -13,7 +13,6 @@ import {
     auditReducer,
     invitesReducer,
 } from "@/features/admin";
-import { adminUsersReducer, invitesReducer } from "@/features/admin";
 import { competencyProfileReducer } from "@/features/competencies/slice/competencyProfileSlice";
 import { dashboardReducer } from "@/features/dashboard/slice/dashboardSlice";
 import { notificationsReducer } from "@/features/notifications";
