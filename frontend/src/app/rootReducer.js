@@ -10,6 +10,7 @@ import {
 } from "@/features/auth";
 import { adminUsersReducer, invitesReducer } from "@/features/admin";
 import { dashboardReducer } from "@/features/dashboard/slice/dashboardSlice";
+import { notificationsReducer } from "@/features/notifications";
 import { onboardingReducer } from "@/features/onboarding";
 import { uiReducer } from "@/features/preferences";
 
@@ -22,6 +23,7 @@ const appReducer = combineReducers({
     invites: invitesReducer,
     adminUsers: adminUsersReducer,
     dashboard: dashboardReducer,
+    notifications: notificationsReducer,
     onboarding: onboardingReducer,
     ui: uiReducer,
 });
