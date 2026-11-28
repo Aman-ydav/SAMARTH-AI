@@ -49,7 +49,6 @@ const userSchema = new mongoose.Schema(
         orgId: {
             type: mongoose.Schema.Types.ObjectId,
             required: requiredCode("ORG_REQUIRED"),
-            immutable: true,
         },
         email: {
             type: String,
@@ -165,6 +164,8 @@ userSchema.index(
     { orgId: 1, createdAt: -1 },
     { name: "users_orgId_createdAt" }
 );
+// serves: platform-admin global user lists
+userSchema.index({ createdAt: -1 }, { name: "users_createdAt" });
 // serves: the deletion job that anonymises accounts whose grace period ended
 userSchema.index(
     { status: 1, deletionScheduledAt: 1 },

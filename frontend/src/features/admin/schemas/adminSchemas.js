@@ -10,14 +10,16 @@ export const SEARCH_MAX_LENGTH = 64;
 const MESSAGES = {
     roleRequired: "admin:invites.form.roleRequired",
     roleInvalid: "admin:users.roleDialog.roleRequired",
+    organisationRequired: "admin:invites.form.organisationRequired",
 };
 
 /**
  * Invite form for one signed-in role: the email as the API wants it (trimmed, lowercased, at most 254 characters) and a
  * role that is one of the roles this person may grant (R68). A role outside the list fails here and, if forced, at the API.
  */
-export const makeInviteSchema = (allowedRoles) =>
-    z.object({
+export const makeInviteSchema = (allowedRoles, requireOrganisation = false) =>
+    z
+        .object({
         email: emailField,
         role: z
             .string(MESSAGES.roleRequired)
@@ -25,13 +27,28 @@ export const makeInviteSchema = (allowedRoles) =>
                 (role) => allowedRoles.includes(role),
                 MESSAGES.roleRequired
             ),
-    });
+            organisationId: z
+                .string()
+                .regex(
+                    /^[a-f0-9]{24}$/i,
+                    MESSAGES.organisationRequired
+                )
+                .or(z.literal(""))
+                .default(""),
+        })
+        .refine(
+            (data) => !requireOrganisation || Boolean(data.organisationId),
+            {
+                path: ["organisationId"],
+                message: MESSAGES.organisationRequired,
+            }
+        );
 
 const INVITE_SCHEMAS = Object.freeze(
     Object.fromEntries(
         Object.entries(INVITE_GRANTS).map(([role, granted]) => [
             role,
-            makeInviteSchema(granted),
+            makeInviteSchema(granted, role === "superadmin"),
         ])
     )
 );
@@ -76,6 +93,11 @@ const usersQuerySchema = z.object({
         .optional()
         .catch(undefined),
     status: z.enum(USER_STATUSES).optional().catch(undefined),
+    organisationId: z
+        .string()
+        .regex(/^[a-f0-9]{24}$/i)
+        .optional()
+        .catch(undefined),
 });
 
 const entries = (params) =>

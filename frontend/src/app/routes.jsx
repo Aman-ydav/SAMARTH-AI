@@ -49,6 +49,7 @@ import {
     lazyOnboarding,
     lazyAdminInvites,
     lazyAdminUsers,
+    lazyOrganisations,
 } from "@/app/lazyPages";
 
 /*
@@ -168,7 +169,11 @@ const adminRoutes = [
 ];
 
 const superadminRoutes = [
-    soon(PATHS.superadminOrganisations, "nav:sidebar.organisations"),
+    route(
+        PATHS.superadminOrganisations,
+        lazyOrganisations,
+        "nav:sidebar.organisations"
+    ),
     soon(PATHS.superadminFramework, "nav:sidebar.framework"),
     soon(PATHS.superadminSystem, "nav:sidebar.system"),
 ];

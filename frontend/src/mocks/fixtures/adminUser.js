@@ -2,6 +2,7 @@
 export function makeAdminUser(overrides = {}) {
     return {
         id: "64b7f0c2a1b2c3d4e5f60301",
+        orgId: "000000000000000000000001",
         email: "ravi.kumar@example.test",
         name: "Ravi Kumar",
         role: "learner",

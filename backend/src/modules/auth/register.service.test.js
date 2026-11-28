@@ -49,7 +49,7 @@ describe("registerUser: a new address (AUTH-26..28)", () => {
             input({ email: "  ANA.New@Example.TEST " }),
             ctx
         );
-        expect(result).toBeUndefined();
+        expect(result).toEqual({ verificationRequired: true });
         const user = await User.findOne({
             email: "ana.new@example.test",
         }).select("+passwordHash");
@@ -122,7 +122,7 @@ describe("registerUser: existing addresses give no signal (AUTH-27)", () => {
             input({ email: owner.email, name: "Impostor" }),
             ctx
         );
-        expect(result).toBeUndefined();
+        expect(result).toEqual({ verificationRequired: true });
         expect(await User.countDocuments({})).toBe(1);
         expect((await User.findById(owner._id).lean()).name).toBe("Real Owner");
         expect(await AuthToken.countDocuments({})).toBe(0);
@@ -240,10 +240,10 @@ describe("registerUser: policy errors", () => {
         });
         await expect(
             registerUser(input({ email: "x@mospi.gov.in" }), ctx)
-        ).resolves.toBeUndefined();
+        ).resolves.toEqual({ verificationRequired: true });
         await expect(
             registerUser(input({ email: "y@nic.in" }), ctx)
-        ).resolves.toBeUndefined();
+        ).resolves.toEqual({ verificationRequired: true });
         await expect(
             registerUser(input({ email: "z@notgov.in" }), ctx)
         ).rejects.toMatchObject({ code: "DOMAIN_NOT_ALLOWED" });

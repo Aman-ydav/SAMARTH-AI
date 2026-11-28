@@ -1,6 +1,7 @@
 import { vi } from "vitest";
 import { createAdminRouter } from "#modules/admin/index.js";
 import { createAuthRouter } from "#modules/auth/index.js";
+import { createOrganisationRouter } from "#modules/organisations/index.js";
 import { createUsersRouter } from "#modules/users/index.js";
 import { TEST_PASSWORD } from "#tests/factories/user.factory.js";
 import { buildApp } from "./appFactory.js";
@@ -27,6 +28,7 @@ export function buildAuthApp({
             );
             api.use("/profile", createUsersRouter(deps));
             api.use("/admin", createAdminRouter(deps));
+            api.use("/organisations", createOrganisationRouter(deps));
             extraRoutes?.(api, deps);
         },
     });

@@ -301,7 +301,7 @@ describe("GET /admin/invites", () => {
         }
     });
 
-    it("never shows another org's invites", async () => {
+    it("shows cross-organisation invites to platform admins", async () => {
         const { asPlatform } = await world();
         await Invite.create({
             orgId: newObjectId(),
@@ -311,9 +311,12 @@ describe("GET /admin/invites", () => {
             tokenId: newObjectId(),
             expiresAt: new Date(Date.now() + 86_400_000),
         });
-        expect(
-            expectSuccess(await asPlatform.agent.get(INVITES)).data.invites
-        ).toEqual([]);
+        const invites = expectSuccess(
+            await asPlatform.agent.get(INVITES)
+        ).data.invites;
+        expect(invites.map((invite) => invite.email)).toEqual([
+            "foreign@example.test",
+        ]);
     });
 });
 

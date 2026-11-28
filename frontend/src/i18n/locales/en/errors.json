@@ -139,6 +139,8 @@
         "CORS_ORIGIN_DENIED": "This request was blocked for security reasons.",
         "CSRF_INVALID": "Your session check failed. Reload the page and try again.",
         "DOMAIN_NOT_ALLOWED": "This email domain is not allowed.",
+        "ORGANISATION_INACTIVE": "This organisation is inactive. Contact your platform administrator.",
+        "ORGANISATION_UNAVAILABLE": "This organisation is not available for registration.",
         "EMAIL_CHANGE_INVALID": "This email-change link is invalid or has expired.",
         "EMAIL_NOT_VERIFIED": "Your email is not verified yet. Check your inbox or request a new link.",
         "FILE_TOO_LARGE": "That file is too large.",

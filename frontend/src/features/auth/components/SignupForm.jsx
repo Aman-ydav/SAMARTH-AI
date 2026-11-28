@@ -21,9 +21,17 @@ import {
 import { registerUser } from "@/features/auth/slice/registrationSlice";
 import { PATHS } from "@/lib/paths";
 
-const FIELDS = ["name", "email", "password", "confirmPassword", "acceptTerms"];
+const FIELDS = [
+    "name",
+    "email",
+    "organisationCode",
+    "password",
+    "confirmPassword",
+    "acceptTerms",
+];
 const CODE_FIELDS = Object.freeze({
     DOMAIN_NOT_ALLOWED: "email",
+    ORGANISATION_UNAVAILABLE: "organisationCode",
     PASSWORD_POLICY: "password",
 });
 const EMPTY_VALUES = Object.freeze({
@@ -32,6 +40,7 @@ const EMPTY_VALUES = Object.freeze({
     password: "",
     confirmPassword: "",
     acceptTerms: false,
+    organisationCode: "",
 });
 
 const newTabLink = { target: "_blank", rel: "noopener noreferrer" };
@@ -53,9 +62,9 @@ export function SignupForm({ defaultValues }) {
         defaultValues: { ...EMPTY_VALUES, ...defaultValues },
     });
     const submit = useAuthFormSubmit(form, FIELDS, CODE_FIELDS);
-    const [password, email, name] = useWatch({
+    const [password, email, name, organisationCode] = useWatch({
         control: form.control,
-        name: ["password", "email", "name"],
+        name: ["password", "email", "name", "organisationCode"],
     });
     const labels = {
         name: t("name"),
@@ -63,13 +72,21 @@ export function SignupForm({ defaultValues }) {
         password: t("password"),
         confirmPassword: t("confirmPassword"),
         acceptTerms: t("signup.terms"),
+        organisationCode: t("signup.organisationCode"),
     };
 
     const onSubmit = form.handleSubmit(
         (values) =>
             submit.run(async () => {
-                await dispatch(registerUser(toRegisterBody(values))).unwrap();
-                navigate(PATHS.verifyEmailSent);
+                const result = await dispatch(
+                    registerUser(toRegisterBody(values))
+                ).unwrap();
+                navigate(PATHS.verifyEmailSent, {
+                    state: {
+                        verificationRequired:
+                            result?.verificationRequired !== false,
+                    },
+                });
             }),
         () => setSummarySignal((count) => count + 1)
     );
@@ -103,6 +120,14 @@ export function SignupForm({ defaultValues }) {
                         label={labels.email}
                         autoComplete="email"
                         placeholder={t("placeholder.email")}
+                    />
+                    <AuthField
+                        form={form}
+                        name="organisationCode"
+                        label={labels.organisationCode}
+                        autoComplete="organization"
+                        description={t("signup.organisationCodeHint")}
+                        placeholder={t("signup.organisationCodePlaceholder")}
                     />
                     <AuthField
                         form={form}
@@ -169,6 +194,7 @@ export function SignupForm({ defaultValues }) {
                 </SubmitButton>
             </form>
             <GoogleButton
+                organisationCode={organisationCode}
                 onSession={flow.onSuccess}
                 onFailure={flow.onFailure}
             />

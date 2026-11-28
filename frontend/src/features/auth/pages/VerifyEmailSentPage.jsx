@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Link, Navigate } from "react-router";
+import { Link, Navigate, useLocation } from "react-router";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { MailSendIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
@@ -24,9 +24,18 @@ export default function VerifyEmailSentPage() {
     const { t } = useTranslation(["auth", "common"]);
     const dispatch = useAppDispatch();
     const email = useAppSelector(selectPendingEmail);
+    const location = useLocation();
+    const verificationRequired =
+        location.state?.verificationRequired !== false;
 
     useDocumentTitle(
-        t("common:documentTitle", { page: t("verifySent.title") })
+        t("common:documentTitle", {
+            page: t(
+                verificationRequired
+                    ? "verifySent.title"
+                    : "signup.readyTitle"
+            ),
+        })
     );
 
     if (!email) return <Navigate to={PATHS.signup} replace />;
@@ -34,23 +43,44 @@ export default function VerifyEmailSentPage() {
     return (
         <AuthCard
             icon={MailSendIcon}
-            title={t("verifySent.title")}
-            description={t("verifySent.body", { email })}
+            title={t(
+                verificationRequired
+                    ? "verifySent.title"
+                    : "signup.readyTitle"
+            )}
+            description={t(
+                verificationRequired
+                    ? "verifySent.body"
+                    : "signup.readyBody",
+                { email }
+            )}
         >
             <div className="flex flex-col gap-4">
                 <p className="text-sm text-muted-foreground">
-                    {t("verifySent.hint")}
+                    {t(
+                        verificationRequired
+                            ? "verifySent.hint"
+                            : "signup.readyHint"
+                    )}
                 </p>
-                <ResendCountdown
-                    label={t("verifySent.primary")}
-                    initialSec={COOLDOWN_SEC}
-                    onResend={() =>
-                        dispatch(resendVerification({ email })).unwrap()
-                    }
-                />
-                <p className="text-sm text-muted-foreground">
-                    {t("verifySent.changeHint")}
-                </p>
+                {verificationRequired ? (
+                    <ResendCountdown
+                        label={t("verifySent.primary")}
+                        initialSec={COOLDOWN_SEC}
+                        onResend={() =>
+                            dispatch(resendVerification({ email })).unwrap()
+                        }
+                    />
+                ) : (
+                    <Button asChild>
+                        <Link to={PATHS.login}>{t("signup.signInNow")}</Link>
+                    </Button>
+                )}
+                {verificationRequired && (
+                    <p className="text-sm text-muted-foreground">
+                        {t("verifySent.changeHint")}
+                    </p>
+                )}
                 <Button asChild variant="outline">
                     <Link
                         to={PATHS.signup}

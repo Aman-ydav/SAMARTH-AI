@@ -4,9 +4,14 @@ import { ERROR_CODES } from "#constants/errorCodes.js";
 import { INVITE_GRANTS, ROLES } from "#constants/roles.js";
 import { INVITE_STATUSES } from "#constants/statuses.js";
 import { AUTH_TOKEN_TYPES } from "#constants/tokenTypes.js";
+import { DEFAULT_ORG_NAME } from "#constants/org.js";
 import { withTransaction } from "#db/transaction.js";
 import { buildFrontendLink } from "#integrations/email/emailLinks.mapper.js";
 import { appendAudit } from "#modules/audit/index.js";
+import {
+    assertOrganisationEmailAllowed,
+    getActiveOrganisationById,
+} from "#modules/organisations/index.js";
 import { Invite, User } from "#modules/users/index.js";
 import { ApiError } from "#utils/apiError.js";
 import { anyOf, gt, lte } from "#utils/mongoOps.js";
@@ -19,7 +24,6 @@ import { describeTtl } from "./register.service.js";
 import { issueEmailToken } from "./tokens.service.js";
 
 const TYPE = AUTH_TOKEN_TYPES.INVITE;
-const ORG_LABEL = "SAMARTH AI";
 /** Resends allowed per invite (rule 05, invites `resentCount` max 5). */
 export const MAX_INVITE_RESENDS = 5;
 export const INVITE_SORT_FIELDS = Object.freeze(["createdAt", "email"]);
@@ -38,6 +42,7 @@ export function toInviteView(invite, now = new Date()) {
         id: String(plain._id ?? plain.id),
         email: plain.email,
         role: plain.role,
+        organisationId: String(plain.orgId),
         status: lapsed ? INVITE_STATUSES.EXPIRED : plain.status,
         departmentId: plain.departmentId ? String(plain.departmentId) : null,
         invitedBy: String(plain.invitedBy),
@@ -82,7 +87,7 @@ export async function listInvites(actor, query = {}, now = new Date()) {
         defaultOrder: "desc",
     });
     const filter = {
-        orgId: actor.orgId,
+        ...(actor.role === ROLES.SUPERADMIN ? {} : { orgId: actor.orgId }),
         ...(actor.role === ROLES.SUPERADMIN ? {} : { role: anyOf(grants) }),
         ...statusFilter(query.status, now),
     };
@@ -106,7 +111,7 @@ async function loadManageable(actor, id, session) {
     const grants = grantsOf(actor);
     const invite = await Invite.findOne({
         _id: toObjectId(id),
-        orgId: actor.orgId,
+        ...(actor.role === ROLES.SUPERADMIN ? {} : { orgId: actor.orgId }),
     }).session(session ?? null);
     if (!invite || !grants.includes(invite.role))
         throw ApiError.notFound(ERROR_CODES.NOT_FOUND);
@@ -160,7 +165,7 @@ export async function revokeInvite(actor, id, now = new Date()) {
  */
 export async function resendInvite(actor, id, ctx, now = new Date()) {
     const inviter = await User.findById(actor.userId).select("name").lean();
-    const { invite, token } = await withTransaction(async (session) => {
+    const { invite, token, organisationName } = await withTransaction(async (session) => {
         const current = await loadManageable(actor, id, session);
         if (current.status !== INVITE_STATUSES.SENT)
             throw ApiError.conflict(ERROR_CODES.CONFLICT);
@@ -170,6 +175,10 @@ export async function resendInvite(actor, id, ctx, now = new Date()) {
             });
         }
         assertEmailDomainAllowed(current.email, ctx.config);
+        const organisation = await getActiveOrganisationById(current.orgId);
+        if (!organisation)
+            throw ApiError.conflict(ERROR_CODES.CONFLICT);
+        assertOrganisationEmailAllowed(current.email, organisation);
         const issued = await issueEmailToken(
             {
                 type: TYPE,
@@ -220,14 +229,15 @@ export async function resendInvite(actor, id, ctx, now = new Date()) {
                 resentCount: current.resentCount + 1,
             },
             token: issued.token,
+            organisationName: organisation.name,
         };
     });
     ctx.mail({
         to: invite.email,
         templateKey: EMAIL_TEMPLATES.INVITE,
         data: {
-            inviterName: inviter?.name ?? ORG_LABEL,
-            orgName: ORG_LABEL,
+            inviterName: inviter?.name ?? DEFAULT_ORG_NAME,
+            orgName: organisationName,
             role: invite.role,
             link: buildFrontendLink(
                 FRONTEND_PATHS.ACCEPT_INVITE,

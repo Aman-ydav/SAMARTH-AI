@@ -14,8 +14,14 @@ import { listSessions } from "./session.service.js";
 import { resendVerification, verifyEmail } from "./verification.service.js";
 
 export const register = asyncHandler(async (req, res) => {
-    await registerUser(req.validated.body, buildRequestContext(req));
-    return ApiResponse.accepted(null, NEUTRAL_MESSAGES.REGISTER).send(res);
+    const result = await registerUser(
+        req.validated.body,
+        buildRequestContext(req)
+    );
+    return ApiResponse.accepted(
+        result,
+        NEUTRAL_MESSAGES.REGISTER
+    ).send(res);
 });
 
 export const verify = asyncHandler(async (req, res) => {

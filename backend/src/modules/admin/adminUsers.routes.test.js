@@ -77,6 +77,7 @@ describe("GET /admin/users", () => {
             "lastLoginAt",
             "mustChangePassword",
             "name",
+            "orgId",
             "role",
             "status",
         ]);
@@ -277,6 +278,7 @@ describe("PATCH /admin/users/:id/role", () => {
             id: String(learner._id),
             role: "admin",
         });
+
         const stale = await asLearner.agent.get("/api/v1/admin/users");
         expect(stale.status).toBe(401);
         expect(["TOKEN_INVALID", "SESSION_REVOKED"]).toContain(stale.body.code);
@@ -370,6 +372,55 @@ describe("PATCH /admin/users/:id/role", () => {
         expect(await User.findById(platform._id).lean()).toMatchObject({
             role: "superadmin",
             status: "active",
+        });
+    });
+
+    describe("PATCH /admin/users/:id/organisation", () => {
+        it("moves a user to an active organisation and revokes their sessions", async () => {
+            const { app, asPlatform, learner } = await world();
+            const organisation = expectSuccess(
+                await asPlatform.agent
+                    .post("/api/v1/organisations")
+                    .send({ name: "Regional Statistics", code: "regional" }),
+                201
+            ).data.organisation;
+            const member = await loginAs(app, learner.email);
+
+            const moved = expectSuccess(
+                await asPlatform.agent
+                    .patch(`${USERS}/${learner._id}/organisation`)
+                    .send({ organisationId: organisation.id })
+            ).data.user;
+            expect(moved.orgId).toBe(organisation.id);
+            expectError(
+                await member.agent.get("/api/v1/auth/me"),
+                401,
+                "TOKEN_INVALID"
+            );
+            expect(
+                await RefreshSession.countDocuments({
+                    userId: learner._id,
+                    revokedAt: null,
+                })
+            ).toBe(0);
+        });
+
+        it("prevents self-assignment and refuses unknown organisations", async () => {
+            const { asPlatform, platform, learner } = await world();
+            expectError(
+                await asPlatform.agent
+                    .patch(`${USERS}/${platform._id}/organisation`)
+                    .send({ organisationId: String(platform.orgId) }),
+                403,
+                "SELF_ACTION_FORBIDDEN"
+            );
+            expectError(
+                await asPlatform.agent
+                    .patch(`${USERS}/${learner._id}/organisation`)
+                    .send({ organisationId: "000000000000000000000099" }),
+                404,
+                "NOT_FOUND"
+            );
         });
     });
 

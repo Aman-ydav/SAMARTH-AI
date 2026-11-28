@@ -2,6 +2,7 @@ import { env } from "#config/env.js";
 import { connectDb, disconnectDb } from "#db/connect.js";
 import { syncPlatformAdmins } from "#modules/admin/index.js";
 import { emailService } from "#services/email.service.js";
+import { ensureDefaultOrganisation } from "#modules/organisations/index.js";
 import { whenBackgroundIdle } from "#utils/backgroundTasks.js";
 import { logger } from "#utils/logger.js";
 import {
@@ -31,6 +32,7 @@ async function runPlatformAdminSync() {
 async function start() {
     registerProcessGuards({ logger });
     await connectDb();
+    await ensureDefaultOrganisation();
     await runPlatformAdminSync();
     const server = createApp().listen(env.port, () =>
         logger.info({ port: env.port, nodeEnv: env.nodeEnv }, "api listening")

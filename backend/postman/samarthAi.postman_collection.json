@@ -3417,7 +3417,7 @@
                                 "exec": [
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(202);",
-                                    "pm.test(\"data is null\", () => pm.expect(sai.body().data).to.eql(null));"
+                                    "pm.test(\"verification is required\", () => pm.expect(sai.body().data).to.eql({ verificationRequired: true }));"
                                 ]
                             }
                         }
@@ -3596,7 +3596,7 @@
                                 "exec": [
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(202);",
-                                    "pm.test(\"data is null\", () => pm.expect(sai.body().data).to.eql(null));",
+                                    "pm.test(\"verification is required\", () => pm.expect(sai.body().data).to.eql({ verificationRequired: true }));",
                                     "sai.sameAs(\"neutralRegister\", \"same neutral message for every address\");",
                                     "sai.cookies({ absent: [\"sai_access\", \"sai_refresh\"] });"
                                 ]
@@ -4121,7 +4121,7 @@
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(202);",
                                     "sai.sameAs(\"neutralRegister\", \"identical message to a brand-new address\");",
-                                    "pm.test(\"the role of the existing account cannot be influenced\", () => pm.expect(sai.body().data).to.eql(null));"
+                                    "pm.test(\"verification policy is reported\", () => pm.expect(sai.body().data).to.eql({ verificationRequired: true }));"
                                 ]
                             }
                         }
@@ -6737,7 +6737,7 @@
                                 "exec": [
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(202);",
-                                    "pm.test(\"data is null\", () => pm.expect(sai.body().data).to.eql(null));"
+                                    "pm.test(\"verification policy is reported\", () => pm.expect(sai.body().data).to.eql({ verificationRequired: true }));"
                                 ]
                             }
                         }
@@ -9719,7 +9719,7 @@
                                 "exec": [
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(202);",
-                                    "pm.test(\"data is null\", () => pm.expect(sai.body().data).to.eql(null));"
+                                    "pm.test(\"verification policy is reported\", () => pm.expect(sai.body().data).to.eql({ verificationRequired: true }));"
                                 ]
                             }
                         }
@@ -9877,7 +9877,7 @@
                                 "exec": [
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(202);",
-                                    "pm.test(\"data is null\", () => pm.expect(sai.body().data).to.eql(null));"
+                                    "pm.test(\"verification policy is reported\", () => pm.expect(sai.body().data).to.eql({ verificationRequired: true }));"
                                 ]
                             }
                         }
@@ -11306,7 +11306,7 @@
                                 "exec": [
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(202);",
-                                    "pm.test(\"data is null\", () => pm.expect(sai.body().data).to.eql(null));"
+                                    "pm.test(\"verification policy is reported\", () => pm.expect(sai.body().data).to.eql({ verificationRequired: true }));"
                                 ]
                             }
                         }
@@ -13379,7 +13379,7 @@
                                 "exec": [
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(202);",
-                                    "pm.test(\"data is null\", () => pm.expect(sai.body().data).to.eql(null));"
+                                    "pm.test(\"verification policy is reported\", () => pm.expect(sai.body().data).to.eql({ verificationRequired: true }));"
                                 ]
                             }
                         }
@@ -17429,7 +17429,7 @@
                                 "exec": [
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(202);",
-                                    "pm.test(\"data is null\", () => pm.expect(sai.body().data).to.eql(null));"
+                                    "pm.test(\"verification policy is reported\", () => pm.expect(sai.body().data).to.eql({ verificationRequired: true }));"
                                 ]
                             }
                         }
@@ -18830,7 +18830,7 @@
                                 "exec": [
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(202);",
-                                    "pm.test(\"data is null\", () => pm.expect(sai.body().data).to.eql(null));"
+                                    "pm.test(\"verification policy is reported\", () => pm.expect(sai.body().data).to.eql({ verificationRequired: true }));"
                                 ]
                             }
                         }
@@ -19520,7 +19520,7 @@
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(201, \"Invitation sent\");",
                                     "const invite = sai.body().data.invite;",
-                                    "pm.test(\"invite view: sent, role trainer, no token fields\", () => { pm.expect(invite.status).to.eql(\"sent\"); pm.expect(invite.role).to.eql(\"trainer\"); pm.expect(invite.resentCount).to.eql(0); pm.expect(Object.keys(invite).sort()).to.eql([\"acceptedAt\", \"createdAt\", \"departmentId\", \"email\", \"expiresAt\", \"id\", \"invitedBy\", \"resentCount\", \"role\", \"status\"]); });",
+                                    "pm.test(\"invite view: sent, role trainer, no token fields\", () => { pm.expect(invite.status).to.eql(\"sent\"); pm.expect(invite.role).to.eql(\"trainer\"); pm.expect(invite.resentCount).to.eql(0); pm.expect(Object.keys(invite).sort()).to.eql([\"acceptedAt\", \"createdAt\", \"departmentId\", \"email\", \"expiresAt\", \"id\", \"invitedBy\", \"organisationId\", \"resentCount\", \"role\", \"status\"]); });",
                                     "pm.test(\"the invitation lasts about 7 days\", () => { const days = (new Date(invite.expiresAt).getTime() - Date.now()) / 86400000; pm.expect(days).to.be.within(6.9, 7.1); });",
                                     "sai.setVar(\"coachInviteId\", invite.id);"
                                 ]
@@ -20050,7 +20050,7 @@
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(201, \"Invitation sent\");",
                                     "const invite = sai.body().data.invite;",
-                                    "pm.test(\"invite view: sent, role trainer, no token fields\", () => { pm.expect(invite.status).to.eql(\"sent\"); pm.expect(invite.role).to.eql(\"trainer\"); pm.expect(invite.resentCount).to.eql(0); pm.expect(Object.keys(invite).sort()).to.eql([\"acceptedAt\", \"createdAt\", \"departmentId\", \"email\", \"expiresAt\", \"id\", \"invitedBy\", \"resentCount\", \"role\", \"status\"]); });",
+                                    "pm.test(\"invite view: sent, role trainer, no token fields\", () => { pm.expect(invite.status).to.eql(\"sent\"); pm.expect(invite.role).to.eql(\"trainer\"); pm.expect(invite.resentCount).to.eql(0); pm.expect(Object.keys(invite).sort()).to.eql([\"acceptedAt\", \"createdAt\", \"departmentId\", \"email\", \"expiresAt\", \"id\", \"invitedBy\", \"organisationId\", \"resentCount\", \"role\", \"status\"]); });",
                                     "pm.test(\"the invitation lasts about 7 days\", () => { const days = (new Date(invite.expiresAt).getTime() - Date.now()) / 86400000; pm.expect(days).to.be.within(6.9, 7.1); });",
                                     "sai.setVar(\"coachInviteId\", invite.id);"
                                 ]
@@ -20116,7 +20116,7 @@
                                     "pm.test(\"the managed learner and the signed-in admin are listed\", () => { const ids = body.data.users.map((u) => u.id); pm.expect(ids).to.include(sai.v(\"managedId\")); pm.expect(ids).to.include(sai.v(\"orgAdminId\")); });",
                                     "pm.test(\"no platform admin is listed for an admin\", () => { pm.expect(body.data.users.map((u) => u.id)).to.not.include(sai.v(\"platformId\")); body.data.users.forEach((u) => pm.expect(u.role).to.not.eql(\"superadmin\")); });",
                                     "pm.test(\"meta is a page descriptor\", () => pm.expect(Object.keys(body.meta).sort()).to.eql([\"hasNext\", \"limit\", \"page\", \"total\", \"totalPages\"]));",
-                                    "pm.test(\"each row has only the allow-listed fields\", () => body.data.users.forEach((u) => pm.expect(Object.keys(u).sort()).to.eql([\"authProviders\", \"createdAt\", \"email\", \"emailVerified\", \"id\", \"lastLoginAt\", \"mustChangePassword\", \"name\", \"role\", \"status\"])));"
+                                    "pm.test(\"each row has only the allow-listed fields\", () => body.data.users.forEach((u) => pm.expect(Object.keys(u).sort()).to.eql([\"authProviders\", \"createdAt\", \"email\", \"emailVerified\", \"id\", \"lastLoginAt\", \"mustChangePassword\", \"name\", \"orgId\", \"role\", \"status\"])));"
                                 ]
                             }
                         }
@@ -20309,7 +20309,7 @@
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(200, \"Account status updated\");",
                                     "pm.test(\"the user is now suspended\", () => pm.expect(sai.body().data.user.status).to.eql(\"suspended\"));",
-                                    "pm.test(\"admin user view has only the allow-listed fields\", () => { let node = sai.body(); \"data.user\".split(\".\").forEach((p) => { node = node[p]; }); pm.expect(Object.keys(node).sort()).to.eql([\"authProviders\", \"createdAt\", \"email\", \"emailVerified\", \"id\", \"lastLoginAt\", \"mustChangePassword\", \"name\", \"role\", \"status\"]); });"
+                                    "pm.test(\"admin user view has only the allow-listed fields\", () => { let node = sai.body(); \"data.user\".split(\".\").forEach((p) => { node = node[p]; }); pm.expect(Object.keys(node).sort()).to.eql([\"authProviders\", \"createdAt\", \"email\", \"emailVerified\", \"id\", \"lastLoginAt\", \"mustChangePassword\", \"name\", \"orgId\", \"role\", \"status\"]); });"
                                 ]
                             }
                         }
@@ -20818,7 +20818,7 @@
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(201, \"Invitation sent\");",
                                     "const invite = sai.body().data.invite;",
-                                    "pm.test(\"invite view: sent, role admin, no token fields\", () => { pm.expect(invite.status).to.eql(\"sent\"); pm.expect(invite.role).to.eql(\"admin\"); pm.expect(invite.resentCount).to.eql(0); pm.expect(Object.keys(invite).sort()).to.eql([\"acceptedAt\", \"createdAt\", \"departmentId\", \"email\", \"expiresAt\", \"id\", \"invitedBy\", \"resentCount\", \"role\", \"status\"]); });",
+                                    "pm.test(\"invite view: sent, role admin, no token fields\", () => { pm.expect(invite.status).to.eql(\"sent\"); pm.expect(invite.role).to.eql(\"admin\"); pm.expect(invite.resentCount).to.eql(0); pm.expect(Object.keys(invite).sort()).to.eql([\"acceptedAt\", \"createdAt\", \"departmentId\", \"email\", \"expiresAt\", \"id\", \"invitedBy\", \"organisationId\", \"resentCount\", \"role\", \"status\"]); });",
                                     "pm.test(\"the invitation lasts about 7 days\", () => { const days = (new Date(invite.expiresAt).getTime() - Date.now()) / 86400000; pm.expect(days).to.be.within(6.9, 7.1); });",
                                     "sai.setVar(\"bossInviteId\", invite.id);"
                                 ]
@@ -20951,7 +20951,7 @@
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(200, \"Role updated\");",
                                     "pm.test(\"the user now has the role trainer\", () => pm.expect(sai.body().data.user.role).to.eql(\"trainer\"));",
-                                    "pm.test(\"admin user view has only the allow-listed fields\", () => { let node = sai.body(); \"data.user\".split(\".\").forEach((p) => { node = node[p]; }); pm.expect(Object.keys(node).sort()).to.eql([\"authProviders\", \"createdAt\", \"email\", \"emailVerified\", \"id\", \"lastLoginAt\", \"mustChangePassword\", \"name\", \"role\", \"status\"]); });"
+                                    "pm.test(\"admin user view has only the allow-listed fields\", () => { let node = sai.body(); \"data.user\".split(\".\").forEach((p) => { node = node[p]; }); pm.expect(Object.keys(node).sort()).to.eql([\"authProviders\", \"createdAt\", \"email\", \"emailVerified\", \"id\", \"lastLoginAt\", \"mustChangePassword\", \"name\", \"orgId\", \"role\", \"status\"]); });"
                                 ]
                             }
                         }
@@ -21784,7 +21784,7 @@
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(200, \"Role updated\");",
                                     "pm.test(\"the user now has the role learner\", () => pm.expect(sai.body().data.user.role).to.eql(\"learner\"));",
-                                    "pm.test(\"admin user view has only the allow-listed fields\", () => { let node = sai.body(); \"data.user\".split(\".\").forEach((p) => { node = node[p]; }); pm.expect(Object.keys(node).sort()).to.eql([\"authProviders\", \"createdAt\", \"email\", \"emailVerified\", \"id\", \"lastLoginAt\", \"mustChangePassword\", \"name\", \"role\", \"status\"]); });"
+                                    "pm.test(\"admin user view has only the allow-listed fields\", () => { let node = sai.body(); \"data.user\".split(\".\").forEach((p) => { node = node[p]; }); pm.expect(Object.keys(node).sort()).to.eql([\"authProviders\", \"createdAt\", \"email\", \"emailVerified\", \"id\", \"lastLoginAt\", \"mustChangePassword\", \"name\", \"orgId\", \"role\", \"status\"]); });"
                                 ]
                             }
                         }
@@ -22109,7 +22109,7 @@
                                 "exec": [
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(202);",
-                                    "pm.test(\"data is null\", () => pm.expect(sai.body().data).to.eql(null));"
+                                    "pm.test(\"verification policy is reported\", () => pm.expect(sai.body().data).to.eql({ verificationRequired: true }));"
                                 ]
                             }
                         }
@@ -22480,7 +22480,7 @@
                                 "exec": [
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(202);",
-                                    "pm.test(\"data is null\", () => pm.expect(sai.body().data).to.eql(null));"
+                                    "pm.test(\"verification policy is reported\", () => pm.expect(sai.body().data).to.eql({ verificationRequired: true }));"
                                 ]
                             }
                         }
@@ -23531,7 +23531,7 @@
                                 "exec": [
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(202);",
-                                    "pm.test(\"data is null\", () => pm.expect(sai.body().data).to.eql(null));"
+                                    "pm.test(\"verification policy is reported\", () => pm.expect(sai.body().data).to.eql({ verificationRequired: true }));"
                                 ]
                             }
                         }
@@ -23745,7 +23745,7 @@
                                 "exec": [
                                     "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
                                     "sai.ok(202);",
-                                    "pm.test(\"data is null\", () => pm.expect(sai.body().data).to.eql(null));"
+                                    "pm.test(\"verification policy is reported\", () => pm.expect(sai.body().data).to.eql({ verificationRequired: true }));"
                                 ]
                             }
                         }
@@ -25867,6 +25867,266 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "Organisation management - authentication guards",
+            "description": "Unauthenticated requests verify the platform-only organisation routes and user reassignment reject access without a session. Use the organisation admin UI or authenticated requests in the route tests to exercise successful changes.",
+            "item": [
+                {
+                    "name": "GET /organisations - no cookie is AUTH_REQUIRED",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": "{{baseUrl}}{{apiPrefix}}/organisations?status=active"
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "(async () => {",
+                                    "if (sai.skipUnlessLocal()) return;",
+                                    "await sai.forgetSession();",
+                                    "})().catch((e) => pm.test(\"pre-request script failed: \" + e.message, () => { throw e; }));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "sai.fail(401, \"AUTH_REQUIRED\", { noFieldErrors: true });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "POST /organisations - no cookie is AUTH_REQUIRED",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}{{apiPrefix}}/organisations",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Regional Statistics\",\n  \"code\": \"regional-statistics\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "(async () => {",
+                                    "if (sai.skipUnlessLocal()) return;",
+                                    "await sai.forgetSession();",
+                                    "})().catch((e) => pm.test(\"pre-request script failed: \" + e.message, () => { throw e; }));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "sai.fail(401, \"AUTH_REQUIRED\", { noFieldErrors: true });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PATCH /organisations/:id - no cookie is AUTH_REQUIRED",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}{{apiPrefix}}/organisations/{{organisationId}}",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Regional Statistics\",\n  \"expectedVersion\": 0\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "(async () => {",
+                                    "if (sai.skipUnlessLocal()) return;",
+                                    "await sai.forgetSession();",
+                                    "})().catch((e) => pm.test(\"pre-request script failed: \" + e.message, () => { throw e; }));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "sai.fail(401, \"AUTH_REQUIRED\", { noFieldErrors: true });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "DELETE /organisations/:id - no cookie is AUTH_REQUIRED",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": "{{baseUrl}}{{apiPrefix}}/organisations/{{organisationId}}"
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "(async () => {",
+                                    "if (sai.skipUnlessLocal()) return;",
+                                    "await sai.forgetSession();",
+                                    "})().catch((e) => pm.test(\"pre-request script failed: \" + e.message, () => { throw e; }));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "sai.fail(401, \"AUTH_REQUIRED\", { noFieldErrors: true });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "POST /organisations/:id/restore - no cookie is AUTH_REQUIRED",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}{{apiPrefix}}/organisations/{{organisationId}}/restore",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "(async () => {",
+                                    "if (sai.skipUnlessLocal()) return;",
+                                    "await sai.forgetSession();",
+                                    "})().catch((e) => pm.test(\"pre-request script failed: \" + e.message, () => { throw e; }));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "sai.fail(401, \"AUTH_REQUIRED\", { noFieldErrors: true });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PATCH /admin/users/:id/organisation - no cookie is AUTH_REQUIRED",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}{{apiPrefix}}/admin/users/{{userId}}/organisation",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"organisationId\": \"{{organisationId}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "(async () => {",
+                                    "if (sai.skipUnlessLocal()) return;",
+                                    "await sai.forgetSession();",
+                                    "})().catch((e) => pm.test(\"pre-request script failed: \" + e.message, () => { throw e; }));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "sai.fail(401, \"AUTH_REQUIRED\", { noFieldErrors: true });"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "event": [
@@ -25984,6 +26244,16 @@
             "key": "saiLib",
             "value": "(function (pm) {\n    \"use strict\";\n    // Shared helpers for every script of this collection. Stored once in the collection variable `saiLib` and loaded\n    // with: const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);\n    const UNSAFE = [\"POST\", \"PUT\", \"PATCH\", \"DELETE\"];\n    const TAGS = [\n        \"session\", \"pending\", \"pwd\", \"reset\", \"acct\", \"email\", \"del\", \"media\", \"learner\",\n        \"profile\", \"rl\", \"lock\", \"e2e\", \"err\", \"other\", \"avatar\", \"utf8\", \"cap\", \"managed\", \"coach\", \"boss\", \"outsider\",\n    ];\n    const v = (name) => pm.variables.get(name);\n    const setVar = (name, value) => pm.collectionVariables.set(name, value);\n    const unsetVar = (name) => pm.collectionVariables.unset(name);\n    const baseUrl = () => String(v(\"baseUrl\"));\n    const prefix = () => String(v(\"apiPrefix\"));\n    const apiUrl = (path) => baseUrl() + prefix() + path;\n    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));\n    const jar = () => pm.cookies.jar();\n    const parseJson = (text) => { try { return JSON.parse(text); } catch (e) { return undefined; } };\n    const body = () => parseJson(pm.response.text());\n    const header = (name) => pm.response.headers.get(name);\n\n    // ---- run identity -------------------------------------------------------------------------------------------\n    const randomText = (length) => {\n        const chars = \"abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789\";\n        let out = \"\";\n        for (let i = 0; i < length; i += 1) out += chars[Math.floor(Math.random() * chars.length)];\n        return out;\n    };\n    const strongPassword = () => \"Zq\" + randomText(8) + \"-\" + randomText(6) + \"!7\";\n\n    function startRun() {\n        const runId = Date.now().toString(36) + randomText(4).toLowerCase();\n        setVar(\"runId\", runId);\n        const domain = String(v(\"allowedEmailDomain\") || \"example.test\");\n        TAGS.forEach((tag) => setVar(tag + \"Email\", \"sai-\" + runId + \"-\" + tag + \"@\" + domain));\n        setVar(\"userName\", \"Postman Runner\");\n        setVar(\"password\", strongPassword());\n        setVar(\"newPassword\", strongPassword());\n        setVar(\"thirdPassword\", strongPassword());\n        setVar(\"adminNewPassword\", strongPassword());\n        setVar(\"weakPassword\", \"short1!\");\n        setVar(\"longPassword\", \"Aa1!\" + \"x\".repeat(72));\n        setVar(\"commonPassword\", \"password1234\");\n        setVar(\"invalidToken\", randomText(43));\n        setVar(\"longToken\", randomText(600));\n        setVar(\"fakeCredential\", \"not-a-real-id-token-\" + randomText(12));\n        setVar(\"unknownObjectId\", \"64b64b64b64b64b64b64b64b\");\n        setVar(\"badObjectId\", \"not-an-object-id\");\n        setVar(\"disallowedEmail\", \"sai-\" + runId + \"@other.test\");\n        setVar(\"sessionEmailUpper\", (\"sai-\" + runId + \"-session@\" + domain).toUpperCase());\n        const fullwidth = (text) => text.replace(/[a-z0-9]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0xfee0));\n        setVar(\"sessionEmailFullwidth\", fullwidth(\"sai\") + \"-\" + fullwidth(runId) + \"-\" + fullwidth(\"session\") + \"@\" + domain);\n        setVar(\"bytes72Password\", \"Aa1!\" + \"é\".repeat(34));\n        setVar(\"bytes73Password\", \"Aa1!\" + \"é\".repeat(34) + \"x\");\n        setVar(\"emailNamePassword\", \"Xx-sai-\" + runId + \"-err-9!\");\n        setVar(\"longName\", \"N\".repeat(101));\n        setVar(\"adminLoginPassword\", String(v(\"adminPassword\") || \"\"));\n        setVar(\"newAddress\", \"sai-\" + runId + \"-newaddress@\" + domain);\n        [\"neutralRegister\", \"neutralForgot\", \"neutralResend\", \"neutralChangeEmail\", \"verifyToken\", \"resetToken\",\n            \"confirmToken\", \"undoToken\", \"sessionId\", \"otherSessionId\", \"mediaId\", \"mediaPublicId\", \"pdfMediaId\",\n            \"webmMediaId\", \"rotatedAt\", \"lockRetryAfter\", \"lockMessage\", \"invalidCredentialsMessage\", \"staleVerifyToken\", \"foreignSessionId\",\n            \"sessionToRevoke\", \"adminLimited\", \"firstSessionId\", \"avatarPublicId\", \"tempMediaId\", \"superMediaId\", \"superPublicId\", \"moderatedMediaId\", \"moderatedPublicId\", \"undoToken\", \"confirmToken\", \"platformId\", \"orgAdminId\", \"managedId\", \"managedPrefix\", \"coachPrefix\", \"coachInviteId\", \"coachToken\", \"coachTokenResent\", \"coachId\", \"bossInviteId\", \"bossToken\", \"bossId\", \"conflictMessage\"].forEach((name) => unsetVar(name));\n    }\n    function ensureRun() { if (!v(\"runId\")) startRun(); }\n\n    // ---- cookies and CSRF ---------------------------------------------------------------------------------------\n    const cookieValue = (name, path) => new Promise((resolve) => {\n        jar().get(baseUrl() + (path || \"/\"), name, (e, c) => resolve(c && typeof c === \"object\" ? c.value : c || undefined));\n    });\n    const dropCookie = (name, path) => new Promise((resolve) => {\n        jar().unset(baseUrl() + (path || \"/\"), name, () => resolve());\n    });\n    const putCookie = (name, value, path, httpOnly) => new Promise((resolve) => {\n        jar().set(baseUrl() + (path || \"/\"), { name, value, path: path || \"/\", httpOnly: !!httpOnly }, () => resolve());\n    });\n    const refreshPath = () => prefix() + \"/auth/refresh\";\n    const refreshCookiePath = () => prefix() + \"/auth\";\n    const forgetSession = async () => {\n        await dropCookie(\"sai_access\");\n        await dropCookie(\"sai_refresh\", refreshPath());\n    };\n    const prime = () => new Promise((resolve) => pm.sendRequest({ url: apiUrl(\"/auth/me\"), method: \"GET\" }, () => resolve()));\n    async function ensureCsrf() {\n        let value = await cookieValue(\"sai_csrf\");\n        if (!value) { await prime(); value = await cookieValue(\"sai_csrf\"); }\n        return value;\n    }\n    async function syncCsrf() {\n        if (!UNSAFE.includes(pm.request.method)) return;\n        const value = await ensureCsrf();\n        if (value) pm.request.headers.upsert({ key: \"X-CSRF-Token\", value });\n    }\n    const dropCsrfHeader = () => pm.request.headers.remove(\"X-CSRF-Token\");\n    const setCsrfHeader = (value) => pm.request.headers.upsert({ key: \"X-CSRF-Token\", value });\n    const slowRequest = (factor) => pm.variables.set(\"budgetFactor\", factor || 4);\n\n    // ---- side requests (share the cookie jar) -------------------------------------------------------------------\n    // TEST-41: outside the local test server only the read-only Smoke folder may run (and prod never sends an unsafe method).\n    const kind = () => String(v(\"environmentKind\") || \"local\");\n    const inSmoke = () => pm.execution.location.indexOf(\"Smoke\") >= 0;\n    function skipUnlessLocal() {\n        if (kind() === \"local\" || inSmoke()) return false;\n        pm.execution.skipRequest();\n        return true;\n    }\n    async function side(method, path, payload, extraHeaders) {\n        if (kind() !== \"local\") throw new Error(\"side requests are only allowed against the local test server (environmentKind=local)\");\n        const headers = Object.assign({ \"Content-Type\": \"application/json\" }, extraHeaders || {});\n        if (UNSAFE.includes(method) && !headers[\"X-CSRF-Token\"]) headers[\"X-CSRF-Token\"] = (await ensureCsrf()) || \"\";\n        const options = { url: apiUrl(path), method, header: headers };\n        if (payload !== undefined) options.body = { mode: \"raw\", raw: typeof payload === \"string\" ? payload : JSON.stringify(payload) };\n        return new Promise((resolve) => pm.sendRequest(options, (err, res) => {\n            resolve({ err, res, code: res ? res.code : undefined, json: () => (res ? parseJson(res.text()) : undefined) });\n        }));\n    }\n    async function login(emailVar, passwordVar) {\n        return side(\"POST\", \"/auth/login\", { email: v(emailVar), password: v(passwordVar || \"password\") });\n    }\n\n    // Repeats a cheap request until the limiter answers 429; returns the attempt number that was refused (0 = never).\n    async function exhaust(method, path, payload, maxTries) {\n        for (let i = 1; i <= maxTries; i += 1) {\n            const answer = await side(method, path, payload);\n            if (answer.code === 429) return i;\n        }\n        return 0;\n    }\n\n    // ---- test-only mail outbox ----------------------------------------------------------------------------------\n    const outboxPath = (filter) => \"/__test__/outbox?\" + Object.keys(filter).map((k) => k + \"=\" + encodeURIComponent(filter[k])).join(\"&\");\n    async function mails(filter) {\n        const r = await side(\"GET\", outboxPath(filter));\n        const data = r.json();\n        return data && data.data && Array.isArray(data.data.emails) ? data.data.emails : [];\n    }\n    async function waitForMail(filter, opts) {\n        const wanted = (opts && opts.count) || 1;\n        const until = Date.now() + ((opts && opts.timeoutMs) || 5000);\n        for (;;) {\n            const found = await mails(filter);\n            if (found.length >= wanted || Date.now() > until) return found;\n            await sleep(30);\n        }\n    }\n    const quietMails = async (filter, quietMs) => { await sleep(quietMs || 400); return mails(filter); };\n    const lastToken = (found) => (found.length ? found[found.length - 1].token : undefined);\n\n    // ---- assertions ---------------------------------------------------------------------------------------------\n    const SUCCESS_SCHEMA = {\n        type: \"object\",\n        required: [\"statusCode\", \"success\", \"message\", \"data\"],\n        properties: {\n            statusCode: { type: \"integer\" },\n            success: { const: true },\n            message: { type: \"string\", minLength: 1 },\n            data: {},\n            meta: { type: \"object\" },\n        },\n        additionalProperties: false,\n    };\n    const ERROR_SCHEMA = {\n        type: \"object\",\n        required: [\"statusCode\", \"success\", \"message\", \"code\", \"errors\", \"data\", \"requestId\"],\n        properties: {\n            statusCode: { type: \"integer\" },\n            success: { const: false },\n            message: { type: \"string\", minLength: 1 },\n            code: { type: \"string\", pattern: \"^[A-Z][A-Z0-9_]+$\" },\n            errors: {\n                type: \"array\",\n                items: {\n                    type: \"object\",\n                    required: [\"message\"],\n                    properties: { field: { type: \"string\" }, message: { type: \"string\" }, code: { type: \"string\" } },\n                    additionalProperties: false,\n                },\n            },\n            data: { type: \"null\" },\n            requestId: { type: \"string\", minLength: 8 },\n            retryAfterSec: { type: \"integer\" },\n        },\n        additionalProperties: false,\n    };\n    const USER_KEYS = [\"authProviders\", \"avatar\", \"email\", \"emailVerified\", \"hasPassword\", \"id\", \"locale\",\n        \"mustChangePassword\", \"name\", \"orgId\", \"role\", \"status\"];\n\n    const status = (code) => pm.test(\"status is \" + code, () => pm.response.to.have.status(code));\n    const jsonContent = () => pm.test(\"Content-Type is application/json\", () => {\n        pm.expect(header(\"Content-Type\") || \"\").to.match(/^application\\/json/);\n    });\n    function ok(code, message) {\n        status(code);\n        jsonContent();\n        pm.test(\"success envelope { statusCode, success, message, data }\", () => {\n            pm.response.to.have.jsonSchema(SUCCESS_SCHEMA);\n            const b = body();\n            pm.expect(b.statusCode).to.eql(code);\n            pm.expect(b).to.have.property(\"data\");\n            if (message) pm.expect(b.message).to.eql(message);\n        });\n    }\n    function fail(code, errCode, opts) {\n        const o = opts || {};\n        status(code);\n        jsonContent();\n        pm.test(\"error envelope with code \" + errCode, () => {\n            pm.response.to.have.jsonSchema(ERROR_SCHEMA);\n            const b = body();\n            pm.expect(b.statusCode).to.eql(code);\n            pm.expect(b.code).to.eql(errCode);\n            pm.expect(b).to.not.have.property(\"stack\");\n        });\n        pm.test(\"requestId equals the X-Request-Id header\", () => pm.expect(body().requestId).to.eql(header(\"X-Request-Id\")));\n        if (o.fields) {\n            pm.test(\"errors[] names \" + o.fields.join(\", \"), () => {\n                const names = body().errors.map((e) => e.field);\n                o.fields.forEach((f) => pm.expect(names, \"field \" + f).to.include(f));\n            });\n        }\n        if (o.noFieldErrors) pm.test(\"errors[] is empty\", () => pm.expect(body().errors).to.eql([]));\n        if (o.retryAfter) {\n            pm.test(\"Retry-After header and retryAfterSec agree\", () => {\n                const sec = Number(header(\"Retry-After\"));\n                pm.expect(sec).to.be.above(0);\n                pm.expect(body().retryAfterSec).to.eql(sec);\n            });\n        }\n    }\n    function userSummary(path) {\n        pm.test(\"user summary has only the allow-listed fields\", () => {\n            const parts = (path || \"data.user\").split(\".\");\n            let node = body();\n            parts.forEach((p) => { node = node && node[p]; });\n            pm.expect(node, \"user object\").to.be.an(\"object\");\n            pm.expect(Object.keys(node).sort()).to.eql(USER_KEYS);\n        });\n    }\n    function sameAs(varName, label) {\n        pm.test(label || \"same message as the first answer\", () => {\n            const first = v(varName);\n            if (!first) { setVar(varName, body().message); return; }\n            pm.expect(body().message).to.eql(first);\n        });\n    }\n\n    // ---- cookies in the response --------------------------------------------------------------------------------\n    const parseSetCookie = (line) => {\n        const parts = String(line).split(\";\").map((s) => s.trim());\n        const first = parts[0];\n        const at = first.indexOf(\"=\");\n        const attrs = {};\n        parts.slice(1).forEach((p) => {\n            const i = p.indexOf(\"=\");\n            attrs[(i < 0 ? p : p.slice(0, i)).toLowerCase()] = i < 0 ? true : p.slice(i + 1);\n        });\n        return { name: first.slice(0, at), value: first.slice(at + 1), attrs };\n    };\n    const setCookies = () => pm.response.headers\n        .filter((h) => String(h.key).toLowerCase() === \"set-cookie\")\n        .map((h) => parseSetCookie(h.value));\n    const secureExpected = () => String(v(\"expectSecureCookies\")) === \"true\";\n    function universalCookieFlags() {\n        const mine = setCookies().filter((c) => c.name.indexOf(\"sai_\") === 0);\n        if (mine.length === 0) return;\n        pm.test(\"sai_* cookies: HttpOnly (csrf not), SameSite=Lax, Path, Secure per environment\", () => {\n            mine.forEach((c) => {\n                pm.expect(!!c.attrs.httponly, c.name + \" HttpOnly\").to.eql(c.name !== \"sai_csrf\");\n                pm.expect(String(c.attrs.samesite).toLowerCase(), c.name + \" SameSite\").to.eql(\"lax\");\n                pm.expect(c.attrs.path, c.name + \" Path\").to.eql(c.name === \"sai_refresh\" ? prefix() + \"/auth\" : \"/\");\n                pm.expect(!!c.attrs.secure, c.name + \" Secure\").to.eql(secureExpected());\n            });\n        });\n        pm.test(\"no cookie value is repeated in the body\", () => {\n            const text = pm.response.text();\n            mine.filter((c) => c.value.length > 8).forEach((c) => pm.expect(text.indexOf(c.value), c.name).to.eql(-1));\n        });\n    }\n    // spec: { set: { sai_access: 900, ... }, cleared: [names], absent: [names] }\n    function cookies(spec) {\n        const found = {};\n        setCookies().forEach((c) => { found[c.name] = c; });\n        Object.keys(spec.set || {}).forEach((name) => {\n            pm.test(name + \" is set with Max-Age \" + spec.set[name], () => {\n                pm.expect(found[name], name + \" Set-Cookie\").to.exist;\n                pm.expect(found[name].value).to.not.eql(\"\");\n                pm.expect(Number(found[name].attrs[\"max-age\"])).to.eql(spec.set[name]);\n            });\n        });\n        (spec.cleared || []).forEach((name) => {\n            pm.test(name + \" is cleared with the same attributes\", () => {\n                pm.expect(found[name], name + \" Set-Cookie\").to.exist;\n                pm.expect(found[name].value).to.eql(\"\");\n                pm.expect(new Date(found[name].attrs.expires).getTime()).to.be.below(Date.now());\n            });\n        });\n        (spec.absent || []).forEach((name) => {\n            pm.test(name + \" is not set by this response\", () => pm.expect(found[name]).to.not.exist);\n        });\n    }\n    const SESSION = { access: 900, normal: 604800, remember: 2592000 };\n    const fullSession = (remember) => cookies({\n        set: {\n            sai_access: SESSION.access,\n            sai_refresh: remember ? SESSION.remember : SESSION.normal,\n            sai_csrf: remember ? SESSION.remember : SESSION.normal,\n        },\n    });\n\n    // ---- helpers for scripts ------------------------------------------------------------------------------------\n    function checkMailLink(mail, route) {\n        pm.test(\"mail link uses the #token= fragment on \" + route + \", never a query string\", () => {\n            pm.expect(mail.links.length, \"links\").to.be.above(0);\n            const link = mail.links[0];\n            pm.expect(link).to.match(new RegExp(\"^https?://[^/]+\" + route + \"#token=\"));\n            pm.expect(link.indexOf(\"?\")).to.eql(-1);\n            pm.expect(mail.token).to.be.a(\"string\").with.length.above(20);\n        });\n    }\n    function skipUnless(...names) {\n        const missing = names.filter((n) => !v(n));\n        if (missing.length) { pm.execution.skipRequest(); return true; }\n        return false;\n    }\n    function skipUnlessTrue(name) {\n        if (String(v(name)) === \"true\") return false;\n        pm.execution.skipRequest();\n        return true;\n    }\n    const budget = () => (Number(v(\"maxResponseMs\")) || 1000) * (Number(v(\"budgetFactor\")) || 1);\n\n    // ---- universal checks (collection-level test script) --------------------------------------------------------\n    function universal() {\n        const url = pm.request.url.getPath();\n        const isOutbox = url.indexOf(\"/__test__/outbox\") >= 0;\n        pm.test(\"X-Request-Id response header is present\", () => {\n            pm.expect(header(\"X-Request-Id\") || \"\").to.match(/^[A-Za-z0-9._-]{8,128}$/);\n        });\n        pm.test(\"response time within the budget\", () => pm.expect(pm.response.responseTime).to.be.below(budget()));\n        if (url.indexOf(prefix() + \"/\") === 0 && pm.request.method !== \"OPTIONS\") {\n            pm.test(\"Cache-Control: no-store on API responses\", () => pm.expect(header(\"Cache-Control\") || \"\").to.include(\"no-store\"));\n        }\n        if (!isOutbox && pm.response.text().length > 0) {\n            pm.test(\"body leaks no hashes, tokens or secrets\", () => {\n                const text = pm.response.text();\n                pm.expect(text).to.not.match(/passwordHash|tokenHash|refreshToken|accessToken|apiSecret|api_secret|passwordHistory/);\n                pm.expect(text).to.not.match(/eyJ[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}/);\n                [\"password\", \"newPassword\", \"thirdPassword\", \"adminPassword\", \"adminNewPassword\", \"cloudinaryApiSecret\"].forEach((name) => {\n                    const secret = v(name);\n                    if (secret && String(secret).length >= 8) pm.expect(text.indexOf(String(secret)), name).to.eql(-1);\n                });\n            });\n        }\n        universalCookieFlags();\n    }\n\n    return {\n        v, setVar, unsetVar, baseUrl, apiUrl, sleep, startRun, ensureRun, cookieValue, dropCookie, putCookie, forgetSession,\n        refreshCookiePath, skipUnlessLocal, ensureCsrf, syncCsrf, dropCsrfHeader, setCsrfHeader, slowRequest, side, login, exhaust, mails, waitForMail, quietMails,\n        lastToken, status, ok, fail, userSummary, sameAs, cookies, fullSession, setCookies, checkMailLink, skipUnless, skipUnlessTrue,\n        universal, body, header, refreshPath, randomText, SESSION,\n    };\n})",
             "type": "any"
+        },
+        {
+            "key": "organisationId",
+            "value": "000000000000000000000002",
+            "type": "string"
+        },
+        {
+            "key": "userId",
+            "value": "000000000000000000000003",
+            "type": "string"
         }
     ]
 }

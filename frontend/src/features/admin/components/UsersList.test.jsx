@@ -10,6 +10,7 @@ import {
     pageMeta,
 } from "@/mocks/fixtures/envelope";
 import { makeAdminUser } from "@/mocks/fixtures/adminUser";
+import { makeOrganisation } from "@/mocks/fixtures/organisation";
 import {
     LEARNER,
     SUSPENDED,
@@ -318,6 +319,80 @@ describe("AdminUsersPage suspend and reactivate", () => {
             expect(toast.error).toHaveBeenCalledWith(text, {
                 id: "admin-failed",
             })
+        );
+    });
+});
+
+describe("AdminUsersPage organisation reassignment", () => {
+    it("moves an account to a selected active organisation", async () => {
+        const destination = makeOrganisation({
+            id: "64b7f0c2a1b2c3d4e5f60309",
+            name: "Regional Statistics",
+            code: "regional-statistics",
+        });
+        let reassignment = null;
+        useList(accounts());
+        server.use(
+            http.get(apiUrl("/organisations"), () =>
+                okResponse(
+                    {
+                        organisations: [makeOrganisation(), destination],
+                    },
+                    { meta: pageMeta({ total: 2 }) }
+                )
+            ),
+            http.patch(
+                apiUrl("/admin/users/:id/organisation"),
+                async ({ params, request }) => {
+                    reassignment = {
+                        id: params.id,
+                        ...(await request.json()),
+                    };
+                    return okResponse({
+                        user: makeAdminUser({
+                            id: params.id,
+                            orgId: destination.id,
+                        }),
+                    });
+                }
+            )
+        );
+        renderUsers({ role: "superadmin" });
+        await screen.findByRole("table");
+        const menu = await openMenu("Ravi Kumar");
+        await userEvent.click(
+            within(menu).getByRole("menuitem", {
+                name: "Change organisation…",
+            })
+        );
+        const dialog = await screen.findByRole("dialog");
+        await userEvent.click(
+            within(dialog).getByRole("combobox", {
+                name: "New organisation",
+            })
+        );
+        await userEvent.click(
+            await screen.findByRole("option", {
+                name: "Regional Statistics",
+            })
+        );
+        await userEvent.click(
+            within(dialog).getByRole("button", {
+                name: "Move user",
+            })
+        );
+
+        await waitFor(() =>
+            expect(reassignment).toEqual({
+                id: LEARNER,
+                organisationId: destination.id,
+            })
+        );
+        await waitFor(() =>
+            expect(toast.success).toHaveBeenCalledWith(
+                "Ravi Kumar was moved to Regional Statistics.",
+                { id: `organisation-changed-${LEARNER}` }
+            )
         );
     });
 });
