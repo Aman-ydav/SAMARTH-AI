@@ -169,6 +169,7 @@
         "PASSWORD_POLICY": "This password does not meet the requirements.",
         "PASSWORD_REUSED": "Choose a password you have not used recently.",
         "PAYLOAD_TOO_LARGE": "The request is too large.",
+        "QUIZ_ATTEMPT_LIMIT": "You have reached the attempt limit for this quiz. Try again later.",
         "RATE_LIMITED": "Too many requests. Please wait a moment and try again.",
         "REAUTH_REQUIRED": "Please confirm your identity to continue.",
         "REFRESH_INVALID": "Your session has ended. Please sign in again.",

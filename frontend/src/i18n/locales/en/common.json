@@ -26,6 +26,62 @@
     "goBack": "Go back",
     "goToDashboard": "Go to dashboard",
     "or": "or",
+    "quiz": {
+        "title": "Quizzes",
+        "intro": "Take a quiz to check your skills. Passing can raise your competency level.",
+        "empty": "No quizzes are available yet.",
+        "open": "Open {{title}}",
+        "questionCount_one": "{{count}} question",
+        "questionCount_other": "{{count}} questions",
+        "minutes_one": "{{count}} minute",
+        "minutes_other": "{{count}} minutes",
+        "noLimit": "No time limit",
+        "score": "Score: {{score}}%",
+        "passed": "Passed",
+        "notPassed": "Not passed",
+        "backToQuizzes": "Back to quizzes",
+        "noQuestions": "This quiz has no questions.",
+        "questionOf": "Question {{current}} of {{total}}",
+        "keyboardHint": "Keyboard: press N for the next question and P for the previous one.",
+        "previous": "Previous",
+        "reviewAnswers": "Review answers",
+        "progress": "Quiz progress",
+        "timeLeft": "Time left",
+        "timeWarning": "{{time}} left",
+        "history": {
+            "title": "Your previous attempts",
+            "empty": "You have not attempted any quiz yet.",
+            "unknown": "Quiz"
+        },
+        "detail": {
+            "title": "Quiz",
+            "questions": "Questions",
+            "time": "Time limit",
+            "passMark": "Pass mark",
+            "rules": "The timer starts when you begin and the quiz submits itself when time runs out. You can attempt a quiz at most 3 times in 24 hours.",
+            "start": "Start quiz"
+        },
+        "confirm": {
+            "title": "Review before you submit",
+            "summary": "You answered {{answered}} of {{total}} questions.",
+            "unanswered": "These questions have no answer yet:",
+            "goTo": "Question {{number}}",
+            "submit": "Submit quiz"
+        },
+        "result": {
+            "title": "Your result",
+            "missing": "This result is no longer available. Your attempt is saved in your history.",
+            "correct": "{{correct}} of {{total}} correct",
+            "levelUp": "Your competency level is now {{level}}.",
+            "noChange": "Your competency level did not change.",
+            "review": "Question review",
+            "right": "Correct",
+            "wrong": "Incorrect"
+        },
+        "errors": {
+            "attemptLimit": "You have reached the limit of 3 attempts for this quiz in 24 hours. Try again later."
+        }
+    },
     "competencies": {
         "title": "My competencies",
         "intro": "Your level in each competency, with the evidence behind it.",
