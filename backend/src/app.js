@@ -20,6 +20,7 @@ import {
 } from "#middlewares/testOutbox.js";
 import { createAdminRouter } from "#modules/admin/index.js";
 import { createAssessmentRouter } from "#modules/assessment/index.js";
+import { createAuditRouter } from "#modules/audit/index.js";
 import { createAuthRouter } from "#modules/auth/index.js";
 import { createCompetencyRouter } from "#modules/competency/index.js";
 import { createJobsRouter } from "#modules/jobs/index.js";
@@ -42,6 +43,8 @@ import { sanitizingQueryParser } from "#utils/sanitize.js";
 function mountModules(api, deps) {
     api.use("/auth", createAuthRouter(deps));
     api.use("/profile", createUsersRouter(deps));
+    // Before `/admin` so the longer prefix matches first; the audit router has its own guards.
+    api.use("/admin/audit", createAuditRouter(deps));
     api.use("/admin", createAdminRouter(deps));
     api.use("/jobs", createJobsRouter(deps));
     api.use("/me/notifications", createNotificationsRouter(deps));

@@ -95,6 +95,8 @@ auditLogSchema.index({ hash: 1 }, { name: "auditLogs_hash_uq", unique: true });
 auditLogSchema.index({ actorId: 1, at: -1 }, { name: "auditLogs_actorId_at" });
 // serves: the org-wide audit search
 auditLogSchema.index({ orgId: 1, at: -1 }, { name: "auditLogs_orgId_at" });
+// serves: the org-scoped admin audit list, newest chain position first (GET /admin/audit for an admin)
+auditLogSchema.index({ orgId: 1, seq: -1 }, { name: "auditLogs_orgId_seq" });
 // serves: the history of one entity (for example one user)
 auditLogSchema.index(
     { entityType: 1, entityId: 1, at: -1 },

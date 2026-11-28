@@ -23,6 +23,7 @@ tags:
     - name: Admin
     - name: Jobs
     - name: Notifications
+    - name: Audit
 security: []
 paths:
     /health:
@@ -2871,6 +2872,159 @@ paths:
                     $ref: "#/components/responses/Error404"
                 "429":
                     $ref: "#/components/responses/Error429"
+    /admin/audit:
+        get:
+            tags:
+                - Audit
+            operationId: listAuditEntries
+            summary: List audit entries, newest first (admin and platform admin)
+            description: An admin sees only the entries of their own organisation; a platform admin sees every organisation and the orgId field. Filters are checked strictly; unknown keys, actions or ids answer 400.
+            security: *a8
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                      type: integer
+                      minimum: 1
+                - name: limit
+                  in: query
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                - name: actor
+                  in: query
+                  description: Acting user id.
+                  schema:
+                      type: string
+                      pattern: ^[a-f0-9]{24}$
+                - name: action
+                  in: query
+                  description: One audit action name, for example LOGIN_SUCCESS or ROLE_CHANGED.
+                  schema:
+                      type: string
+                - name: from
+                  in: query
+                  description: Earliest entry time, an ISO 8601 instant. Must not be after "to".
+                  schema:
+                      type: string
+                      format: date-time
+                - name: to
+                  in: query
+                  description: Latest entry time, an ISO 8601 instant.
+                  schema:
+                      type: string
+                      format: date-time
+            responses:
+                "200":
+                    description: A page of audit entries
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  entries:
+                                                      type: array
+                                                      items:
+                                                          $ref: "#/components/schemas/AuditEntry"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                "401":
+                    $ref: "#/components/responses/Error401"
+                "403":
+                    $ref: "#/components/responses/Error403"
+                "429":
+                    $ref: "#/components/responses/Error429"
+    /admin/audit/verify:
+        get:
+            tags:
+                - Audit
+            operationId: verifyAuditChain
+            summary: Recompute the whole audit hash chain (platform admin only)
+            description: Walks every entry in order and reports intact or the first broken sequence number. Platform admin only, because the chain spans all organisations. It is synchronous; a very long chain would move to a background job.
+            security: *a8
+            responses:
+                "200":
+                    description: The chain status
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  chain:
+                                                      $ref: "#/components/schemas/AuditChainStatus"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                "401":
+                    $ref: "#/components/responses/Error401"
+                "403":
+                    $ref: "#/components/responses/Error403"
+                "429":
+                    $ref: "#/components/responses/Error429"
+    /admin/audit/demo/tamper:
+        post:
+            tags:
+                - Audit
+            operationId: simulateAuditTamper
+            summary: Show how the chain detects tampering, without changing it (platform admin only, demo flag)
+            description: Reads the first entries of the chain, checks them, then checks a copy in which one entry is altered in memory, and reports where the check breaks. It never writes to stored records and runs the same check as the real verification. Answers 404 NOT_FOUND unless the AUDIT_TAMPER_DEMO switch is on, and 422 when the chain has fewer than two entries or the chosen seq is outside the checked window.
+            security: *a8
+            parameters:
+                - *a1
+            requestBody:
+                required: false
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                seq:
+                                    type: integer
+                                    minimum: 1
+                                    maximum: 200
+                                    description: Entry to alter; defaults to the middle of the checked window.
+            responses:
+                "200":
+                    description: The simulation outcome
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  simulation:
+                                                      $ref: "#/components/schemas/TamperSimulation"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                "401":
+                    $ref: "#/components/responses/Error401"
+                "403":
+                    $ref: "#/components/responses/Error403"
+                "404":
+                    $ref: "#/components/responses/Error404"
+                "422":
+                    description: Fewer than two entries, or the chosen seq is outside the checked window
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorEnvelope"
+                "429":
+                    $ref: "#/components/responses/Error429"
 components:
     securitySchemes:
         accessCookie:
@@ -3509,6 +3663,114 @@ components:
                     type: boolean
                 allowGoogleLogin:
                     type: boolean
+        AuditEntry:
+            type: object
+            additionalProperties: false
+            required:
+                - id
+                - seq
+                - at
+                - actorId
+                - action
+                - entityType
+                - entityId
+                - meta
+                - prevHash
+                - hash
+            properties:
+                id:
+                    type: string
+                    pattern: ^[a-f0-9]{24}$
+                seq:
+                    type: integer
+                    minimum: 1
+                    description: Position in the hash chain.
+                at:
+                    type: string
+                    format: date-time
+                actorId:
+                    type: [string, "null"]
+                    description: Acting user id; null for system events and sign-in attempts of unknown accounts.
+                orgId:
+                    type: string
+                    description: Present only for a platform admin.
+                action:
+                    type: string
+                entityType:
+                    type: string
+                    maxLength: 40
+                entityId:
+                    type: [string, "null"]
+                meta:
+                    type: object
+                    description: Event details, hashes and flags only; never passwords, tokens or raw emails.
+                prevHash:
+                    type: string
+                    pattern: ^[a-f0-9]{64}$
+                hash:
+                    type: string
+                    pattern: ^[a-f0-9]{64}$
+        AuditChainStatus:
+            type: object
+            required:
+                - valid
+                - verifiedAt
+                - tamperDemoEnabled
+            properties:
+                valid:
+                    type: boolean
+                count:
+                    type: integer
+                    minimum: 0
+                    description: Number of entries checked; present when valid is true.
+                brokenAtSeq:
+                    type: integer
+                    minimum: 1
+                    description: First entry whose sequence, previous hash or own hash does not match; present when valid is false.
+                verifiedAt:
+                    type: string
+                    format: date-time
+                tamperDemoEnabled:
+                    type: boolean
+                    description: Whether the tamper demo route is switched on (AUDIT_TAMPER_DEMO).
+        TamperSimulation:
+            type: object
+            additionalProperties: false
+            required:
+                - windowSize
+                - tamperedSeq
+                - before
+                - after
+                - detected
+            properties:
+                windowSize:
+                    type: integer
+                    minimum: 2
+                    maximum: 200
+                    description: How many entries from the start of the chain were checked.
+                tamperedSeq:
+                    type: integer
+                    minimum: 1
+                    description: The entry that was altered in the in-memory copy.
+                before:
+                    type: object
+                    description: The check of the entries as stored.
+                    properties:
+                        valid:
+                            type: boolean
+                        brokenAtSeq:
+                            type: integer
+                after:
+                    type: object
+                    description: The check of the copy with one entry altered.
+                    properties:
+                        valid:
+                            type: boolean
+                        brokenAtSeq:
+                            type: integer
+                detected:
+                    type: boolean
+                    description: True when the stored entries are intact and the altered copy broke exactly at the altered entry.
         Notification:
             type: object
             additionalProperties: false
