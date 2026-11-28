@@ -1,5 +1,9 @@
 {
     "required": "This field is required.",
+    "onboarding": {
+        "tooLong": "Use 100 characters or fewer.",
+        "years": "Enter whole years between 0 and 60."
+    },
     "name": {
         "required": "Enter your full name.",
         "tooShort": "Enter at least 2 characters.",

@@ -26,6 +26,32 @@
     "goBack": "Go back",
     "goToDashboard": "Go to dashboard",
     "or": "or",
+    "onboarding": {
+        "title": "Welcome to SAMARTH AI",
+        "progress": "Step {{step}} of {{total}}",
+        "steps": {
+            "1": "Your role and department",
+            "2": "Rate your skills",
+            "3": "Review and finish"
+        },
+        "role": {
+            "designation": "Designation",
+            "department": "Department",
+            "yearsOfService": "Years of service",
+            "targetRole": "Target role",
+            "targetRolePlaceholder": "Choose a role",
+            "noRoles": "No roles are available yet."
+        },
+        "assessment": {
+            "hint": "Rate yourself from 0 (no skill) to {{max}} (expert). Rate at least one skill.",
+            "needOne": "Rate at least one skill to continue.",
+            "empty": "No competencies are available yet."
+        },
+        "review": {
+            "ratings": "Your self-ratings",
+            "finish": "Finish"
+        }
+    },
     "language": {
         "label": "Language",
         "en": "English",

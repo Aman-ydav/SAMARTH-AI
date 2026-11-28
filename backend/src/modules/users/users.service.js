@@ -63,7 +63,11 @@ export async function getAuthUser(userId) {
 export async function getProfile(userId) {
     const user = await User.findById(userId).select("+passwordHash").lean();
     if (!user) throw ApiError.notFound(ERROR_CODES.NOT_FOUND);
-    return { ...toAuthUser(user), timezone: user.timezone };
+    return {
+        ...toAuthUser(user),
+        timezone: user.timezone,
+        ...onboardingFields(user),
+    };
 }
 
 /**
@@ -84,6 +88,49 @@ export async function updateProfile(userId, input) {
         .lean();
     if (!user) throw ApiError.notFound(ERROR_CODES.NOT_FOUND);
     return { ...toAuthUser(user), timezone: user.timezone };
+}
+
+const onboardingFields = (user) => ({
+    designation: user.designation ?? null,
+    department: user.department ?? null,
+    yearsOfService: user.yearsOfService ?? null,
+    targetRole: user.targetRole ?? null,
+    onboardingCompletedAt: user.onboardingCompletedAt ?? null,
+});
+
+/**
+ * `PATCH /profile/onboarding`: saves the onboarding fields on the caller's own account only (owner and org scoped by the
+ * `_id` + `orgId` filter). A missing, soft-deleted or inactive account gives the same neutral answers, never details.
+ */
+export async function completeOnboarding(userId, orgId, input) {
+    const existing = await User.findOne({ _id: userId, orgId })
+        .select("status")
+        .lean();
+    if (!existing) throw ApiError.notFound(ERROR_CODES.NOT_FOUND);
+    if (existing.status !== USER_STATUSES.ACTIVE) {
+        throw ApiError.forbidden(ERROR_CODES.FORBIDDEN);
+    }
+    const user = await User.findOneAndUpdate(
+        { _id: userId, orgId },
+        {
+            $set: {
+                designation: input.designation,
+                department: input.department,
+                yearsOfService: input.yearsOfService,
+                targetRole: input.targetRole,
+                onboardingCompletedAt: new Date(),
+            },
+        },
+        { returnDocument: "after", runValidators: true }
+    )
+        .select("+passwordHash")
+        .lean();
+    if (!user) throw ApiError.notFound(ERROR_CODES.NOT_FOUND);
+    return {
+        ...toAuthUser(user),
+        timezone: user.timezone,
+        ...onboardingFields(user),
+    };
 }
 
 /**

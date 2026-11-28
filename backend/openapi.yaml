@@ -1299,6 +1299,81 @@ paths:
                 "403":
                     $ref: "#/components/responses/Error403"
                     description: "Codes: CSRF_INVALID, MUST_CHANGE_PASSWORD."
+    /profile/onboarding:
+        patch:
+            tags:
+                - Profile
+            operationId: completeOnboarding
+            summary: Save the onboarding profile fields
+            description: Writes designation, department, yearsOfService and targetRole on the caller's own account and stamps onboardingCompletedAt. Owner and organisation scoped; unknown fields (orgId, role) are refused. Limited to 20 requests per hour per user.
+            security: *a8
+            parameters:
+                - *a1
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+                            required:
+                                - designation
+                                - department
+                                - yearsOfService
+                                - targetRole
+                            properties:
+                                designation:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 100
+                                department:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 100
+                                yearsOfService:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 60
+                                targetRole:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 100
+            responses:
+                "200":
+                    description: Onboarding saved
+                    headers:
+                        X-Request-Id:
+                            $ref: "#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          statusCode:
+                                              const: 200
+                                          data:
+                                              type: object
+                                              additionalProperties: false
+                                              properties:
+                                                  user:
+                                                      $ref: "#/components/schemas/ProfileUser"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                    description: "Codes: VALIDATION_ERROR."
+                "401":
+                    $ref: "#/components/responses/Error401"
+                    description: "Codes: AUTH_REQUIRED, TOKEN_EXPIRED, TOKEN_INVALID, SESSION_REVOKED."
+                "403":
+                    $ref: "#/components/responses/Error403"
+                    description: "Codes: FORBIDDEN (account not active), CSRF_INVALID, MUST_CHANGE_PASSWORD."
+                "404":
+                    $ref: "#/components/responses/Error404"
+                    description: "Codes: NOT_FOUND."
+                "429":
+                    $ref: "#/components/responses/Error429"
+                    description: "Codes: RATE_LIMITED."
     /media/signatures:
         post:
             tags:
@@ -2964,6 +3039,27 @@ components:
                 - mustChangePassword
             additionalProperties: false
             properties:
+                designation:
+                    type:
+                        - string
+                        - "null"
+                department:
+                    type:
+                        - string
+                        - "null"
+                yearsOfService:
+                    type:
+                        - integer
+                        - "null"
+                targetRole:
+                    type:
+                        - string
+                        - "null"
+                onboardingCompletedAt:
+                    type:
+                        - string
+                        - "null"
+                    format: date-time
                 timezone:
                     type: string
                     examples:
