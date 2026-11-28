@@ -96,6 +96,8 @@ export const lazyNotifications = () =>
 export const lazyOnboarding = () =>
     import("@/features/onboarding/pages/OnboardingPage.jsx").then(toRoute);
 
+export const lazyAdminAudit = () =>
+    import("@/features/admin/pages/AdminAuditPage.jsx").then(toRoute);
 export const lazyAdminInvites = () =>
     import("@/features/admin/pages/AdminInvitesPage.jsx").then(toRoute);
 export const lazyAdminUsers = () =>

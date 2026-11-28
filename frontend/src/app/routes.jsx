@@ -48,6 +48,7 @@ import {
     lazyRecommendations,
     lazyNotifications,
     lazyOnboarding,
+    lazyAdminAudit,
     lazyAdminInvites,
     lazyAdminUsers,
     lazyOrganisations,
@@ -168,7 +169,7 @@ const adminRoutes = [
     route(PATHS.adminUsers, lazyAdminUsers, "nav:sidebar.users"),
     route(PATHS.adminInvites, lazyAdminInvites, "nav:sidebar.invites"),
     soon(PATHS.adminDepartments, "nav:sidebar.departments"),
-    soon(PATHS.adminAudit, "nav:sidebar.audit"),
+    route(PATHS.adminAudit, lazyAdminAudit, "nav:sidebar.audit"),
     soon(PATHS.adminIntegrations, "nav:sidebar.integrations"),
     soon(PATHS.adminSettings, "nav:sidebar.adminSettings"),
 ];

@@ -204,5 +204,68 @@
         "restore": "Restore",
         "deactivateTitle": "Deactivate {{name}}?",
         "deactivateBody": "All users in this organisation will be signed out immediately and cannot access the platform until it is restored. Restoring will not restore old sessions."
+    },
+    "audit": {
+        "title": "Audit trail",
+        "subtitleAdmin": "Security-relevant events in your organisation, newest first. Each entry is chained to the one before it, so any change to history can be detected.",
+        "subtitlePlatform": "Security-relevant events across every organisation, newest first. Entries are hash-chained, so any change to history can be detected.",
+        "loadingLabel": "Loading audit entries",
+        "filters": {
+            "action": "Action",
+            "allActions": "All actions",
+            "from": "From",
+            "to": "To",
+            "clear": "Clear filters"
+        },
+        "table": {
+            "caption": "Audit entries, newest first",
+            "seq": "No.",
+            "time": "Time",
+            "action": "Action",
+            "actor": "Actor",
+            "entity": "Subject",
+            "organisation": "Organisation",
+            "hash": "Hash",
+            "system": "System"
+        },
+        "empty": {
+            "title": "No audit entries yet",
+            "body": "Security events such as sign-ins and role changes will appear here.",
+            "filteredTitle": "No entries match your filters",
+            "filteredBody": "Try a different action or time range.",
+            "clear": "Clear filters"
+        },
+        "chain": {
+            "title": "Chain integrity",
+            "description": "Recomputes every hash from the first entry and checks each link.",
+            "verify": "Verify chain",
+            "verifyAgain": "Verify again",
+            "checking": "Checking the chain…",
+            "intactTitle": "Chain intact",
+            "intactBody_one": "{{count}} entry verified, every link matches.",
+            "intactBody_other": "{{count}} entries verified, every link matches.",
+            "brokenTitle": "Chain broken",
+            "brokenBody": "The check failed at entry {{seq}}: its content or link does not match. Entries from {{seq}} onward cannot be trusted.",
+            "verifiedAt": "Checked {{time}}"
+        },
+        "demo": {
+            "title": "Simulate tampering",
+            "description": "Alters one entry in a temporary copy and shows how the check catches it. Stored records are never changed.",
+            "run": "Simulate tampering",
+            "running": "Simulating…",
+            "detectedTitle": "Tampering detected",
+            "detectedBody": "Entry {{tampered}} was altered in a copy of the first {{window}} entries. The check broke at entry {{broken}}. Nothing stored was changed.",
+            "inconclusiveTitle": "Result not conclusive",
+            "inconclusiveBody": "The stored chain is already broken at entry {{seq}}, so the simulation cannot show a clean comparison.",
+            "before": "Stored entries",
+            "after": "Altered copy",
+            "intact": "intact",
+            "brokenAt": "broken at entry {{seq}}"
+        },
+        "errors": {
+            "forbidden": "Only a platform admin can do this.",
+            "demoOff": "The tampering demo is switched off on this server.",
+            "notEnough": "There are not enough audit entries yet to run the demo."
+        }
     }
 }
