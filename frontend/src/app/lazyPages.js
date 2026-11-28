@@ -89,6 +89,10 @@ export const lazyGaps = () =>
     import("@/features/competencies/pages/GapsPage.jsx").then(toRoute);
 export const lazyRecommendations = () =>
     import("@/features/learning/pages/RecommendationsPage.jsx").then(toRoute);
+export const lazyNotifications = () =>
+    import("@/features/notifications/pages/NotificationsPage.jsx").then(
+        toRoute
+    );
 export const lazyOnboarding = () =>
     import("@/features/onboarding/pages/OnboardingPage.jsx").then(toRoute);
 

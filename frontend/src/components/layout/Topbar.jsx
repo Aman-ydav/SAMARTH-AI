@@ -6,6 +6,7 @@ import { UserMenu } from "@/components/layout/UserMenu";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAuth } from "@/features/auth";
+import { NotificationsLoader } from "@/features/notifications";
 
 /**
  * Sticky topbar of the app shell (UI-61): sidebar trigger, breadcrumbs, then language, theme, notifications and the
@@ -25,7 +26,7 @@ export function Topbar() {
                     <LanguageSwitch />
                     <ThemeToggle />
                 </div>
-                <NotificationsBell />
+                <NotificationsLoader fallback={<NotificationsBell />} />
                 <UserMenu user={user} />
             </div>
         </header>

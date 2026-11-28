@@ -13,6 +13,8 @@ describe("rootReducer", () => {
             "adminUsers",
             "auth",
             "invites",
+            "notifications",
+            "onboarding",
             "profile",
             "registration",
             "sessions",

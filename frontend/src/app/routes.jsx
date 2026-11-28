@@ -46,6 +46,7 @@ import {
     lazyDashboard,
     lazyGaps,
     lazyRecommendations,
+    lazyNotifications,
     lazyOnboarding,
     lazyAdminInvites,
     lazyAdminUsers,
@@ -140,7 +141,11 @@ const learnerRoutes = [
     soon(PATHS.result, "nav:sidebar.quizzes"),
     soon(PATHS.practice, "nav:sidebar.quizzes"),
     soon(PATHS.chat, "nav:sidebar.tutor"),
-    soon(PATHS.notifications, "nav:sidebar.notifications"),
+    route(
+        PATHS.notifications,
+        lazyNotifications,
+        "nav:sidebar.notifications"
+    ),
     acct(PATHS.settingsProfile, lazyProfile, "settings.profile"),
     acct(PATHS.settingsSecurity, lazySecurity, "settings.security"),
     acct(PATHS.settingsSessions, lazySessions, "settings.sessions"),
