@@ -45,6 +45,7 @@ import {
     lazyLabs,
     lazyDashboard,
     lazyGaps,
+    lazyHelp,
     lazyRecommendations,
     lazyNotifications,
     lazyOnboarding,
@@ -147,6 +148,7 @@ const learnerRoutes = [
         lazyNotifications,
         "nav:sidebar.notifications"
     ),
+    route(PATHS.help, lazyHelp, "nav:shell.help"),
     acct(PATHS.settingsProfile, lazyProfile, "settings.profile"),
     acct(PATHS.settingsSecurity, lazySecurity, "settings.security"),
     acct(PATHS.settingsSessions, lazySessions, "settings.sessions"),
@@ -223,6 +225,8 @@ const roleGroup = (roles, children) => ({
 
 const appRoutes = {
     lazy: lazyAppShell,
+    // Tells RootLayout the shell renders the status banners itself (under its top bar).
+    handle: { statusBanners: "shell" },
     children: [
         roleGroup(ROLE_SETS.learner, learnerRoutes),
         roleGroup(ROLE_SETS.trainer, trainerRoutes),

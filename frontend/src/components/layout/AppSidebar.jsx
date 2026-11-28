@@ -113,8 +113,18 @@ export function AppSidebar() {
                 ) : null}
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild tooltip={t("shell.help")}>
-                            <Link to={PATHS.comingSoon} onClick={closeMobile}>
+                        <SidebarMenuButton
+                            asChild
+                            isActive={pathname === PATHS.help}
+                            tooltip={t("shell.help")}
+                        >
+                            <Link
+                                to={PATHS.help}
+                                aria-current={
+                                    pathname === PATHS.help ? "page" : undefined
+                                }
+                                onClick={closeMobile}
+                            >
                                 <Icons.HelpIcon aria-hidden="true" />
                                 <span>{t("shell.help")}</span>
                             </Link>

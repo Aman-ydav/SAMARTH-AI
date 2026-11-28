@@ -3,6 +3,7 @@ import { Outlet } from "react-router";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { PageSkeleton } from "@/components/layout/PageSkeleton";
+import { ShellStatusBanners } from "@/components/layout/ShellStatusBanners";
 import { Topbar } from "@/components/layout/Topbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,6 +28,7 @@ export function AppShell() {
                 <AppSidebar />
                 <div className="flex min-w-0 flex-1 flex-col">
                     <Topbar />
+                    <ShellStatusBanners />
                     <div className="relative flex w-full flex-1 flex-col bg-background">
                         <div className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
                             <Suspense fallback={<PageSkeleton />}>
