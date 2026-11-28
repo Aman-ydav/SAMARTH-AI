@@ -95,9 +95,7 @@ export function LearnerOverview() {
                 />
             </Suspense>
             <div className="flex flex-col gap-4">
-                {status === STATUS.SUCCEEDED && (
-                    <SkillGapsCard gaps={gaps} />
-                )}
+                {status === STATUS.SUCCEEDED && <SkillGapsCard gaps={gaps} />}
                 {status === STATUS.SUCCEEDED && (
                     <Card>
                         <CardContent className="flex items-center gap-3">
