@@ -7,6 +7,11 @@ const CATALOG = {
     VALIDATION_ERROR: [400, "The request contains invalid data."],
     BAD_REQUEST: [400, "The request could not be processed."],
     INVALID_ID: [400, "The identifier is not valid."],
+    INVALID_ANSWERS: [
+        400,
+        "The submitted answers are not valid for this quiz.",
+    ],
+    INVALID_RATINGS: [400, "The submitted ratings are not valid."],
     INVALID_JSON: [400, "The request body is not valid JSON."],
     UPLOAD_INVALID: [400, "The upload is not valid."],
     PASSWORD_POLICY: [400, "The password does not meet the policy."],
@@ -60,6 +65,11 @@ const CATALOG = {
     MEDIA_NOT_FOUND: [404, "The media item was not found."],
     JOB_NOT_FOUND: [404, "The job was not found."],
     NOTIFICATION_NOT_FOUND: [404, "The notification was not found."],
+    QUIZ_NOT_FOUND: [404, "The quiz was not found."],
+    ATTEMPT_NOT_FOUND: [404, "The quiz attempt was not found."],
+    ROLE_NOT_FOUND: [404, "The role profile was not found."],
+    COURSE_NOT_FOUND: [404, "The course was not found."],
+    ENROLMENT_NOT_FOUND: [404, "The enrolment was not found."],
     // 409
     CONFLICT: [
         409,
@@ -78,6 +88,10 @@ const CATALOG = {
     ],
     ACCOUNT_LOCKED: [423, "The account is temporarily locked."],
     RATE_LIMITED: [429, "Too many requests. Please try again later."],
+    QUIZ_ATTEMPT_LIMIT: [
+        429,
+        "You have reached the attempt limit for this quiz. Try again later.",
+    ],
     // 5xx
     INTERNAL: [500, "Something went wrong."],
     INTEGRATION_ERROR: [502, "An upstream service failed."],

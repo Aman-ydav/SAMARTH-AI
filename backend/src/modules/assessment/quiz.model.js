@@ -1,59 +1,79 @@
 import mongoose from "mongoose";
 import { toJsonPlugin } from "#db/toJsonPlugin.js";
 
+const MAX_QUESTIONS = 100;
+const MIN_OPTIONS = 2;
+const MAX_OPTIONS = 6;
+
+/* Embedded question: the correct answer and the explanation never leave the database with the quiz (DB-11); the attempt
+   service asks for them explicitly with `select("+questions.correctOptionIndex +questions.explanation")`. */
 const questionSchema = new mongoose.Schema(
     {
-        id: { type: String, required: true },
-        question: { type: String, required: true, trim: true },
-        options: [{ type: String, required: true, trim: true }],
-        correctOptionIndex: { type: Number, required: true, select: false }, // protected from direct leak
-        explanation: { type: String, required: true, select: false },
+        id: { type: String, required: true, trim: true, maxlength: 64 },
+        question: { type: String, required: true, trim: true, maxlength: 500 },
+        options: {
+            type: [
+                { type: String, required: true, trim: true, maxlength: 300 },
+            ],
+            validate: {
+                validator: (options) =>
+                    options.length >= MIN_OPTIONS &&
+                    options.length <= MAX_OPTIONS,
+                message: "A question needs two to six options.",
+            },
+        },
+        correctOptionIndex: {
+            type: Number,
+            required: true,
+            min: 0,
+            max: MAX_OPTIONS - 1,
+            select: false,
+        },
+        explanation: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: 1000,
+            select: false,
+        },
     },
-    { _id: false }
+    { _id: false, timestamps: { createdAt: false, updatedAt: false } }
 );
 
 const quizSchema = new mongoose.Schema(
     {
-        _id: { type: String, required: true, trim: true },
-        title: { type: String, required: true, trim: true },
-        domain: { type: String, required: true, trim: true },
-        competencyId: { type: String, required: true, ref: "Competency", index: true },
+        _id: { type: String, required: true, trim: true, maxlength: 64 },
+        title: { type: String, required: true, trim: true, maxlength: 200 },
+        domain: { type: String, required: true, trim: true, maxlength: 80 },
+        competencyId: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: 64,
+            ref: "Competency",
+        },
         level: { type: Number, required: true, min: 1, max: 5 },
-        timeLimitMinutes: { type: Number, default: 15 },
-        passingScorePercent: { type: Number, default: 70 },
-        description: { type: String, required: true, trim: true },
-        questions: [questionSchema],
+        timeLimitMinutes: { type: Number, default: 15, min: 1, max: 240 },
+        passingScorePercent: { type: Number, default: 70, min: 1, max: 100 },
+        description: {
+            type: String,
+            required: true,
+            trim: true,
+            maxlength: 1000,
+        },
+        questions: {
+            type: [questionSchema],
+            validate: {
+                validator: (questions) => questions.length <= MAX_QUESTIONS,
+                message: "A quiz holds at most 100 questions.",
+            },
+        },
     },
-    { timestamps: true }
+    { timestamps: true, collection: "quizzes" }
 );
 
+// serves: the quiz list filtered by competency
+quizSchema.index({ competencyId: 1 }, { name: "quizzes_competencyId" });
 quizSchema.plugin(toJsonPlugin);
 
-const answerRecordSchema = new mongoose.Schema(
-    {
-        questionId: { type: String, required: true },
-        selectedOptionIndex: { type: Number, required: true },
-        isCorrect: { type: Boolean, required: true },
-        correctOptionIndex: { type: Number, required: true },
-        explanation: { type: String, required: true },
-    },
-    { _id: false }
-);
-
-const quizAttemptSchema = new mongoose.Schema(
-    {
-        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
-        quizId: { type: String, ref: "Quiz", required: true },
-        answers: [answerRecordSchema],
-        scorePercent: { type: Number, required: true, min: 0, max: 100 },
-        passed: { type: Boolean, required: true },
-        feedback: { type: String, trim: true },
-        submittedAt: { type: Date, default: Date.now },
-    },
-    { timestamps: true }
-);
-
-quizAttemptSchema.plugin(toJsonPlugin);
-
 export const Quiz = mongoose.model("Quiz", quizSchema);
-export const QuizAttempt = mongoose.model("QuizAttempt", quizAttemptSchema);

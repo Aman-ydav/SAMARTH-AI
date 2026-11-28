@@ -145,10 +145,7 @@ export default function GetStartedPage() {
             </section>
 
             <footer className="mx-auto mt-16 max-w-2xl border-t border-border pt-6 text-center">
-                <p className="type-small text-muted-foreground">
-                    {t("common:prototypeNotice")}
-                </p>
-                <p className="type-small mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+                <p className="type-small flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
                     <span className="text-muted-foreground">
                         {t("errors:pages.getStarted.legalLabel")}
                     </span>

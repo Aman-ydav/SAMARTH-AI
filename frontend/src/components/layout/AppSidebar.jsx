@@ -4,7 +4,6 @@ import * as Icons from "@/components/icons";
 import { LanguageSwitch } from "@/components/layout/LanguageSwitch";
 import { Logo } from "@/components/layout/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
-import { Badge } from "@/components/ui/badge";
 import {
     Sidebar,
     SidebarContent,
@@ -114,8 +113,18 @@ export function AppSidebar() {
                 ) : null}
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild tooltip={t("shell.help")}>
-                            <Link to={PATHS.comingSoon} onClick={closeMobile}>
+                        <SidebarMenuButton
+                            asChild
+                            isActive={pathname === PATHS.help}
+                            tooltip={t("shell.help")}
+                        >
+                            <Link
+                                to={PATHS.help}
+                                aria-current={
+                                    pathname === PATHS.help ? "page" : undefined
+                                }
+                                onClick={closeMobile}
+                            >
                                 <Icons.HelpIcon aria-hidden="true" />
                                 <span>{t("shell.help")}</span>
                             </Link>
@@ -138,12 +147,6 @@ export function AppSidebar() {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
-                <Badge
-                    variant="outline"
-                    className="mx-2 w-fit group-data-[collapsible=icon]:hidden"
-                >
-                    {t("common:prototype")}
-                </Badge>
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>

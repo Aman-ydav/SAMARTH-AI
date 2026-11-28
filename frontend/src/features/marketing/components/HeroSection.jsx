@@ -50,9 +50,6 @@ export function HeroSection() {
                                 </a>
                             </Button>
                         </Reveal>
-                        <p className="type-small text-muted-foreground">
-                            {t("hero.note")}
-                        </p>
                     </div>
                     <TickerMarquee
                         items={Array.isArray(chips) ? chips : []}

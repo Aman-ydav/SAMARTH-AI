@@ -1,11 +1,11 @@
-import { useEffect, useMemo } from "react";
+import { Suspense, lazy, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { RadarChartCard } from "@/components/charts/RadarChartCard";
 import { ClockIcon, RadarIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { SkillGapsCard } from "@/features/dashboard/components/SkillGapsCard";
 import {
     fetchDashboard,
@@ -14,6 +14,14 @@ import {
 } from "@/features/dashboard/slice/dashboardSlice";
 import { STATUS } from "@/lib/asyncState";
 import { PATHS } from "@/lib/paths";
+
+/* The chart library is heavy (about 100 kB gzip), so the radar loads as its own chunk and the rest of the dashboard
+   paints first (FE-111: route chunks stay under 150 kB gzip). */
+const RadarChartCard = lazy(() =>
+    import("@/components/charts/RadarChartCard").then((module) => ({
+        default: module.RadarChartCard,
+    }))
+);
 
 /** Learner overview: radar of current against required level, top five gaps, planned learning hours. */
 export function LearnerOverview() {
@@ -63,23 +71,31 @@ export function LearnerOverview() {
 
     return (
         <div className="grid gap-4 lg:grid-cols-2">
-            <RadarChartCard
-                axes={axes}
-                loading={loading}
-                error={status === STATUS.FAILED ? error : null}
-                onRetry={retry}
-                description={
-                    analysis
-                        ? t("dashboard.readiness", {
-                              score: analysis.readinessScore,
-                          })
-                        : undefined
+            <Suspense
+                fallback={
+                    <Card aria-busy="true">
+                        <CardContent>
+                            <Skeleton className="h-72 w-full" />
+                        </CardContent>
+                    </Card>
                 }
-            />
+            >
+                <RadarChartCard
+                    axes={axes}
+                    loading={loading}
+                    error={status === STATUS.FAILED ? error : null}
+                    onRetry={retry}
+                    description={
+                        analysis
+                            ? t("dashboard.readiness", {
+                                  score: analysis.readinessScore,
+                              })
+                            : undefined
+                    }
+                />
+            </Suspense>
             <div className="flex flex-col gap-4">
-                {status === STATUS.SUCCEEDED && (
-                    <SkillGapsCard gaps={gaps} />
-                )}
+                {status === STATUS.SUCCEEDED && <SkillGapsCard gaps={gaps} />}
                 {status === STATUS.SUCCEEDED && (
                     <Card>
                         <CardContent className="flex items-center gap-3">

@@ -35,16 +35,16 @@ describe("HeroSection", { timeout: 30000 }, () => {
         }
     );
 
-    it("shows the sub-headline, the prototype note and the eyebrow", () => {
+    it("shows the sub-headline and the eyebrow, and no prototype note", () => {
         renderWithProviders(<HeroSection />);
         expect(
             screen.getByText(/maps every official's competencies to their role/)
         ).toBeInTheDocument();
         expect(
-            screen.getByText(
+            screen.queryByText(
                 "Prototype for SIH26101. Not an official Government of India website."
             )
-        ).toBeInTheDocument();
+        ).not.toBeInTheDocument();
         expect(
             screen.getByText(
                 "Smart Competency Intelligence for Official Statistics"

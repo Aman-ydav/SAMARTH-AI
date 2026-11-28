@@ -99,6 +99,8 @@ export const lazyQuizResult = () =>
     import("@/features/quiz/pages/QuizResultPage.jsx").then(toRoute);
 export const lazyRecommendations = () =>
     import("@/features/learning/pages/RecommendationsPage.jsx").then(toRoute);
+export const lazyHelp = () =>
+    import("@/features/help/pages/HelpPage.jsx").then(toRoute);
 export const lazyNotifications = () =>
     import("@/features/notifications/pages/NotificationsPage.jsx").then(
         toRoute
@@ -106,6 +108,8 @@ export const lazyNotifications = () =>
 export const lazyOnboarding = () =>
     import("@/features/onboarding/pages/OnboardingPage.jsx").then(toRoute);
 
+export const lazyAdminAudit = () =>
+    import("@/features/admin/pages/AdminAuditPage.jsx").then(toRoute);
 export const lazyAdminInvites = () =>
     import("@/features/admin/pages/AdminInvitesPage.jsx").then(toRoute);
 export const lazyAdminUsers = () =>

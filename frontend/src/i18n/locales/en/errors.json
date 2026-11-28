@@ -189,6 +189,9 @@
         "UPLOAD_INVALID": "The upload was not valid.",
         "VALIDATION_ERROR": "Please check the highlighted fields.",
         "VERIFY_TOKEN_INVALID": "This verification link is invalid, expired or already used.",
-        "WEBHOOK_SIGNATURE_INVALID": "This request could not be verified."
+        "WEBHOOK_SIGNATURE_INVALID": "This request could not be verified.",
+        "INVALID_ANSWERS": "Some answers could not be accepted. Please review the quiz and try again.",
+        "INVALID_RATINGS": "Some ratings could not be saved. Please review them and try again.",
+        "QUIZ_ATTEMPT_LIMIT": "You have used all attempts for this quiz for now. You can try again later."
     }
 }

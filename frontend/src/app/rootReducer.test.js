@@ -11,7 +11,9 @@ describe("rootReducer", () => {
         expect(Object.keys(setupStore().getState()).sort()).toEqual([
             "account",
             "adminUsers",
+            "audit",
             "auth",
+            "dashboard",
             "invites",
             "notifications",
             "onboarding",

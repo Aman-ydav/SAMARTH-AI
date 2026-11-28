@@ -33,6 +33,10 @@ export function RootLayout() {
     useDocumentTitle(
         titleKey ? t("documentTitle", { page: t(titleKey) }) : t("brand.name")
     );
+    // The signed-in shell shows the status banners itself, under its top bar, so they never cover the top bar or sidebar.
+    const shellShowsBanners = matches.some(
+        (match) => match.handle?.statusBanners === "shell"
+    );
 
     useRevalidateOnFocus(() => {
         if (signedIn) dispatch(fetchCurrentUser({ force: true }));
@@ -50,7 +54,7 @@ export function RootLayout() {
         <>
             <BootGate>
                 <SkipLink />
-                <StatusBanners />
+                {shellShowsBanners ? null : <StatusBanners />}
                 <Suspense fallback={<BootSplash />}>
                     <Outlet />
                 </Suspense>

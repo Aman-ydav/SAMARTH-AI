@@ -8,6 +8,11 @@ import {
     registrationReducer,
     sessionsReducer,
 } from "@/features/auth";
+import {
+    adminUsersReducer,
+    auditReducer,
+    invitesReducer,
+} from "@/features/admin";
 import { adminUsersReducer, invitesReducer } from "@/features/admin";
 import { competencyProfileReducer } from "@/features/competencies/slice/competencyProfileSlice";
 import { dashboardReducer } from "@/features/dashboard/slice/dashboardSlice";
@@ -24,6 +29,7 @@ const appReducer = combineReducers({
     sessions: sessionsReducer,
     invites: invitesReducer,
     adminUsers: adminUsersReducer,
+    audit: auditReducer,
     competencyProfile: competencyProfileReducer,
     dashboard: dashboardReducer,
     notifications: notificationsReducer,

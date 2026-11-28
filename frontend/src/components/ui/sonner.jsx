@@ -6,6 +6,7 @@ import {
     SpinnerIcon,
     WarningIcon,
 } from "@/components/icons";
+import { useIsMobile } from "@/hooks/useMobile";
 
 /* Status colours come from the -subtle token sets (UI-07). The theme comes from the app's ThemeProvider
    (prop), not next-themes. --toast-*-border bridge variables live in index.css because sonner defines
@@ -29,11 +30,21 @@ const toastStyle = {
     "--border-radius": "var(--radius)",
 };
 
+/* Placement (UI spec, toast row): bottom-right on desktop, bottom-center on phones, always at the bottom edge so a toast
+   sits in the content area and never on the top bar (top) or the left sidebar. Toasts keep z-100 (UI-43) on purpose: a toast
+   must stay in front of dialogs and menus or an error raised while one is open would be invisible. */
+const DESKTOP_OFFSET = 24;
+const MOBILE_OFFSET = 16;
+
 function Toaster({ theme = "system", ...props }) {
+    const isMobile = useIsMobile();
     return (
         <Sonner
             theme={theme}
             richColors
+            position={isMobile ? "bottom-center" : "bottom-right"}
+            offset={DESKTOP_OFFSET}
+            mobileOffset={MOBILE_OFFSET}
             className="toaster group z-100! font-sans!"
             icons={{
                 success: (

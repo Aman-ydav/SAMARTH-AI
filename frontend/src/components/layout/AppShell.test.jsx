@@ -90,23 +90,13 @@ describe("AppShell frame", () => {
         expect(sidebarNav()).toBeInTheDocument();
     });
 
-    it("shows the dismissible prototype notice and keeps it dismissed while navigating", async () => {
-        const { router } = renderShell();
-        expect(
-            screen.getByText(
-                "Prototype for SIH26101. Not an official Government of India website."
-            )
-        ).toBeInTheDocument();
-        await userEvent.click(
-            screen.getByRole("button", { name: "Dismiss notice" })
-        );
+    it("shows no prototype banner above the page (removed on purpose, 2026-11-28)", () => {
+        renderShell();
         expect(
             screen.queryByText(/Prototype for SIH26101/)
         ).not.toBeInTheDocument();
-        await router.navigate("/gaps");
-        await screen.findByText("Gaps page");
         expect(
-            screen.queryByText(/Prototype for SIH26101/)
+            screen.queryByRole("button", { name: "Dismiss notice" })
         ).not.toBeInTheDocument();
     });
 

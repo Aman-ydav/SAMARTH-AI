@@ -110,7 +110,6 @@ export function AuthSplitLayout() {
                     </Reveal>
                 </div>
                 <footer className="flex flex-col gap-2 px-4 py-6 text-sm text-muted-foreground sm:px-6 lg:px-8">
-                    <p>{t("common:prototypeNotice")}</p>
                     <nav
                         aria-label={t("auth:layout.legalNav")}
                         className="flex gap-4"
