@@ -1,0 +1,165 @@
+{
+    "page": {
+        "title": "Help",
+        "subtitle": "A short guide to SAMARTH AI for your role: what each area does and what you can use today.",
+        "roleLine": "Showing help for your role:"
+    },
+    "status": {
+        "available": "Available",
+        "soon": "Coming soon"
+    },
+    "actions": {
+        "open": "Open",
+        "openTopic": "Open {{topic}}"
+    },
+    "sections": {
+        "everyone": {
+            "title": "For everyone",
+            "description": "These parts are open to every signed-in role."
+        },
+        "learner": {
+            "title": "For learners",
+            "description": "Understand your skills, close your gaps and keep learning."
+        },
+        "trainer": {
+            "title": "For trainers",
+            "description": "Prepare material and quizzes for your learners."
+        },
+        "admin": {
+            "title": "For admins",
+            "description": "Look after the people and the records of your organisation."
+        },
+        "superadmin": {
+            "title": "For platform admins",
+            "description": "Look after the whole platform."
+        }
+    },
+    "topics": {
+        "dashboard": {
+            "title": "Dashboard",
+            "body": "Your starting page. It greets you by name and points to the areas planned for your role."
+        },
+        "notifications": {
+            "title": "Notifications",
+            "body": "Updates about tasks you started, newest first. Mark them as read or dismiss them; the bell in the top bar shows how many are unread."
+        },
+        "profile": {
+            "title": "Profile",
+            "body": "Update your personal details and your photo."
+        },
+        "security": {
+            "title": "Security",
+            "body": "Change your password and manage the security of your account."
+        },
+        "sessions": {
+            "title": "Devices and sessions",
+            "body": "See where you are signed in and sign out of devices you no longer use."
+        },
+        "gaps": {
+            "title": "Skill gaps",
+            "body": "Choose a role to compare against, see where your skills fall short and filter the gaps by domain."
+        },
+        "recommendations": {
+            "title": "Recommendations",
+            "body": "Learning suggested to close your biggest gaps."
+        },
+        "quizzes": {
+            "title": "Quizzes",
+            "body": "Practice quizzes and tests with feedback on every answer."
+        },
+        "tutor": {
+            "title": "AI tutor",
+            "body": "Ask questions and get answers that point back to the source material."
+        },
+        "labs": {
+            "title": "Virtual labs",
+            "body": "Hands-on labs for practising statistical methods."
+        },
+        "content": {
+            "title": "Content library",
+            "body": "Upload and organise the material your learners study."
+        },
+        "generate": {
+            "title": "Generate quiz",
+            "body": "Draft quiz questions from your material with AI help."
+        },
+        "review": {
+            "title": "Review questions",
+            "body": "Check and edit every drafted question before learners see it."
+        },
+        "trainerQuizzes": {
+            "title": "Quizzes and results",
+            "body": "Publish quizzes and read how your learners performed."
+        },
+        "users": {
+            "title": "Users",
+            "body": "Find accounts in your organisation and suspend or reactivate them. Platform admins can also change roles."
+        },
+        "invites": {
+            "title": "Team invitations",
+            "body": "Invite trainers to your organisation (platform admins can also invite admins), then resend or revoke invitations that are still open."
+        },
+        "audit": {
+            "title": "Audit log",
+            "body": "Browse the tamper-evident record of important actions and check that its chain is intact."
+        },
+        "overview": {
+            "title": "Overview",
+            "body": "Your organisation at a glance."
+        },
+        "analytics": {
+            "title": "Analytics",
+            "body": "Competency and learning figures across your organisation."
+        },
+        "departments": {
+            "title": "Departments",
+            "body": "Group people into departments and compare them."
+        },
+        "organisations": {
+            "title": "Organisations",
+            "body": "Review the organisations on the platform."
+        },
+        "framework": {
+            "title": "Competency framework",
+            "body": "Maintain the competencies and their levels."
+        },
+        "system": {
+            "title": "System settings",
+            "body": "Platform-wide settings."
+        }
+    },
+    "faq": {
+        "title": "Common questions",
+        "legal": "Read more:",
+        "items": [
+            {
+                "question": "I forgot my password. What do I do?",
+                "answer": "On the sign-in page choose Forgot password and enter your email address. If an account exists we send a reset link. The reply is always the same, so nobody can find out whether an email address is registered."
+            },
+            {
+                "question": "How do I change my password?",
+                "answer": "Open Settings, then Security, and choose a new password."
+            },
+            {
+                "question": "My account is locked. When can I sign in again?",
+                "answer": "After five wrong passwords in a row the account is locked for 15 minutes. Each further wrong attempt doubles the wait, up to 24 hours. Wait until the time is over, then sign in again."
+            },
+            {
+                "question": "Why was I signed out?",
+                "answer": "You are signed out when your session ends or when you sign out of it from Devices and sessions. Sign in again to continue; you return to the page you were on."
+            },
+            {
+                "question": "How do trainers and admins get their accounts?",
+                "answer": "Learners create their own account. Trainers and admins join by invitation: an admin invites trainers, and a platform admin invites trainers and admins. Platform admins are set up by the people who run the platform."
+            },
+            {
+                "question": "Some menu items say Coming soon. Why?",
+                "answer": "Those areas are planned for a later stage. They will start working without any action from you, and this page will show them as Available."
+            },
+            {
+                "question": "How do I change the language or the theme?",
+                "answer": "Use the language switch and the theme toggle in the top bar. On a phone, open the menu and find them at the bottom."
+            }
+        ]
+    }
+}
