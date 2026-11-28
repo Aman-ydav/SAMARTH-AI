@@ -1,6 +1,7 @@
 import { env } from "#config/env.js";
 import { connectDb, disconnectDb } from "#db/connect.js";
 import { syncPlatformAdmins } from "#modules/admin/index.js";
+import { createJobWorker } from "#modules/jobs/index.js";
 import { emailService } from "#services/email.service.js";
 import { ensureDefaultOrganisation } from "#modules/organisations/index.js";
 import { whenBackgroundIdle } from "#utils/backgroundTasks.js";
@@ -39,10 +40,15 @@ async function start() {
     );
     server.keepAliveTimeout = KEEP_ALIVE_MS;
     server.headersTimeout = KEEP_ALIVE_MS + 1000;
+    // The worker starts here only (never in app.js), so Supertest and unit tests never run it. Handlers register by
+    // importing their `jobs/*.job.js` file; with none registered the worker just polls an empty queue.
+    const jobWorker = createJobWorker({ log: logger });
+    jobWorker.start();
     registerGracefulShutdown({
         server,
         logger,
         closers: [
+            () => jobWorker.stop(),
             whenBackgroundIdle,
             () => emailService.whenSettled(),
             disconnectDb,

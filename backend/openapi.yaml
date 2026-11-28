@@ -21,6 +21,7 @@ tags:
     - name: Profile
     - name: Media
     - name: Admin
+    - name: Jobs
 security: []
 paths:
     /health:
@@ -2571,6 +2572,46 @@ paths:
                     $ref: "#/components/responses/Error409"
                 "429":
                     $ref: "#/components/responses/Error429"
+    /jobs/{id}:
+        get:
+            tags:
+                - Jobs
+            operationId: getJob
+            summary: Status of a background job the signed-in user started
+            description: Any signed-in role may read its own jobs. Another user's job, a system job and an unknown id all answer 404 JOB_NOT_FOUND. Jobs are removed 30 days after they end, so a polling client stops on 404. The payload and lock fields are never returned.
+            security: *a8
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      pattern: ^[a-f0-9]{24}$
+            responses:
+                "200":
+                    description: The job
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/SuccessEnvelope"
+                                    - type: object
+                                      properties:
+                                          data:
+                                              type: object
+                                              properties:
+                                                  job:
+                                                      $ref: "#/components/schemas/Job"
+                "400":
+                    $ref: "#/components/responses/Error400"
+                "401":
+                    $ref: "#/components/responses/Error401"
+                "403":
+                    $ref: "#/components/responses/Error403"
+                "404":
+                    $ref: "#/components/responses/Error404"
+                "429":
+                    $ref: "#/components/responses/Error429"
 components:
     securitySchemes:
         accessCookie:
@@ -3188,6 +3229,61 @@ components:
                     type: boolean
                 allowGoogleLogin:
                     type: boolean
+        Job:
+            type: object
+            additionalProperties: false
+            required:
+                - id
+                - type
+                - status
+                - attempts
+                - maxAttempts
+                - result
+                - error
+                - createdAt
+                - startedAt
+                - finishedAt
+            properties:
+                id:
+                    type: string
+                    pattern: ^[a-f0-9]{24}$
+                type:
+                    type: string
+                    description: Lowercase dotted code of the handler, for example content.extract-text.
+                status:
+                    type: string
+                    enum: [queued, running, done, failed]
+                attempts:
+                    type: integer
+                    minimum: 0
+                    maximum: 10
+                maxAttempts:
+                    type: integer
+                    minimum: 1
+                    maximum: 10
+                result:
+                    description: Small JSON object the handler returned; null until the job is done.
+                    type: [object, "null"]
+                error:
+                    description: Safe failure reason of the latest failed attempt; null when there is none. A retried job keeps it until it finishes.
+                    type: [object, "null"]
+                    additionalProperties: false
+                    properties:
+                        code:
+                            type: string
+                            description: Lowercase snake_case, for example no_handler, handler_error, handler_timeout, lock_expired.
+                        message:
+                            type: string
+                            maxLength: 500
+                createdAt:
+                    type: string
+                    format: date-time
+                startedAt:
+                    type: [string, "null"]
+                    format: date-time
+                finishedAt:
+                    type: [string, "null"]
+                    format: date-time
         Organisation:
             type: object
             additionalProperties: false
@@ -3358,6 +3454,7 @@ x-error-statuses:
     MUST_CHANGE_PASSWORD: 403
     NOT_FOUND: 404
     MEDIA_NOT_FOUND: 404
+    JOB_NOT_FOUND: 404
     CONFLICT: 409
     LAST_ADMIN: 409
     AUTH_METHOD_REQUIRED: 409
