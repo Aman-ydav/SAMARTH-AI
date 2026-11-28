@@ -26,6 +26,27 @@
     "goBack": "Go back",
     "goToDashboard": "Go to dashboard",
     "or": "or",
+    "competencies": {
+        "title": "My competencies",
+        "intro": "Your level in each competency, with the evidence behind it.",
+        "filter": "Filter by domain",
+        "allDomains": "All domains",
+        "level": "Level",
+        "levelValue": "{{level}} of 5",
+        "levelAria": "{{name}}: level {{level}} of 5",
+        "confidence": "Confidence",
+        "lastAssessed": "Last assessed",
+        "never": "Not assessed yet",
+        "evidence": "Evidence",
+        "noEvidence": "No evidence recorded yet.",
+        "evidenceScore": "Score {{score}}",
+        "evidenceType": {
+            "self_assessment": "Self-assessment",
+            "quiz": "Quiz",
+            "course": "Course"
+        },
+        "empty": "No competencies to show yet. Complete onboarding to rate your skills."
+    },
     "charts": {
         "radar": {
             "title": "Skills against role requirements",
