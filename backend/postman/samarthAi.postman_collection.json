@@ -18105,6 +18105,177 @@
                             }
                         }
                     ]
+                },
+                {
+                    "name": "PATCH /profile/onboarding - no cookie is AUTH_REQUIRED",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}{{apiPrefix}}/profile/onboarding",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"designation\": \"Statistical Officer\",\n  \"department\": \"Survey Division\",\n  \"yearsOfService\": 4,\n  \"targetRole\": \"statistical_officer\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "sai.fail(401, \"AUTH_REQUIRED\", { noFieldErrors: true });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PATCH /profile/onboarding - saves the onboarding fields",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}{{apiPrefix}}/profile/onboarding",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"designation\": \"Statistical Officer\",\n  \"department\": \"Survey Division\",\n  \"yearsOfService\": 4,\n  \"targetRole\": \"statistical_officer\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "sai.ok(200, \"Onboarding saved\");",
+                                    "pm.test(\"fields saved and completion stamped\", () => { const u = sai.body().data.user; pm.expect(u.designation).to.eql(\"Statistical Officer\"); pm.expect(u.yearsOfService).to.eql(4); pm.expect(u.onboardingCompletedAt).to.be.a(\"string\"); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PATCH /profile/onboarding - missing fields",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}{{apiPrefix}}/profile/onboarding",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"designation\": \"Officer\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "sai.fail(400, \"VALIDATION_ERROR\", { fields: [\"department\", \"yearsOfService\", \"targetRole\"] });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PATCH /profile/onboarding - yearsOfService out of range",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}{{apiPrefix}}/profile/onboarding",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"designation\": \"Statistical Officer\",\n  \"department\": \"Survey Division\",\n  \"yearsOfService\": 99,\n  \"targetRole\": \"statistical_officer\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "sai.fail(400, \"VALIDATION_ERROR\", { fields: [\"yearsOfService\"] });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PATCH /profile/onboarding - orgId is a protected field",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}{{apiPrefix}}/profile/onboarding",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"designation\": \"Statistical Officer\",\n  \"department\": \"Survey Division\",\n  \"yearsOfService\": 4,\n  \"targetRole\": \"statistical_officer\",\n  \"orgId\": \"{{unknownObjectId}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const sai = eval(pm.collectionVariables.get(\"saiLib\"))(pm);",
+                                    "sai.fail(400, \"VALIDATION_ERROR\", { fields: [\"orgId\"] });"
+                                ]
+                            }
+                        }
+                    ]
                 }
             ]
         },

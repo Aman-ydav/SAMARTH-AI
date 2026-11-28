@@ -36,3 +36,19 @@ export const updateProfileBody = z
     });
 
 export const emptyQuery = z.object({});
+
+const shortText = (max) =>
+    z
+        .string()
+        .trim()
+        .min(1, "Required")
+        .max(max)
+        .refine((value) => !hasControlCharacters(value), "Invalid characters");
+
+/** `PATCH /profile/onboarding`: the five onboarding fields. Unknown keys (orgId, role, userId...) are refused. */
+export const onboardingBody = z.strictObject({
+    designation: shortText(100),
+    department: shortText(100),
+    yearsOfService: z.number().int().min(0).max(60),
+    targetRole: shortText(100),
+});

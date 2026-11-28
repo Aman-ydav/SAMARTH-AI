@@ -122,6 +122,17 @@ const userSchema = new mongoose.Schema(
             maxlength: 64,
         },
         avatar: { type: avatarSchema, default: undefined },
+        // Onboarding profile (learner front door). `department` is free text owned by the user's own org (orgId scopes every read/write).
+        designation: { type: String, trim: true, maxlength: 100 },
+        department: { type: String, trim: true, maxlength: 100 },
+        yearsOfService: {
+            type: Number,
+            min: 0,
+            max: 60,
+            validate: Number.isInteger,
+        },
+        targetRole: { type: String, trim: true, maxlength: 100 },
+        onboardingCompletedAt: { type: Date, default: null },
         termsAcceptedAt: { type: Date },
         policyVersion: { type: String, trim: true, maxlength: 20 },
         deactivatedAt: { type: Date, default: null },

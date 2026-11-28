@@ -14,3 +14,12 @@ export const updateProfile = asyncHandler(async (req, res) => {
     );
     return ApiResponse.ok({ user }, "Profile updated").send(res);
 });
+
+export const completeOnboarding = asyncHandler(async (req, res) => {
+    const user = await usersService.completeOnboarding(
+        req.auth.userId,
+        req.auth.orgId,
+        req.validated.body
+    );
+    return ApiResponse.ok({ user }, "Onboarding saved").send(res);
+});
