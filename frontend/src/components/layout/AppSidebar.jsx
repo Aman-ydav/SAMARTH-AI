@@ -4,7 +4,6 @@ import * as Icons from "@/components/icons";
 import { LanguageSwitch } from "@/components/layout/LanguageSwitch";
 import { Logo } from "@/components/layout/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
-import { Badge } from "@/components/ui/badge";
 import {
     Sidebar,
     SidebarContent,
@@ -138,12 +137,6 @@ export function AppSidebar() {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
-                <Badge
-                    variant="outline"
-                    className="mx-2 w-fit group-data-[collapsible=icon]:hidden"
-                >
-                    {t("common:prototype")}
-                </Badge>
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>

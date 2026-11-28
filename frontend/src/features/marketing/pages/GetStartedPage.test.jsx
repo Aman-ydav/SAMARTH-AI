@@ -77,7 +77,7 @@ describe.each(["en", "hi"])("GetStartedPage (%s)", (lng) => {
         expect(router.state.location.hash).toBe("#invitations");
     });
 
-    it("links the Terms, the Privacy Policy and shows the prototype notice", () => {
+    it("links the Terms and the Privacy Policy and shows no prototype line", () => {
         open();
         expect(
             screen.getByRole("link", { name: t("common:pages.terms") })
@@ -86,8 +86,8 @@ describe.each(["en", "hi"])("GetStartedPage (%s)", (lng) => {
             screen.getByRole("link", { name: t("common:pages.privacy") })
         ).toHaveAttribute("href", "/privacy");
         expect(
-            screen.getByText(t("common:prototypeNotice"))
-        ).toBeInTheDocument();
+            screen.queryByText(/Not an official Government of India website/)
+        ).not.toBeInTheDocument();
     });
 
     it("is role aware: a signed-in user is offered the dashboard", async () => {

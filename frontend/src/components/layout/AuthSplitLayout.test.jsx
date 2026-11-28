@@ -56,14 +56,14 @@ describe("AuthSplitLayout", () => {
         expect(panel.querySelector("[class*=gradient]")).toBeNull();
     });
 
-    it("shows the prototype disclaimer and legal links in the footer", () => {
+    it("shows the legal links in the footer and no prototype line", () => {
         renderFrame();
         const footer = screen.getByRole("contentinfo");
         expect(
-            within(footer).getByText(
+            within(footer).queryByText(
                 /Not an official Government of India website/
             )
-        ).toBeInTheDocument();
+        ).not.toBeInTheDocument();
         expect(
             within(footer).getByRole("link", { name: "Terms of Use" })
         ).toHaveAttribute("href", "/terms");
