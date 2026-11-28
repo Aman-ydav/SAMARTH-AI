@@ -25,6 +25,7 @@ import { createCompetencyRouter } from "#modules/competency/index.js";
 import { createJobsRouter } from "#modules/jobs/index.js";
 import { createLearningRouter } from "#modules/learning/index.js";
 import { mediaRouter } from "#modules/media/index.js";
+import { createNotificationsRouter } from "#modules/notifications/index.js";
 import { createOrganisationRouter } from "#modules/organisations/index.js";
 import { createUsersRouter } from "#modules/users/index.js";
 import { emailService as defaultEmailService } from "#services/email.service.js";
@@ -43,6 +44,7 @@ function mountModules(api, deps) {
     api.use("/profile", createUsersRouter(deps));
     api.use("/admin", createAdminRouter(deps));
     api.use("/jobs", createJobsRouter(deps));
+    api.use("/me/notifications", createNotificationsRouter(deps));
     api.use("/competencies", createCompetencyRouter(deps));
     api.use("/learning", createLearningRouter(deps));
     api.use("/assessment", createAssessmentRouter(deps));

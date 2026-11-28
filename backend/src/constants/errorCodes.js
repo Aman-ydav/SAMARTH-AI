@@ -59,6 +59,7 @@ const CATALOG = {
     NOT_FOUND: [404, "The resource was not found."],
     MEDIA_NOT_FOUND: [404, "The media item was not found."],
     JOB_NOT_FOUND: [404, "The job was not found."],
+    NOTIFICATION_NOT_FOUND: [404, "The notification was not found."],
     // 409
     CONFLICT: [
         409,
