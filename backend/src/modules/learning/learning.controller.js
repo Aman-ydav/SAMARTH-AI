@@ -3,6 +3,7 @@ import { asyncHandler } from "#utils/asyncHandler.js";
 import { buildPageMeta, parsePagination } from "#utils/pagination.js";
 import { DEFAULT_TARGET_ROLE, LEARNING_LIMITS } from "./learning.constants.js";
 import * as learningService from "./learning.service.js";
+import * as learningPathService from "./learningPath.service.js";
 
 /** Who is asking comes from the verified session, never from the request (EDGE-22). */
 const userIdOf = (req) => req.auth.userId;
@@ -32,7 +33,7 @@ export const getCourseDetail = asyncHandler(async (req, res) => {
 });
 
 export const getMyRecommendations = asyncHandler(async (req, res) => {
-    const data = await learningService.getRecommendationsForUser(
+    const data = await learningPathService.getRecommendationsForUser(
         userIdOf(req),
         targetRoleOf(req)
     );
@@ -40,7 +41,7 @@ export const getMyRecommendations = asyncHandler(async (req, res) => {
 });
 
 export const getMyLearningPath = asyncHandler(async (req, res) => {
-    const pathData = await learningService.getLearningPath(
+    const pathData = await learningPathService.getLearningPath(
         userIdOf(req),
         targetRoleOf(req)
     );

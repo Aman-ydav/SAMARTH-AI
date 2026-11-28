@@ -1,6 +1,7 @@
 import { ApiResponse } from "#utils/apiResponse.js";
 import { asyncHandler } from "#utils/asyncHandler.js";
 import { DEFAULT_TARGET_ROLE } from "./competency.constants.js";
+import { calculateGapAnalysis } from "./competencyGap.service.js";
 import * as competencyService from "./competency.service.js";
 
 /** Who is asking comes from the verified session, never from the request (EDGE-22). */
@@ -43,9 +44,6 @@ export const submitSelfAssessment = asyncHandler(async (req, res) => {
 
 export const getMyGaps = asyncHandler(async (req, res) => {
     const targetRole = req.validated.query.targetRole ?? DEFAULT_TARGET_ROLE;
-    const gapAnalysis = await competencyService.calculateGapAnalysis(
-        userIdOf(req),
-        targetRole
-    );
+    const gapAnalysis = await calculateGapAnalysis(userIdOf(req), targetRole);
     return ApiResponse.ok({ gapAnalysis }, "Skill gap analysis").send(res);
 });
