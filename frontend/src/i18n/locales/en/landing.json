@@ -308,10 +308,7 @@
                     "PG Diploma in Data Science"
                 ],
                 "training": "Past training",
-                "trainingItems": [
-                    "Survey methods workshop",
-                    "Python basics"
-                ],
+                "trainingItems": ["Survey methods workshop", "Python basics"],
                 "resultTitle": "Estimated starting levels",
                 "live": "Live estimate",
                 "level": "Level",
